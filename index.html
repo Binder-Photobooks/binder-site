@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binder — Custom Photobooks, Delivered Across India</title>
+<meta name="description" content="Design your photobook online. We print at 300 DPI in CMYK and deliver across India.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" onload="this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
+<style>
+/* ═══════════════════════════════════════════════
+   BINDER — Homepage
+   ═══════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#27AE72;--accent-h:#1f9660;--accent-l:#e8f7f0;--accent-m:#d0f0e2;
+  --black:#0a0a0a;--white:#ffffff;
+  --gray-50:#f9f9f9;--gray-100:#f2f2f2;--gray-200:#e4e4e4;--gray-300:#c8c8c8;
+  --gray-400:#999;--gray-500:#666;--gray-600:#444;
+  --font:'Inter',system-ui,sans-serif;
+  --font-serif:'Playfair Display',Georgia,serif;
+  --max-w:1120px;--radius:10px;--radius-lg:16px;--radius-xl:24px;
+  --shadow:0 2px 8px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.04);
+  --shadow-lg:0 4px 24px rgba(0,0,0,.08),0 16px 48px rgba(0,0,0,.06);
+}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);background:var(--white);color:var(--black);line-height:1.6;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+button{font-family:var(--font);cursor:pointer}
+
+/* ── CONTAINER ── */
+.wrap{width:100%;max-width:var(--max-w);margin:0 auto;padding:0 5vw}
+@media(min-width:1200px){.wrap{padding:0 48px}}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;cursor:pointer;font-family:var(--font);font-weight:500;transition:all .18s;white-space:nowrap;text-decoration:none}
+.btn-primary{background:var(--accent);color:var(--white);padding:13px 28px;border-radius:var(--radius);font-size:14px;font-weight:600}
+.btn-primary:hover{background:var(--accent-h);transform:translateY(-1px);box-shadow:0 6px 20px rgba(39,174,114,.28)}
+.btn-primary:active{transform:none}
+.btn-primary--lg{padding:15px 36px;font-size:16px;border-radius:12px}
+.btn-outline{background:transparent;color:var(--gray-600);padding:12px 24px;border-radius:var(--radius);font-size:14px;border:1.5px solid var(--gray-200)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-outline--lg{padding:14px 32px;font-size:15px;border-radius:12px}
+.btn-ghost{background:transparent;border:none;color:var(--gray-500);font-size:13px;padding:6px 0;font-weight:500}
+.btn-ghost:hover{color:var(--black)}
+.btn-white{background:var(--white);color:var(--black);padding:14px 32px;border-radius:12px;font-size:15px;font-weight:600}
+.btn-white:hover{background:var(--gray-100)}
+
+/* ── NAVIGATION ── */
+#nav{position:fixed;top:0;left:0;right:0;z-index:200;transition:background .25s,box-shadow .25s}
+#nav.scrolled{background:rgba(255,255,255,.97);backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--gray-200)}
+.nav-inner{display:flex;align-items:center;height:64px;gap:32px}
+.nav-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-logo-mark{width:36px;height:36px;background:var(--black);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--white);font-weight:700;font-size:17px;letter-spacing:-.5px;flex-shrink:0;transition:background .15s}
+.nav-logo-mark:hover{background:var(--accent)}
+.nav-logo-name{font-size:16px;font-weight:700;letter-spacing:-.2px}
+.nav-links{display:flex;gap:28px;flex:1}
+.nav-links a{font-size:13px;color:var(--gray-400);font-weight:500;transition:color .15s;padding:4px 0}
+.nav-links a:hover{color:var(--black)}
+.nav-cta{display:flex;gap:8px;align-items:center}
+.nav-hamburger{display:none;flex-direction:column;gap:4px;background:none;border:none;padding:8px;cursor:pointer}
+.nav-hamburger span{width:20px;height:1.5px;background:var(--black);display:block;transition:all .2s;border-radius:2px}
+/* Mobile nav drawer */
+.nav-drawer{display:none;position:fixed;top:64px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--gray-200);padding:12px 5vw 20px;flex-direction:column;gap:2px;z-index:199;box-shadow:0 8px 32px rgba(0,0,0,.08)}
+.nav-drawer.open{display:flex}
+.nav-drawer a{font-size:15px;font-weight:500;color:var(--gray-600);padding:10px 4px;border-bottom:1px solid var(--gray-100)}
+.nav-drawer a:last-of-type{border:none}
+.nav-drawer .btn-primary{margin-top:8px;width:100%;justify-content:center;border-radius:10px}
+
+/* ── HERO ── */
+.hero{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 5vw 60px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(160deg,#f7faf8 0%,#ffffff 50%,#f4f8f5 100%);z-index:0}
+.hero-content{position:relative;z-index:1;max-width:760px;margin:0 auto}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--accent-l);color:var(--accent-h);font-size:11px;font-weight:700;padding:5px 14px;border-radius:100px;letter-spacing:.6px;text-transform:uppercase;margin-bottom:28px}
+.hero-title{font-size:clamp(38px,6vw,72px);font-weight:700;line-height:1.1;letter-spacing:-1.5px;margin-bottom:22px;color:var(--black)}
+.hero-title em{font-style:normal;color:var(--accent);font-family:var(--font-serif)}
+.hero-sub{font-size:clamp(16px,2vw,19px);color:var(--gray-500);line-height:1.7;max-width:520px;margin:0 auto 40px;font-weight:300}
+.hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:60px}
+/* Floating book illustrations in hero */
+.hero-books{display:flex;gap:16px;justify-content:center;align-items:flex-end;flex-wrap:wrap;margin-top:8px}
+.hero-book{border-radius:8px;overflow:hidden;box-shadow:var(--shadow-lg);flex-shrink:0;transition:transform .3s;position:relative}
+.hero-book:hover{transform:translateY(-6px)}
+.hero-book-img{background:var(--gray-100);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.img-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--gray-300);background:var(--gray-100);font-size:11px;font-weight:500;letter-spacing:.3px;text-transform:uppercase}
+.img-placeholder svg{opacity:.4}
+.img-placeholder-label{opacity:.5;font-size:10px}
+
+/* ── PHOTO BANNER (full-bleed) ── */
+.photo-banner{width:100%;height:clamp(260px,40vw,520px);background:var(--gray-100);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.photo-banner-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.photo-banner-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--gray-400);background:linear-gradient(135deg,#f0f0f0 0%,#e8e8e8 100%)}
+.photo-banner-placeholder svg{opacity:.25;width:56px;height:56px}
+.photo-banner-placeholder p{font-size:13px;font-weight:500;color:var(--gray-400);text-align:center;line-height:1.6;max-width:320px}
+.photo-banner-placeholder strong{color:var(--gray-500)}
+.photo-banner img{width:100%;height:100%;object-fit:cover;object-position:center}
+/* Overlay text on banner */
+.banner-overlay{position:absolute;inset:0;background:linear-gradient(to right, rgba(0,0,0,.55) 0%, rgba(0,0,0,.2) 50%, rgba(0,0,0,0) 100%);display:flex;align-items:center;padding:0 6vw}
+.banner-text{color:var(--white);max-width:420px}
+.banner-text h2{font-size:clamp(22px,3.5vw,40px);font-weight:700;line-height:1.2;margin-bottom:12px;letter-spacing:-.3px}
+.banner-text p{font-size:clamp(13px,1.5vw,16px);opacity:.85;line-height:1.6;margin-bottom:20px}
+
+/* ── TRUST BAR ── */
+.trust-bar{padding:20px 5vw;background:var(--white);border-bottom:1px solid var(--gray-100)}
+.trust-bar-inner{display:flex;gap:0;justify-content:center;flex-wrap:wrap;max-width:860px;margin:0 auto}
+.trust-item{display:flex;align-items:center;gap:8px;padding:8px 20px;font-size:13px;color:var(--gray-500);font-weight:500;border-right:1px solid var(--gray-100);white-space:nowrap}
+.trust-item:last-child{border:none}
+.trust-item span{font-size:16px}
+@media(max-width:680px){.trust-item{border:none;padding:6px 12px;font-size:12px}}
+
+/* ── SECTION HEADERS ── */
+.sh{text-align:center;margin-bottom:52px}
+.sh-eyebrow{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.sh-title{font-size:clamp(24px,3.5vw,38px);font-weight:700;letter-spacing:-.4px;line-height:1.2;margin-bottom:12px}
+.sh-sub{font-size:15px;color:var(--gray-400);max-width:520px;margin:0 auto;line-height:1.7;font-weight:300}
+
+/* ── FEATURE GRID ── */
+.feature-grid-section{padding:88px 5vw}
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;max-width:980px;margin:0 auto}
+.feature-block{background:var(--gray-50);padding:40px 36px;transition:background .15s}
+.feature-block:hover{background:var(--accent-l)}
+.feature-block:first-child{border-radius:var(--radius-xl) 0 0 0}
+.feature-block:nth-child(2){border-radius:0 var(--radius-xl) 0 0}
+.feature-block:nth-child(3){border-radius:0 0 0 var(--radius-xl)}
+.feature-block:last-child{border-radius:0 0 var(--radius-xl) 0}
+.feature-icon{width:44px;height:44px;border-radius:12px;background:var(--white);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.feature-title{font-size:16px;font-weight:600;margin-bottom:7px;letter-spacing:-.1px}
+.feature-desc{font-size:13px;color:var(--gray-500);line-height:1.65}
+
+/* ── SIZES SECTION ── */
+.sizes-section{padding:88px 5vw;background:var(--gray-50)}
+.sizes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:860px;margin:0 auto}
+.size-card{background:var(--white);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);transition:all .22s;cursor:default}
+.size-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+.size-card__image{height:200px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.size-card__image .img-placeholder{background:linear-gradient(145deg,var(--gray-100),var(--gray-200))}
+.size-card__body{padding:20px}
+.size-card__name{font-size:17px;font-weight:700;margin-bottom:3px;letter-spacing:-.2px}
+.size-card__dim{font-size:12px;color:var(--gray-400);margin-bottom:12px}
+.size-card__price{font-size:20px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.size-card__per{font-size:11px;color:var(--gray-400)}
+.size-card__cta{display:block;margin-top:14px;padding:10px;text-align:center;border-radius:8px;font-size:13px;font-weight:600;background:var(--accent);color:var(--white);transition:background .15s}
+.size-card__cta:hover{background:var(--accent-h)}
+.size-card.featured{border:2px solid var(--accent)}
+.size-card.featured .size-card__tag{display:block;background:var(--accent);color:var(--white);font-size:10px;font-weight:700;padding:2px 10px;border-radius:100px;letter-spacing:.4px;text-align:center;margin-bottom:8px;text-transform:uppercase}
+.size-card__tag{display:none}
+
+/* ── SHOWCASE STRIP (horizontal scroll) ── */
+.showcase-section{padding:80px 0}
+.showcase-section .sh{padding:0 5vw}
+.showcase-strip{display:flex;gap:16px;overflow-x:auto;padding:8px 5vw 24px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
+.showcase-strip::-webkit-scrollbar{height:4px}
+.showcase-strip::-webkit-scrollbar-track{background:var(--gray-100)}
+.showcase-strip::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:2px}
+.showcase-item{flex-shrink:0;border-radius:var(--radius-lg);overflow:hidden;scroll-snap-align:start;box-shadow:var(--shadow);transition:transform .2s}
+.showcase-item:hover{transform:scale(1.02)}
+.showcase-item .img-placeholder{border-radius:0}
+
+/* ── HOW IT WORKS ── */
+.how-section{padding:88px 5vw;background:var(--white)}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:980px;margin:0 auto}
+.step{background:var(--gray-50);border-radius:var(--radius-lg);padding:28px 24px;position:relative}
+.step-num{width:32px;height:32px;border-radius:50%;background:var(--accent);color:var(--white);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.step-title{font-size:14px;font-weight:700;margin-bottom:7px;letter-spacing:-.1px}
+.step-body{font-size:13px;color:var(--gray-500);line-height:1.65}
+.step-connector{position:absolute;top:44px;right:-12px;width:24px;height:2px;background:var(--accent-m);z-index:1}
+.step:last-child .step-connector{display:none}
+
+/* ── PRICING SECTION ── */
+.pricing-section{padding:88px 5vw;background:var(--gray-50)}
+.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:900px;margin:0 auto 20px}
+.pricing-card{background:var(--white);border-radius:var(--radius-lg);padding:28px 20px;text-align:center;border:1.5px solid var(--gray-200);transition:all .2s;position:relative}
+.pricing-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--shadow)}
+.pricing-card.popular{border-color:var(--accent);background:var(--accent-l)}
+.pricing-popular-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--white);font-size:10px;font-weight:700;padding:3px 12px;border-radius:100px;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap}
+.pricing-qty{font-size:36px;font-weight:700;line-height:1;color:var(--black);margin-bottom:3px}
+.pricing-books{font-size:12px;color:var(--gray-400);margin-bottom:14px}
+.pricing-discount{font-size:16px;font-weight:700;color:var(--accent)}
+.pricing-save{font-size:11px;color:var(--accent-h);font-weight:500;margin-top:5px}
+.pricing-note{text-align:center;font-size:13px;color:var(--gray-400);max-width:480px;margin:0 auto}
+
+/* ── TESTIMONIALS ── */
+.testimonials-section{padding:88px 5vw;background:var(--white)}
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:980px;margin:0 auto}
+.testimonial{background:var(--gray-50);border-radius:var(--radius-lg);padding:28px 24px}
+.testimonial-stars{color:var(--accent);font-size:14px;margin-bottom:12px;letter-spacing:2px}
+.testimonial-text{font-size:14px;color:var(--gray-600);line-height:1.7;margin-bottom:16px;font-style:italic}
+.testimonial-author{display:flex;align-items:center;gap:10px}
+.testimonial-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-m);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--accent-h)}
+.testimonial-name{font-size:13px;font-weight:600}
+.testimonial-loc{font-size:11px;color:var(--gray-400);margin-top:1px}
+
+/* ── FINAL CTA ── */
+.cta-section{padding:100px 5vw;background:var(--black);text-align:center;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 60% 50%, rgba(39,174,114,.15) 0%, transparent 70%);pointer-events:none}
+.cta-inner{position:relative;z-index:1;max-width:600px;margin:0 auto}
+.cta-section h2{font-size:clamp(26px,4vw,44px);font-weight:700;color:var(--white);margin-bottom:14px;letter-spacing:-.5px;line-height:1.15}
+.cta-section h2 em{font-style:normal;color:var(--accent);font-family:var(--font-serif)}
+.cta-section p{font-size:16px;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:36px}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* ── FOOTER ── */
+footer{background:#0d0d0d;color:rgba(255,255,255,.7);padding:56px 5vw 0}
+.footer-inner{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:48px;border-bottom:1px solid rgba(255,255,255,.08)}
+.footer-brand{}
+.footer-logo{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.footer-logo-mark{width:34px;height:34px;background:var(--white);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--black);font-weight:700;font-size:16px}
+.footer-logo-name{font-size:15px;font-weight:700;color:var(--white)}
+.footer-brand p{font-size:13px;line-height:1.7;color:rgba(255,255,255,.45);max-width:240px;margin-bottom:20px}
+.footer-social{display:flex;gap:10px}
+.footer-social-icon{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:14px;transition:background .15s}
+.footer-social-icon:hover{background:var(--accent)}
+.footer-col h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.35);margin-bottom:14px}
+.footer-col a{display:block;font-size:13px;color:rgba(255,255,255,.5);margin-bottom:9px;transition:color .15s}
+.footer-col a:hover{color:var(--white)}
+.footer-bottom{padding:16px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px;color:rgba(255,255,255,.25)}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:900px){
+  .feature-grid{grid-template-columns:1fr;gap:2px}
+  .feature-block{border-radius:0!important}
+  .feature-block:first-child{border-radius:var(--radius-xl) var(--radius-xl) 0 0!important}
+  .feature-block:last-child{border-radius:0 0 var(--radius-xl) var(--radius-xl)!important}
+  .sizes-grid{grid-template-columns:1fr}
+  .steps-grid{grid-template-columns:1fr 1fr;gap:12px}
+  .step-connector{display:none}
+  .pricing-grid{grid-template-columns:1fr 1fr}
+  .testimonials-grid{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr 1fr;gap:32px}
+}
+@media(max-width:640px){
+  .nav-links,.nav-cta{display:none}
+  .nav-hamburger{display:flex}
+  .hero{min-height:auto;padding:90px 5vw 52px}
+  .hero-books{gap:10px}
+  .trust-bar-inner{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+  .sizes-grid{grid-template-columns:1fr}
+  .steps-grid{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr 1fr}
+  .testimonials-grid{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr}
+  .cta-btns{flex-direction:column;align-items:center}
+  .cta-btns .btn-primary--lg,.cta-btns .btn-white{width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav id="nav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">B</div>
+      <div class="nav-logo-name">Binder</div>
+    </a>
+    <div class="nav-links">
+      <a href="#sizes">Sizes & Pricing</a>
+      <a href="#how">How it works</a>
+      <a href="#showcase">Our work</a>
+      <a href="my-orders.html">My Account</a>
+      <a href="blog.html">Blog</a>
+    </div>
+    <div class="nav-cta">
+      <a href="my-orders.html" class="btn btn-ghost">Sign in</a>
+      <a href="photobook-editor.html" class="btn btn-primary">Start designing →</a>
+    </div>
+    <button class="nav-hamburger" onclick="toggleNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile nav drawer -->
+<div class="nav-drawer" id="nav-drawer">
+  <a href="#sizes" onclick="closeNav()">Sizes & Pricing</a>
+  <a href="#how" onclick="closeNav()">How it works</a>
+  <a href="#showcase" onclick="closeNav()">Our work</a>
+  <a href="my-orders.html">My Account</a>
+  <a href="blog.html" onclick="closeNav()">Blog</a>
+  <a href="press.html" onclick="closeNav()">Press</a>
+  <a href="photobook-editor.html" class="btn btn-primary">Start designing →</a>
+</div>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">✦ Premium photobooks · Delivered nationwide</div>
+    <h1 class="hero-title">Turn your photos<br>into a <em>beautiful book</em></h1>
+    <p class="hero-sub">Design your photobook in minutes. We print at 300 DPI in CMYK and deliver across India in 5–7 days.</p>
+    <div class="hero-ctas">
+      <a href="photobook-editor.html" class="btn btn-primary btn-primary--lg">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 8h6M8 5v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Create your photobook
+      </a>
+      <a href="#how" class="btn btn-outline btn-outline--lg">See how it works</a>
+    </div>
+
+    <!-- Hero book illustrations — replace img src with your photos -->
+    <div class="hero-books">
+      <div class="hero-book" style="width:120px;height:150px">
+        <div class="hero-book-img" style="width:120px;height:150px">
+          <!-- Replace with: <img src="your-photo.jpg" alt="Sample photobook cover" style="width:100%;height:100%;object-fit:cover"> -->
+          <div class="img-placeholder">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="img-placeholder-label">Add photo</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-book" style="width:160px;height:180px;transform:rotate(-2deg)">
+        <div class="hero-book-img" style="width:160px;height:180px">
+          <div class="img-placeholder">
+            <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="img-placeholder-label">Add photo</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-book" style="width:140px;height:165px;transform:rotate(1.5deg)">
+        <div class="hero-book-img" style="width:140px;height:165px">
+          <div class="img-placeholder">
+            <svg width="30" height="30" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="img-placeholder-label">Add photo</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-book" style="width:110px;height:140px">
+        <div class="hero-book-img" style="width:110px;height:140px">
+          <div class="img-placeholder">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="img-placeholder-label">Add photo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TRUST BAR ══ -->
+<div class="trust-bar">
+  <div class="trust-bar-inner">
+    <div class="trust-item"><span>🖨️</span> 300 DPI CMYK print</div>
+    <div class="trust-item"><span>📖</span> Premium binding</div>
+    <div class="trust-item"><span>📍</span> New Delhi</div>
+    <div class="trust-item"><span>🚚</span> Pan-India delivery</div>
+    <div class="trust-item"><span>⭐</span> 4.9 / 5 rating</div>
+    <div class="trust-item"><span>🔒</span> Secure checkout</div>
+  </div>
+</div>
+
+<!-- ══ PHOTO BANNER ══ -->
+<div class="photo-banner" id="showcase">
+  <!--
+    TO ADD YOUR BANNER IMAGE:
+    Replace the div below with:
+    <img src="your-photobooks-banner.jpg" alt="Binder photobooks" style="width:100%;height:100%;object-fit:cover;object-position:center">
+    Recommended: 2400 × 900px landscape photo of your printed books
+  -->
+  <div class="photo-banner-inner">
+    <div class="photo-banner-placeholder">
+      <svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+      <p><strong>Add your hero banner image here</strong><br>Replace this placeholder with a wide lifestyle photo<br>of your printed photobooks. Recommended: 2400 × 900 px</p>
+    </div>
+  </div>
+  <div class="banner-overlay">
+    <div class="banner-text">
+      <h2>Memories worth holding onto</h2>
+      <p>Every spread printed with precision. Every photo preserved forever.</p>
+      <a href="photobook-editor.html" class="btn btn-white">Design yours →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FEATURES ══ -->
+<section class="feature-grid-section">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-eyebrow">Why Binder</div>
+      <h2 class="sh-title">Print quality you can feel</h2>
+      <p class="sh-sub">Every book is made to the same exacting standard — whether you're ordering one or a hundred.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-block">
+        <div class="feature-icon">🎨</div>
+        <div class="feature-title">True CMYK colour</div>
+        <div class="feature-desc">We print in CMYK at 300 DPI — the same standard used by professional photo labs worldwide. What you see on screen is what you get on paper.</div>
+      </div>
+      <div class="feature-block">
+        <div class="feature-icon">📐</div>
+        <div class="feature-title">Premium binding</div>
+        <div class="feature-desc">Our premium binding ensures every spread lies flat and opens beautifully. Your panoramas and full-bleed photos shine exactly as intended.</div>
+      </div>
+      <div class="feature-block">
+        <div class="feature-icon">✏️</div>
+        <div class="feature-title">Free online editor</div>
+        <div class="feature-desc">No software to install. Design entirely in your browser — drag and drop photos, choose from 28 fonts, and design every spread exactly how you want it.</div>
+      </div>
+      <div class="feature-block">
+        <div class="feature-icon">🚀</div>
+        <div class="feature-title">5–7 day delivery</div>
+        <div class="feature-desc">From your design to your doorstep in under a week. We deliver to every PIN code in India, packaged carefully so your book arrives in perfect condition.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SHOWCASE STRIP ══ -->
+<section class="showcase-section">
+  <div class="sh" style="padding:0 5vw">
+    <div class="sh-eyebrow">Our work</div>
+    <h2 class="sh-title">Books made by Binder customers</h2>
+    <p class="sh-sub">Add your own photos here to show visitors the quality of your finished books.</p>
+  </div>
+  <div class="showcase-strip">
+    <!-- Add your book photos below. Replace img-placeholder with <img src="book1.jpg" ...> -->
+    <div class="showcase-item" style="width:260px;height:220px">
+      <div class="img-placeholder" style="width:260px;height:220px">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+        <span class="img-placeholder-label">Showcase photo 1</span>
+      </div>
+    </div>
+    <div class="showcase-item" style="width:300px;height:220px">
+      <div class="img-placeholder" style="width:300px;height:220px">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+        <span class="img-placeholder-label">Showcase photo 2</span>
+      </div>
+    </div>
+    <div class="showcase-item" style="width:240px;height:220px">
+      <div class="img-placeholder" style="width:240px;height:220px">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+        <span class="img-placeholder-label">Showcase photo 3</span>
+      </div>
+    </div>
+    <div class="showcase-item" style="width:280px;height:220px">
+      <div class="img-placeholder" style="width:280px;height:220px">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+        <span class="img-placeholder-label">Showcase photo 4</span>
+      </div>
+    </div>
+    <div class="showcase-item" style="width:260px;height:220px">
+      <div class="img-placeholder" style="width:260px;height:220px">
+        <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+        <span class="img-placeholder-label">Showcase photo 5</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SIZES ══ -->
+<section class="sizes-section" id="sizes">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-eyebrow">Book sizes</div>
+      <h2 class="sh-title">Three sizes. One standard.</h2>
+      <p class="sh-sub">All sizes use 200gsm premium matte paper with a durable hardcover.</p>
+    </div>
+    <div class="sizes-grid">
+
+      <div class="size-card">
+        <div class="size-card__image">
+          <!--  <img src="size-6x6.jpg" alt="6x6 inch photobook"> -->
+          <div class="img-placeholder">
+            <svg width="36" height="36" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+            <span class="img-placeholder-label">6×6" book photo</span>
+          </div>
+        </div>
+        <div class="size-card__body">
+          <div class="size-card__name">6 × 6"</div>
+          <div class="size-card__dim">Small · Square · 152 × 152 mm</div>
+          <div class="size-card__price">₹1,999</div>
+          <div class="size-card__per">per book</div>
+          <a href="photobook-editor.html" class="size-card__cta">Design this size</a>
+        </div>
+      </div>
+
+      <div class="size-card featured">
+        <div class="size-card__image">
+          <!-- <img src="size-8x8.jpg" alt="8x8 inch photobook"> -->
+          <div class="img-placeholder">
+            <svg width="36" height="36" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+            <span class="img-placeholder-label">8×8" book photo</span>
+          </div>
+        </div>
+        <div class="size-card__body">
+          <div class="size-card__tag">Most popular</div>
+          <div class="size-card__name">8 × 8"</div>
+          <div class="size-card__dim">Medium · Square · 203 × 203 mm</div>
+          <div class="size-card__price">₹2,999</div>
+          <div class="size-card__per">per book</div>
+          <a href="photobook-editor.html" class="size-card__cta">Design this size</a>
+        </div>
+      </div>
+
+      <div class="size-card">
+        <div class="size-card__image">
+          <!-- <img src="size-12x12.jpg" alt="12x12 inch photobook"> -->
+          <div class="img-placeholder">
+            <svg width="36" height="36" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+            <span class="img-placeholder-label">12×12" book photo</span>
+          </div>
+        </div>
+        <div class="size-card__body">
+          <div class="size-card__name">12 × 12"</div>
+          <div class="size-card__dim">Large · Square · 305 × 305 mm</div>
+          <div class="size-card__price">₹4,499</div>
+          <div class="size-card__per">per book</div>
+          <a href="photobook-editor.html" class="size-card__cta">Design this size</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW IT WORKS ══ -->
+<section class="how-section" id="how">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-eyebrow">The process</div>
+      <h2 class="sh-title">From photos to your hands in four steps</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-connector"></div>
+        <div class="step-title">Design online</div>
+        <div class="step-body">Upload photos, arrange spreads, add text — all in your browser. No software needed.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-connector"></div>
+        <div class="step-title">Place your order</div>
+        <div class="step-body">Choose your size and quantity. Volume discounts kick in from 10 books — up to 55% off.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-connector"></div>
+        <div class="step-title">We print & bind</div>
+        <div class="step-body">Your design goes to press at 300 DPI CMYK on our professional print line.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-title">Delivered to you</div>
+        <div class="step-body">Packaged carefully and shipped nationwide. Most orders arrive in 5–7 business days.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PRICING ══ -->
+<section class="pricing-section">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-eyebrow">Volume pricing</div>
+      <h2 class="sh-title">More books, more savings</h2>
+      <p class="sh-sub">Perfect for weddings, corporate events, family reunions, and gifting.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-qty">1</div>
+        <div class="pricing-books">book</div>
+        <div class="pricing-discount">Full price</div>
+        <div class="pricing-save">&nbsp;</div>
+      </div>
+      <div class="pricing-card popular">
+        <div class="pricing-popular-badge">Popular</div>
+        <div class="pricing-qty">10</div>
+        <div class="pricing-books">books</div>
+        <div class="pricing-discount">20% off</div>
+        <div class="pricing-save">Save ₹6,000+</div>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-qty">50</div>
+        <div class="pricing-books">books</div>
+        <div class="pricing-discount">40% off</div>
+        <div class="pricing-save">Save ₹29,000+</div>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-qty">100</div>
+        <div class="pricing-books">books</div>
+        <div class="pricing-discount">55% off</div>
+        <div class="pricing-save">Save ₹82,000+</div>
+      </div>
+    </div>
+    <p class="pricing-note">Prices shown for 8×8" books. All sizes eligible. <a href="mailto:hello@binder.co.in" style="color:var(--accent)">Contact us</a> for orders over 100.</p>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══ -->
+<section class="testimonials-section">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-eyebrow">Customer love</div>
+      <h2 class="sh-title">What people are saying</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"The quality is absolutely stunning. I ordered a 12×12" wedding album and every spread is perfect — the colours are vivid and the binding is absolutely flawless."</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">PS</div>
+          <div>
+            <div class="testimonial-name">Priya S.</div>
+            <div class="testimonial-loc">Bengaluru, Karnataka</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"Ordered 50 copies for our company event. The bulk discount was excellent and all books arrived on time, perfectly packaged. Will order again."</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">RV</div>
+          <div>
+            <div class="testimonial-name">Rohit V.</div>
+            <div class="testimonial-loc">Mumbai, Maharashtra</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"The online editor is so easy to use. I designed a baby album in under an hour and the printed result exceeded my expectations. Highly recommend."</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">AI</div>
+          <div>
+            <div class="testimonial-name">Ananya I.</div>
+            <div class="testimonial-loc">Chennai, Tamil Nadu</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FINAL CTA ══ -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <h2>Start designing your<br><em>photobook today</em></h2>
+    <p>Free to design. No account needed until you're ready to order. Your first book is just a few minutes away.</p>
+    <div class="cta-btns">
+      <a href="photobook-editor.html" class="btn btn-primary btn-primary--lg">
+        Create your photobook →
+      </a>
+      <a href="my-orders.html" class="btn btn-white">
+        View my orders
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="footer-logo-mark">B</div>
+          <div class="footer-logo-name">Binder</div>
+        </div>
+        <p>Premium photobooks crafted with care. 300 DPI CMYK · Hardcover · Pan-India delivery.</p>
+        <div class="footer-social">
+          <a class="footer-social-icon" href="https://instagram.com/binderbooks" target="_blank" rel="noopener" aria-label="Instagram" title="Follow us on Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a class="footer-social-icon" href="https://facebook.com/binderbooks" target="_blank" rel="noopener" aria-label="Facebook" title="Like us on Facebook">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Design</h4>
+        <a href="photobook-editor.html">Create a photobook</a>
+        <a href="#sizes">Sizes & pricing</a>
+        <a href="#how">How it works</a>
+        <a href="#showcase">Our work</a>
+        <a href="blog.html">Blog</a>
+        <a href="press.html">Press & Media</a>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <a href="my-orders.html">Sign in</a>
+        <a href="my-orders.html">Create account</a>
+        <a href="my-orders.html">My orders</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="mailto:hello@binder.co.in">hello@binder.co.in</a>
+        <a href="#">A-291/1, Okhla Phase I</a>
+        <a href="#">Delhi — 110020</a>
+        <a href="#">Shipping policy</a>
+        <a href="#">Returns</a>
+        <a href="#">Privacy policy</a>
+        <a href="admin-cms.html" style="opacity:.3">Admin</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Binder. All rights reserved. 🇮🇳 New Delhi, India</span>
+      <span>Powered by Binder Platform</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CMS CONTENT RENDERER
+// Reads from window.BINDER_CONTENT (injected by build.js)
+// and updates the DOM with live content from the CMS
+// ═══════════════════════════════════════════════════════════
+(function() {
+  const C = window.BINDER_CONTENT;
+  if (!C) return; // no CMS data yet — static defaults show fine
+
+  function set(sel, val, attr) {
+    const els = document.querySelectorAll(sel);
+    els.forEach(el => {
+      if (!val && val !== 0) return;
+      if (attr === 'src')  { el.src = val; el.style.display = val ? 'block' : 'none'; }
+      else if (attr === 'href') el.href = val;
+      else if (attr === 'style.display') el.style.display = val;
+      else el.innerHTML = val;
+    });
+  }
+
+  function setImg(sel, src, fallbackSel) {
+    if (!src) return;
+    document.querySelectorAll(sel).forEach(el => {
+      if (el.tagName === 'IMG') { el.src = src; }
+      else {
+        // Replace placeholder div with actual image
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block';
+        el.innerHTML = '';
+        el.appendChild(img);
+      }
+    });
+    // Hide any sibling placeholder
+    if (fallbackSel) {
+      document.querySelectorAll(fallbackSel).forEach(el => el.style.display = 'none');
+    }
+  }
+
+  // ── Hero ────────────────────────────────────────────────────────
+  if (C.hero) {
+    const h = C.hero;
+    set('.hero-eyebrow', h.eyebrow);
+    // Title: line1 + <br><em>line2</em>
+    const titleEl = document.querySelector('.hero-title');
+    if (titleEl && h.title1 && h.title2) {
+      titleEl.innerHTML = `${h.title1}<br><em>${h.title2}</em>`;
+    }
+    set('.hero-sub', h.subtitle);
+    // CTA buttons
+    const ctas = document.querySelectorAll('.hero-ctas .btn');
+    if (ctas[0] && h.cta1) ctas[0].textContent = h.cta1;
+    if (ctas[1] && h.cta2) ctas[1].textContent = h.cta2;
+  }
+
+  // ── Banner ──────────────────────────────────────────────────────
+  if (C.banner) {
+    const b = C.banner;
+    if (b.image) {
+      const bannerInner = document.querySelector('.photo-banner-inner');
+      if (bannerInner) {
+        bannerInner.innerHTML = `<img src="${b.image}" alt="Binder photobooks" style="width:100%;height:100%;object-fit:cover;object-position:center">`;
+      }
+    }
+    set('.banner-text h2', b.headline);
+    const bannerP = document.querySelector('.banner-text p');
+    if (bannerP && b.subline) bannerP.textContent = b.subline;
+    const bannerBtn = document.querySelector('.banner-overlay .btn-white');
+    if (bannerBtn && b.cta) bannerBtn.textContent = b.cta;
+  }
+
+  // ── Features ────────────────────────────────────────────────────
+  if (C.features) {
+    const f = C.features;
+    set('.feature-grid-section .sh-eyebrow', f.eyebrow);
+    set('.feature-grid-section .sh-title', f.title);
+    set('.feature-grid-section .sh-sub', f.subtitle);
+    if (f.tiles && f.tiles.length) {
+      const blocks = document.querySelectorAll('.feature-block');
+      f.tiles.forEach((tile, i) => {
+        if (!blocks[i]) return;
+        const icon  = blocks[i].querySelector('.feature-icon');
+        const title = blocks[i].querySelector('.feature-title');
+        const desc  = blocks[i].querySelector('.feature-desc');
+        if (icon)  icon.textContent  = tile.icon;
+        if (title) title.textContent = tile.title;
+        if (desc)  desc.textContent  = tile.desc;
+      });
+    }
+  }
+
+  // ── Sizes ───────────────────────────────────────────────────────
+  if (C.sizes) {
+    const cards = document.querySelectorAll('.size-card');
+    const sizeData = [C.sizes.s6, C.sizes.s8, C.sizes.s12];
+    cards.forEach((card, i) => {
+      const s = sizeData[i];
+      if (!s) return;
+      const priceEl = card.querySelector('.size-card__price');
+      const dimEl   = card.querySelector('.size-card__dim');
+      if (priceEl && s.price) priceEl.textContent = '₹' + s.price;
+      if (dimEl   && s.desc)  dimEl.textContent   = s.desc;
+      if (s.image) {
+        const imgWrap = card.querySelector('.size-card__image');
+        if (imgWrap) {
+          imgWrap.innerHTML = `<img src="${s.image}" alt="${s.desc || ''}" style="width:100%;height:100%;object-fit:cover">`;
+        }
+      }
+    });
+  }
+
+  // ── Showcase photos ─────────────────────────────────────────────
+  if (C.showcase && C.showcase.photos) {
+    const strip = document.querySelector('.showcase-strip');
+    if (strip) {
+      const items = strip.querySelectorAll('.showcase-item');
+      C.showcase.photos.forEach((photo, i) => {
+        if (!photo.image || !items[i]) return;
+        items[i].innerHTML = `<img src="${photo.image}" alt="${photo.caption || ''}" style="width:100%;height:100%;object-fit:cover">`;
+      });
+    }
+  }
+
+  // ── Testimonials ────────────────────────────────────────────────
+  if (C.testimonials && C.testimonials.items) {
+    const cards = document.querySelectorAll('.testimonial');
+    C.testimonials.items.forEach((t, i) => {
+      if (!cards[i]) return;
+      const textEl   = cards[i].querySelector('.testimonial-text');
+      const nameEl   = cards[i].querySelector('.testimonial-name');
+      const locEl    = cards[i].querySelector('.testimonial-loc');
+      const avatarEl = cards[i].querySelector('.testimonial-avatar');
+      if (textEl) textEl.textContent = t.text;
+      if (nameEl) nameEl.textContent = t.author;
+      if (locEl)  locEl.textContent  = t.location;
+      if (avatarEl) avatarEl.textContent = t.author.split(' ').map(w=>w[0]).join('').substring(0,2);
+    });
+  }
+
+  // ── Site settings ───────────────────────────────────────────────
+  if (C.general) {
+    const g = C.general;
+    // Footer address
+    document.querySelectorAll('[data-cms="address"]').forEach(el => {
+      if (g.address) el.textContent = g.address;
+    });
+    // Social links
+    if (g.instagram) {
+      document.querySelectorAll('a[aria-label="Instagram"]').forEach(el => el.href = g.instagram);
+    }
+    if (g.facebook) {
+      document.querySelectorAll('a[aria-label="Facebook"]').forEach(el => el.href = g.facebook);
+    }
+  }
+
+  // ── SEO ─────────────────────────────────────────────────────────
+  if (C.seo && C.seo.home_title) {
+    document.title = C.seo.home_title;
+  }
+  if (C.seo && C.seo.home_desc) {
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.content = C.seo.home_desc;
+  }
+  if (C.seo && C.seo.og_image) {
+    let og = document.querySelector('meta[property="og:image"]');
+    if (!og) { og = document.createElement('meta'); og.setAttribute('property','og:image'); document.head.appendChild(og); }
+    og.setAttribute('content', C.seo.og_image);
+  }
+
+})();
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20);
+}, { passive: true });
+
+// ── Mobile nav ───────────────────────────────────────────────────
+function toggleNav() {
+  document.getElementById('nav-drawer').classList.toggle('open');
+}
+function closeNav() {
+  document.getElementById('nav-drawer').classList.remove('open');
+}
+document.addEventListener('click', e => {
+  const nav = document.getElementById('nav-drawer');
+  const btn = document.querySelector('.nav-hamburger');
+  if (!nav.contains(e.target) && !btn.contains(e.target)) closeNav();
+});
+
+// ── Smooth anchor scrolling ──────────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+</script>
+</body>
+</html>

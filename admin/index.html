@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Binder CMS</title>
+  <style>
+    /* Loading screen while CMS initialises */
+    #cms-loading {
+      position: fixed; inset: 0;
+      background: #0a0a0a;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 16px; z-index: 9999;
+      font-family: Inter, system-ui, sans-serif;
+    }
+    .cms-loading-mark {
+      width: 52px; height: 52px;
+      background: white; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: 700; color: #0a0a0a;
+    }
+    .cms-loading-name { color: white; font-size: 18px; font-weight: 600; }
+    .cms-loading-sub  { color: rgba(255,255,255,.4); font-size: 13px; }
+    .cms-loading-bar  {
+      width: 200px; height: 3px;
+      background: rgba(255,255,255,.1); border-radius: 2px;
+      overflow: hidden; margin-top: 8px;
+    }
+    .cms-loading-fill {
+      height: 100%; width: 0%;
+      background: #27AE72; border-radius: 2px;
+      animation: load 1.5s ease forwards;
+    }
+    @keyframes load { to { width: 100%; } }
+  </style>
+</head>
+<body>
+  <div id="cms-loading">
+    <div class="cms-loading-mark">B</div>
+    <div class="cms-loading-name">Binder CMS</div>
+    <div class="cms-loading-sub">Loading content editor…</div>
+    <div class="cms-loading-bar"><div class="cms-loading-fill"></div></div>
+  </div>
+
+  <!-- Netlify CMS / Decap CMS -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script>
+    // Hide loading screen once CMS is ready
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        var el = document.getElementById('cms-loading');
+        if (el) {
+          el.style.opacity = '0';
+          el.style.transition = 'opacity 0.3s';
+          setTimeout(function() { el.remove(); }, 300);
+        }
+      }, 800);
+    });
+  </script>
+</body>
+</html>

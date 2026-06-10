@@ -1,0 +1,27 @@
+{
+  "eyebrow": "Why Binder",
+  "title": "Print quality you can feel",
+  "subtitle": "Every book is made to the same exacting standard — whether you're ordering one or a hundred.",
+  "tiles": [
+    {
+      "icon": "🎨",
+      "title": "True CMYK colour",
+      "desc": "We print in CMYK at 300 DPI — the same standard used by professional photo labs worldwide. What you see on screen is what you get on paper."
+    },
+    {
+      "icon": "📐",
+      "title": "Premium binding",
+      "desc": "Our premium binding ensures every spread lies flat and opens beautifully. Your panoramas and full-bleed photos shine exactly as intended."
+    },
+    {
+      "icon": "✏️",
+      "title": "Free online editor",
+      "desc": "No software to install. Design entirely in your browser — drag and drop photos, choose from 28 fonts, and design every spread exactly how you want it."
+    },
+    {
+      "icon": "🚀",
+      "title": "5–7 day delivery",
+      "desc": "From your design to your doorstep in under a week. We deliver to every PIN code in India, packaged carefully so your book arrives in perfect condition."
+    }
+  ]
+}

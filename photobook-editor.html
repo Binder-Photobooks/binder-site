@@ -1,0 +1,3727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Montserrat:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Raleway:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Nunito:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Work+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Josefin+Sans:ital,wght@0,300;0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Abril+Fatface&family=Oswald:wght@300;400;500;600&family=Dancing+Script:wght@400;500;600;700&family=Pacifico&family=Great+Vibes&family=Satisfy&family=Caveat:wght@400;500;600;700&family=Sacramento&family=Yellowtail&family=Courgette&family=Kaushan+Script&family=Lobster&display=swap" onload="this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600&display=swap"></noscript>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --white:#ffffff;--black:#0a0a0a;--gray-50:#f9f9f9;--gray-100:#f0f0f0;--gray-200:#e0e0e0;--gray-300:#c8c8c8;--gray-400:#a0a0a0;--gray-500:#707070;--gray-600:#4a4a4a;--gray-700:#2a2a2a;
+  --accent:#27AE72;--accent-hover:#1f9660;--accent-light:#e8f7f0;--accent-mid:#d0f0e2;
+  --bleed-color:#e53e3e;--trim-color:#000000;--sidebar-w:280px;--header-h:52px;--mob-nav-h:60px;--font-ui:'Inter',sans-serif;
+}
+/* ── RESET & BASE ── */
+body{font-family:var(--font-ui);background:var(--gray-50);color:var(--black);overflow:hidden;height:100dvh;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent}
+button,select,input,textarea{font-family:var(--font-ui);-webkit-appearance:none}
+/* ── HEADER ── */
+#header{height:var(--header-h);background:var(--white);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;padding:0 16px;gap:12px;z-index:100;flex-shrink:0}
+#header .logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
+#header .logo img{height:26px;width:auto}
+#header .logo span{font-size:12px;font-weight:400;color:var(--gray-400)}
+.header-sep{width:1px;height:20px;background:var(--gray-200);flex-shrink:0}
+#book-title-input{border:none;font-size:13px;color:var(--black);background:transparent;min-width:0;flex:1;outline:none;font-weight:400}
+#book-title-input:focus{background:var(--gray-100);border-radius:6px;padding:0 8px}
+.header-spacer{flex:1}
+.header-btn{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;white-space:nowrap}
+.header-btn.outline{background:transparent;border:1px solid var(--gray-200);color:var(--gray-600)}
+.header-btn.outline:hover{border-color:var(--accent);color:var(--accent)}
+.header-btn.primary{background:var(--accent);color:var(--white)}
+.header-btn.primary:hover{background:var(--accent-hover)}
+.nav-tabs{display:flex;gap:2px;background:var(--gray-100);padding:3px;border-radius:9px;flex-shrink:0}
+.nav-tab{padding:5px 12px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;color:var(--gray-500);border:none;background:transparent;transition:all 0.15s}
+.nav-tab.active{background:var(--white);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+/* ── APP BODY ── */
+#app-body{display:flex;flex:1;overflow:hidden;min-height:0;position:relative}
+/* ── LEFT SIDEBAR (desktop) ── */
+#sidebar{width:var(--sidebar-w);background:var(--white);border-right:1px solid var(--gray-200);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;min-height:0}
+#pages-panel{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;border-bottom:1px solid var(--gray-100)}
+#pages-panel-header{padding:12px 12px 8px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.sidebar-label{font-size:11px;font-weight:500;color:var(--gray-400);letter-spacing:0.8px;text-transform:uppercase}
+#pages-list{flex:1;overflow-y:auto;padding:4px 8px 8px;min-height:0}
+#pages-list::-webkit-scrollbar{width:4px}
+#pages-list::-webkit-scrollbar-thumb{background:var(--gray-200);border-radius:4px}
+#pages-panel-footer{flex-shrink:0;padding:8px 12px 10px}
+.sidebar-section{padding:14px;border-bottom:1px solid var(--gray-100);flex-shrink:0}
+.add-page-btn{width:100%;padding:9px;border:1px dashed var(--gray-300);border-radius:8px;font-size:12px;font-weight:500;color:var(--gray-500);cursor:pointer;background:transparent;transition:all 0.15s;min-height:44px}
+.add-page-btn:hover,.add-page-btn:active{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+#sidebar-bottom{flex-shrink:0;overflow-y:auto;max-height:260px}
+#sidebar-bottom::-webkit-scrollbar{width:4px}
+#sidebar-bottom::-webkit-scrollbar-thumb{background:var(--gray-200);border-radius:4px}
+/* Page thumbnails */
+.page-thumb{border-radius:8px;border:2px solid transparent;cursor:pointer;margin-bottom:6px;transition:all 0.15s;padding:3px}
+.page-thumb:hover{border-color:var(--gray-300)}
+.page-thumb.active{border-color:var(--accent)}
+.page-thumb-inner{background:var(--white);border:1px solid var(--gray-200);border-radius:4px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--gray-400);overflow:hidden}
+.page-thumb-inner.spread{aspect-ratio:2/1}
+.page-thumb canvas{width:100%;height:100%;object-fit:contain}
+.page-thumb-label{font-size:9px;color:var(--gray-400);text-align:center;margin-top:3px}
+/* ── RIGHT PANEL ── */
+#right-panel{width:260px;background:var(--white);border-left:1px solid var(--gray-200);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.panel-section{padding:16px;border-bottom:1px solid var(--gray-100)}
+.panel-section:last-child{border-bottom:none}
+.panel-title{font-size:11px;font-weight:500;color:var(--gray-400);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:12px}
+.prop-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.prop-label{font-size:12px;color:var(--gray-500)}
+.prop-input{width:80px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:6px;font-size:12px;text-align:right;outline:none;min-height:36px}
+.prop-input:focus{border-color:var(--accent)}
+.color-swatch{width:32px;height:32px;border-radius:6px;border:1px solid var(--gray-200);cursor:pointer;overflow:hidden}
+.color-swatch input[type=color]{width:40px;height:40px;margin:-4px -4px;border:none;cursor:pointer;background:none}
+.font-select{width:100%;padding:8px;border:1px solid var(--gray-200);border-radius:6px;font-size:12px;outline:none;cursor:pointer;min-height:36px}
+.font-select:focus{border-color:var(--accent)}
+.font-size-row{display:flex;align-items:center;gap:6px}
+.icon-btn{width:36px;height:36px;border:1px solid var(--gray-200);border-radius:6px;background:transparent;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.icon-btn:hover,.icon-btn:active{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.icon-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
+.text-style-row{display:flex;gap:4px}
+.layer-row{display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;cursor:pointer;transition:all 0.12s;border:1px solid transparent;min-height:40px}
+.layer-row:hover,.layer-row:active{background:var(--accent-light)}
+.layer-row.selected{background:var(--accent-mid);border-color:var(--accent)}
+.layer-icon{font-size:14px}
+.layer-name{font-size:12px;color:var(--gray-600);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.layer-del{width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gray-400);font-size:13px;border-radius:4px;transition:all 0.1s;opacity:0.6}
+.layer-del:hover,.layer-del:active{color:#e53e3e;opacity:1;background:#fef2f2}
+/* ── CANVAS AREA ── */
+#canvas-area{flex:1;background:var(--gray-100);display:flex;align-items:center;justify-content:center;overflow:auto;position:relative;min-height:0;touch-action:none}
+.canvas-bg-pattern{position:absolute;inset:0;background-image:radial-gradient(circle,var(--gray-300) 1px,transparent 1px);background-size:20px 20px;opacity:0.4;pointer-events:none}
+#spread-container{position:relative;flex-shrink:0}
+#main-canvas{display:block;cursor:crosshair;box-shadow:0 4px 24px rgba(0,0,0,0.1);background:white;touch-action:none}
+/* ── TOOLBAR (floating) ── */
+#toolbar{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:var(--white);border:1px solid var(--gray-200);border-radius:12px;display:flex;align-items:center;padding:4px;gap:2px;box-shadow:0 4px 16px rgba(0,0,0,0.08);z-index:50;flex-wrap:nowrap}
+.tool-btn{width:36px;height:36px;border-radius:8px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--gray-500);transition:all 0.12s;position:relative;flex-shrink:0}
+.tool-btn:hover,.tool-btn:active{background:var(--accent-light);color:var(--accent)}
+.tool-btn.active{background:var(--accent);color:white}
+.tool-sep{width:1px;height:20px;background:var(--gray-200);margin:0 2px;flex-shrink:0}
+/* ── MODALS ── */
+/* Checkout / order modals: bottom sheet on all screens */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px)}
+.modal{background:var(--white);border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:520px;max-height:92dvh;overflow-y:auto;box-shadow:0 -4px 40px rgba(0,0,0,0.15)}
+.modal-handle{width:40px;height:4px;background:var(--gray-300);border-radius:2px;margin:0 auto 20px}
+.modal h2{font-size:18px;font-weight:600;margin-bottom:6px}
+.modal p{font-size:14px;color:var(--gray-500);margin-bottom:20px;line-height:1.6}
+/* Setup modal: always centred, scrollable, never bottom-sheet */
+#setup-modal{align-items:center;justify-content:center;overflow-y:auto;padding:20px}
+#setup-modal .modal{border-radius:20px;max-width:480px;width:100%;max-height:calc(100dvh - 40px);overflow-y:auto;margin:auto}
+#setup-modal .modal-handle{display:none}
+@media(max-width:520px){
+  #setup-modal{padding:12px;align-items:flex-start;padding-top:max(20px,env(safe-area-inset-top))}
+  #setup-modal .modal{border-radius:16px;width:100%;max-height:none}
+}
+/* ── QUALITY WARNING ── */
+.quality-badge{position:absolute;pointer-events:none;z-index:30;display:flex;align-items:center;gap:4px;padding:3px 7px;border-radius:6px;font-size:10px;font-weight:600;letter-spacing:0.3px;line-height:1;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.2)}
+.quality-badge.warn{background:#f59e0b;color:#fff}
+.quality-badge.danger{background:#ef4444;color:#fff}
+.quality-badge svg{flex-shrink:0}
+/* Quality indicator in right panel */
+#quality-indicator{margin-top:8px;padding:8px 10px;border-radius:8px;font-size:11px;font-weight:500;align-items:flex-start;gap:6px;line-height:1.4;display:none}
+#quality-indicator.ok{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;display:flex}
+#quality-indicator.warn{background:#fffbeb;color:#92400e;border:1px solid #fde68a;display:flex}
+#quality-indicator.danger{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;display:flex}
+#quality-indicator svg{margin-top:1px;flex-shrink:0}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+.size-card{border:2px solid var(--gray-200);border-radius:12px;padding:14px 10px;cursor:pointer;text-align:center;transition:all 0.15s}
+.size-card:hover,.size-card:active{border-color:var(--accent)}
+.size-card.selected{border-color:var(--accent);background:var(--accent-light)}
+.size-card .size-preview{width:100%;aspect-ratio:1/1;background:var(--gray-100);border-radius:6px;margin-bottom:8px;display:flex;align-items:center;justify-content:center}
+.size-card .size-name{font-size:13px;font-weight:600;margin-bottom:2px}
+.size-card .size-desc{font-size:10px;color:var(--gray-400)}
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;font-weight:500;color:var(--gray-600);margin-bottom:6px;display:block}
+.form-input{width:100%;padding:12px;border:1px solid var(--gray-200);border-radius:10px;font-size:16px;outline:none;transition:border-color 0.15s;min-height:48px}
+.form-input:focus{border-color:var(--accent)}
+.btn-row{display:flex;gap:8px;justify-content:flex-end}
+.btn{padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;min-height:48px}
+.btn-ghost{background:transparent;border:1px solid var(--gray-200);color:var(--gray-600)}
+.btn-ghost:hover,.btn-ghost:active{border-color:var(--accent);color:var(--accent)}
+.btn-primary{background:var(--accent);color:white;flex:1}
+.btn-primary:hover,.btn-primary:active{background:var(--accent-hover)}
+/* ── PRICING ── */
+.pricing-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+.price-tier{border:2px solid var(--gray-200);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all 0.15s;min-height:80px}
+.price-tier:hover,.price-tier:active{border-color:var(--accent)}
+.price-tier.selected{border-color:var(--accent);background:var(--accent-light)}
+.price-tier .qty{font-size:22px;font-weight:600;color:var(--accent)}
+.price-tier .qty-label{font-size:10px;color:var(--gray-400);margin-bottom:4px}
+.price-tier .price{font-size:12px;font-weight:500}
+.price-tier .save{font-size:10px;color:var(--accent);font-weight:500;margin-top:2px}
+/* ── STATUS BAR ── */
+#status-bar{height:26px;background:var(--white);border-top:1px solid var(--gray-200);display:flex;align-items:center;padding:0 12px;gap:10px;font-size:10px;color:var(--gray-400);flex-shrink:0;overflow:hidden}
+.status-item{display:flex;align-items:center;gap:3px;white-space:nowrap}
+/* ── ADMIN PANEL ── */
+#admin-panel{display:none;flex:1;overflow-y:auto;padding:20px;background:var(--gray-50)}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.admin-header h1{font-size:20px;font-weight:600}
+.admin-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--white);border-radius:12px;padding:16px;border:1px solid var(--gray-200)}
+.stat-label{font-size:11px;color:var(--gray-400);font-weight:500;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px}
+.stat-value{font-size:24px;font-weight:600;color:var(--accent)}
+.stat-sub{font-size:11px;color:var(--gray-400);margin-top:2px}
+.orders-table{background:var(--white);border-radius:12px;border:1px solid var(--gray-200);overflow:hidden}
+.orders-table table{width:100%;border-collapse:collapse;min-width:600px}
+.orders-table-wrap{overflow-x:auto}
+.orders-table th{padding:10px 12px;text-align:left;font-size:10px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.6px;border-bottom:1px solid var(--gray-200);background:var(--gray-50);white-space:nowrap}
+.orders-table td{padding:12px;font-size:12px;border-bottom:1px solid var(--gray-100);vertical-align:middle}
+.orders-table tr:last-child td{border-bottom:none}
+.orders-table tr:hover td{background:var(--accent-light)}
+.status-badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:100px;font-size:10px;font-weight:500}
+.status-badge.new{background:#dbeafe;color:#1d4ed8}
+.status-badge.ready{background:var(--accent-light);color:var(--accent-hover)}
+.status-badge.shipped{background:#f3e8ff;color:#7c3aed}
+.download-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:500;background:var(--accent);color:white;border:none;cursor:pointer;transition:all 0.15s;min-height:32px}
+.download-btn:hover{background:var(--accent-hover)}
+/* ── UPLOAD ZONE ── */
+.upload-zone{border:2px dashed var(--gray-300);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all 0.15s;position:relative}
+.upload-zone:hover,.upload-zone:active{border-color:var(--accent);background:var(--accent-light)}
+.upload-zone.drag-over{border-color:var(--accent);background:var(--accent-light);transform:scale(1.02)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-zone-text{font-size:12px;color:var(--gray-400);line-height:1.6}
+.upload-zone-icon{font-size:20px;margin-bottom:4px}
+/* Canvas drag-drop overlay */
+#canvas-drop-overlay{position:absolute;inset:0;z-index:200;display:none;align-items:center;justify-content:center;pointer-events:none}
+#canvas-drop-overlay.active{display:flex}
+.canvas-drop-inner{background:rgba(39,174,114,0.92);border-radius:16px;padding:24px 36px;text-align:center;color:white;font-size:16px;font-weight:500;border:3px dashed rgba(255,255,255,0.6);backdrop-filter:blur(4px)}
+.canvas-drop-inner svg{display:block;margin:0 auto 10px;opacity:0.9}
+/* ── ASSETS GRID ── */
+#assets-grid{padding:0 12px 12px}
+.asset-item{border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.12s;aspect-ratio:1/1;background:var(--gray-100);position:relative}
+.asset-item:hover,.asset-item:active{border-color:var(--accent);transform:scale(0.97)}
+.asset-item img{width:100%;height:100%;object-fit:cover;display:block}
+.asset-item-add{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(39,174,114,0.85);opacity:0;transition:opacity 0.15s;color:white;font-size:22px;font-weight:300}
+.asset-item:hover .asset-item-add{opacity:1}
+/* ── TOAST ── */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--accent);color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:3000;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
+#toast.show{opacity:1}
+/* ── SCROLLBARS ── */
+#canvas-area::-webkit-scrollbar{width:4px;height:4px}
+#canvas-area::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:4px}
+
+/* ── SIDEBAR IMAGE TABS ── */
+.img-tabs{display:flex;gap:2px;background:var(--gray-100);padding:2px;border-radius:8px;margin-bottom:10px}
+.img-tab{flex:1;padding:5px 4px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--gray-500);font-family:var(--font-ui);transition:all 0.15s;text-align:center}
+.img-tab.active{background:var(--white);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.stock-search-row{display:flex;gap:6px;margin-bottom:8px}
+.stock-search-input{flex:1;padding:7px 10px;border:1px solid var(--gray-200);border-radius:8px;font-size:12px;outline:none;font-family:var(--font-ui)}
+.stock-search-input:focus{border-color:var(--accent)}
+.stock-search-btn{width:32px;height:32px;border-radius:8px;border:none;background:var(--accent);color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s}
+.stock-search-btn:hover{background:var(--accent-hover)}
+.stock-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.stock-img-item{border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid transparent;aspect-ratio:3/2;background:var(--gray-100);position:relative;transition:all 0.12s}
+.stock-img-item:hover{border-color:var(--accent);transform:scale(0.97)}
+.stock-img-item img{width:100%;height:100%;object-fit:cover;display:block}
+.stock-img-add{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(39,174,114,0.8);opacity:0;transition:opacity 0.15s;color:white;font-size:20px}
+.stock-img-item:hover .stock-img-add{opacity:1}
+.stock-source-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;letter-spacing:0.3px;text-transform:uppercase;background:#1a1a1a;color:#fff;margin-bottom:6px}
+.stock-loading{text-align:center;padding:20px 0;font-size:12px;color:var(--gray-400)}
+.stock-empty{font-size:11px;color:var(--gray-400);line-height:1.6;text-align:center;padding:8px 0 4px}
+/* ── CROP MODAL ── */
+#crop-modal{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:2000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#crop-modal.open{display:flex}
+#crop-wrap{position:relative;display:inline-block;user-select:none;touch-action:none}
+#crop-wrap img{display:block;max-width:min(90vw,700px);max-height:65vh;object-fit:contain}
+#crop-box{position:absolute;border:2px solid #27AE72;box-sizing:border-box}
+#crop-box::after{content:"";position:absolute;inset:0;border:1px dashed rgba(255,255,255,0.5)}
+.crop-handle{position:absolute;width:14px;height:14px;background:white;border:2px solid #27AE72;border-radius:2px;z-index:10;box-sizing:border-box}
+.crop-handle.tl{top:-7px;left:-7px;cursor:nw-resize}
+.crop-handle.tr{top:-7px;right:-7px;cursor:ne-resize}
+.crop-handle.bl{bottom:-7px;left:-7px;cursor:sw-resize}
+.crop-handle.br{bottom:-7px;right:-7px;cursor:se-resize}
+.crop-handle.tm{top:-7px;left:calc(50% - 7px);cursor:n-resize}
+.crop-handle.bm{bottom:-7px;left:calc(50% - 7px);cursor:s-resize}
+.crop-handle.ml{left:-7px;top:calc(50% - 7px);cursor:w-resize}
+.crop-handle.mr{right:-7px;top:calc(50% - 7px);cursor:e-resize}
+.crop-rule{position:absolute;background:rgba(255,255,255,0.2);pointer-events:none}
+.crop-rule.h{left:0;right:0;height:1px}
+.crop-rule.v{top:0;bottom:0;width:1px}
+#crop-hint{color:rgba(255,255,255,0.55);font-size:12px;margin-top:8px;text-align:center}
+#crop-footer{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.crop-btn{padding:10px 24px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;border:none;min-height:44px;font-family:var(--font-ui);transition:all 0.15s}
+.crop-btn.cancel{background:rgba(255,255,255,0.15);color:white}
+.crop-btn.cancel:hover{background:rgba(255,255,255,0.25)}
+.crop-btn.apply{background:#27AE72;color:white}
+.crop-btn.apply:hover{background:#1f9660}
+.crop-ratios{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;justify-content:center}
+.crop-ratio{padding:5px 11px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid rgba(255,255,255,0.3);background:transparent;color:rgba(255,255,255,0.7);transition:all 0.12s;font-family:var(--font-ui)}
+.crop-ratio:hover,.crop-ratio.active{background:rgba(255,255,255,0.18);color:white;border-color:rgba(255,255,255,0.7)}
+/* ── TEXT FORMAT TOOLBAR ── */
+.fmt-toolbar{display:flex;flex-wrap:wrap;gap:2px;padding:6px 0 8px;border-bottom:1px solid var(--gray-100);margin-bottom:8px}
+.fmt-btn{width:26px;height:26px;border-radius:5px;border:1px solid var(--gray-200);background:transparent;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all 0.1s;font-family:inherit;color:var(--gray-600);flex-shrink:0}
+.fmt-btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.fmt-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
+.fmt-sep{width:1px;height:18px;background:var(--gray-200);margin:0 2px;align-self:center;flex-shrink:0}
+.fmt-color-wrap{width:26px;height:26px;border-radius:5px;border:1px solid var(--gray-200);overflow:hidden;cursor:pointer;position:relative;flex-shrink:0}
+.fmt-color-wrap input[type=color]{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);border:none;cursor:pointer}
+.fmt-size{width:42px;padding:2px 4px;border:1px solid var(--gray-200);border-radius:5px;font-size:12px;text-align:center;outline:none;height:26px;font-family:inherit}
+.fmt-size:focus{border-color:var(--accent)}
+.fmt-select{padding:2px 4px;border:1px solid var(--gray-200);border-radius:5px;font-size:11px;outline:none;cursor:pointer;height:26px;font-family:inherit;max-width:110px}
+.fmt-select:focus{border-color:var(--accent)}
+
+/* ════════════════════════════════════════════════
+   MOBILE BOTTOM SHEET ARCHITECTURE  (≤ 768px)
+   ════════════════════════════════════════════════ */
+/* Mobile bottom navigation bar */
+#mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:var(--mob-nav-h);background:var(--white);border-top:1px solid var(--gray-200);z-index:200;flex-direction:row;align-items:stretch}
+.mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:transparent;cursor:pointer;color:var(--gray-400);font-size:10px;font-weight:500;transition:color 0.15s;padding:4px 0;min-height:44px}
+.mob-nav-btn svg{width:22px;height:22px}
+.mob-nav-btn.active{color:var(--accent)}
+.mob-nav-btn.active svg{stroke:var(--accent)}
+
+/* Mobile bottom sheet (slides up from bottom) */
+#mob-sheet{display:none;position:fixed;bottom:calc(var(--mob-nav-h));left:0;right:0;background:var(--white);border-radius:16px 16px 0 0;box-shadow:0 -4px 32px rgba(0,0,0,0.12);z-index:190;max-height:65dvh;flex-direction:column;overflow:hidden}
+#mob-sheet.open{display:flex}
+.mob-sheet-handle{width:40px;height:4px;background:var(--gray-300);border-radius:2px;margin:10px auto 0;flex-shrink:0}
+.mob-sheet-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 8px;flex-shrink:0;border-bottom:1px solid var(--gray-100)}
+.mob-sheet-title{font-size:13px;font-weight:600;color:var(--black)}
+.mob-sheet-close{width:28px;height:28px;border:none;background:var(--gray-100);border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--gray-500)}
+.mob-sheet-body{flex:1;overflow-y:auto;padding:8px 0 16px}
+.mob-sheet-body::-webkit-scrollbar{width:3px}
+.mob-sheet-body::-webkit-scrollbar-thumb{background:var(--gray-200);border-radius:4px}
+
+/* Mobile pages strip — horizontal scroll */
+#mob-pages-strip{display:none;position:fixed;top:var(--header-h);left:0;right:0;height:80px;background:var(--white);border-bottom:1px solid var(--gray-200);z-index:80;overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:8px 12px;gap:8px;-webkit-overflow-scrolling:touch}
+#mob-pages-strip::-webkit-scrollbar{display:none}
+.mob-page-chip{display:inline-flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:2px 4px;border-radius:6px;border:2px solid transparent;transition:all 0.12s;flex-shrink:0}
+.mob-page-chip.active{border-color:var(--accent)}
+.mob-page-chip canvas{border-radius:3px;border:1px solid var(--gray-200)}
+.mob-page-chip span{font-size:8px;color:var(--gray-400);white-space:nowrap}
+
+/* Mobile toolbar — compact row */
+#mob-toolbar{display:none;position:fixed;bottom:calc(var(--mob-nav-h));left:0;right:0;height:52px;background:var(--white);border-top:1px solid var(--gray-200);z-index:195;flex-direction:row;align-items:center;padding:0 8px;gap:4px;overflow-x:auto}
+#mob-toolbar::-webkit-scrollbar{display:none}
+.mob-tool-btn{width:40px;height:40px;border-radius:10px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-400);flex-shrink:0;transition:all 0.12s}
+.mob-tool-btn.active{background:var(--accent);color:white}
+.mob-tool-btn:active{background:var(--accent-light);color:var(--accent)}
+.mob-tool-sep{width:1px;height:24px;background:var(--gray-200);flex-shrink:0;margin:0 2px}
+
+/* Mobile props panel embedded in sheet */
+.mob-props-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px}
+.mob-prop-item{display:flex;flex-direction:column;gap:4px}
+.mob-prop-label{font-size:10px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.5px}
+.mob-prop-input{width:100%;padding:8px;border:1px solid var(--gray-200);border-radius:8px;font-size:14px;text-align:center;outline:none;min-height:40px}
+.mob-prop-input:focus{border-color:var(--accent)}
+
+@media(max-width:768px){
+  /* Hide desktop panels */
+  #sidebar{display:none !important}
+  #right-panel{display:none !important}
+  #status-bar{display:none !important}
+  #toolbar{display:none !important}
+  /* Show mobile chrome */
+  #mob-nav{display:flex}
+  #mob-pages-strip{display:flex;align-items:center}
+  #mob-toolbar{display:flex}
+  /* Canvas area: leave room for pages strip (80px) + toolbar (52px) + nav (60px) */
+  #canvas-area{margin-top:80px;margin-bottom:112px}
+  /* Compact header */
+  #header{padding:0 12px;gap:8px}
+  #book-title-input{font-size:12px}
+  .header-btn{padding:6px 10px;font-size:12px}
+  .nav-tabs{gap:1px}
+  .nav-tab{padding:4px 8px;font-size:11px}
+  /* Modal: full bottom sheet */
+  .modal{border-radius:20px 20px 0 0;padding:20px 16px 40px;max-height:92dvh}
+  .modal-grid{grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .pricing-grid{grid-template-columns:repeat(2,1fr)}
+  /* Admin */
+  .admin-stats{grid-template-columns:repeat(2,1fr)}
+  #admin-panel{padding:16px}
+}
+@media(min-width:769px){
+  #mob-nav{display:none !important}
+  #mob-sheet{display:none !important}
+  #mob-pages-strip{display:none !important}
+  #mob-toolbar{display:none !important}
+  #right-panel{display:flex}
+  #sidebar{display:flex}
+}
+@media(min-width:769px) and (max-width:1100px){
+  #right-panel{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- SETUP MODAL -->
+<div class="modal-overlay" id="setup-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Create your photobook</h2>
+    <p>Choose a size to get started. All sizes are rendered at 300 DPI for professional print quality.</p>
+    <div class="modal-grid">
+      <div class="size-card selected" data-size="6x6" onclick="selectSize(this,'6x6')">
+        <div class="size-preview"><svg width="40" height="40" viewBox="0 0 40 40"><rect x="4" y="4" width="32" height="32" fill="#f0f0f0" stroke="#c8c8c8" stroke-width="1.5" rx="2"/></svg></div>
+        <div class="size-name">6 × 6</div>
+        <div class="size-desc">Small · Square</div>
+      </div>
+      <div class="size-card" data-size="8x8" onclick="selectSize(this,'8x8')">
+        <div class="size-preview"><svg width="48" height="40" viewBox="0 0 48 40"><rect x="2" y="4" width="44" height="32" fill="#f0f0f0" stroke="#c8c8c8" stroke-width="1.5" rx="2"/></svg></div>
+        <div class="size-name">8 × 8</div>
+        <div class="size-desc">Medium · Square</div>
+      </div>
+      <div class="size-card" data-size="12x12" onclick="selectSize(this,'12x12')">
+        <div class="size-preview"><svg width="56" height="40" viewBox="0 0 56 40"><rect x="0" y="2" width="56" height="36" fill="#f0f0f0" stroke="#c8c8c8" stroke-width="1.5" rx="2"/></svg></div>
+        <div class="size-name">12 × 12</div>
+        <div class="size-desc">Large · Square</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Book Title</label>
+      <input class="form-input" type="text" id="book-name-input" placeholder="e.g. Our Holiday 2024" value="My Photobook">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="initEditor()">Start Designing →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkout-modal" style="display:none">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Order your photobook</h2>
+    <p>Your design is complete. Choose your quantity — more books means better value.</p>
+    <div class="pricing-grid" id="pricing-grid"></div>
+    <div style="background:var(--gray-50);border-radius:10px;padding:16px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--gray-500)">Book size</span><span id="co-size" style="font-weight:500"></span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--gray-500)">Pages</span><span id="co-pages" style="font-weight:500"></span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--gray-500)">Quantity</span><span id="co-qty" style="font-weight:500"></span></div>
+      <div style="border-top:1px solid var(--gray-200);margin:10px 0"></div>
+      <div style="display:flex;justify-content:space-between;font-size:15px"><span style="font-weight:500">Total</span><span id="co-total" style="font-weight:600;font-size:18px"></span></div>
+    </div>
+    <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" type="text" id="co-name" placeholder="Jane Smith"></div>
+    <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="co-email" placeholder="jane@example.com"></div>
+    <div class="form-group"><label class="form-label">Shipping Address</label><input class="form-input" type="text" id="co-address" placeholder="123 Main Street, City, Country"></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="document.getElementById('checkout-modal').style.display='none'">Cancel</button>
+      <button class="btn btn-primary" onclick="submitOrder()">Place Order →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-modal" style="display:none">
+  <div class="modal" style="text-align:center">
+    <div style="font-size:48px;margin-bottom:16px">📚</div>
+    <h2 style="margin-bottom:8px">Order placed!</h2>
+    <p>Your order has been received. We'll start printing once payment is confirmed. You'll receive a confirmation email shortly.</p>
+    <div style="background:var(--gray-50);border-radius:10px;padding:14px;margin:16px 0;font-size:13px;color:var(--gray-500)">Order ID: <strong id="order-id" style="color:var(--black)"></strong></div>
+    <p style="font-size:12px;color:var(--gray-400);margin-bottom:16px;line-height:1.6">Your design file is kept securely for 90 days. We'll email you a reminder before it's removed.</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <a href="my-orders.html" class="btn btn-primary" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 8h6M5 5h4M5 11h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        View my orders
+      </a>
+      <button class="btn btn-ghost" onclick="document.getElementById('confirm-modal').style.display='none'">Continue designing</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div id="header" style="display:none">
+  <div class="logo">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAKMGlDQ1BJQ0MgUHJvZmlsZQAAeJydlndUVNcWh8+9d3qhzTAUKUPvvQ0gvTep0kRhmBlgKAMOMzSxIaICEUVEBBVBgiIGjIYisSKKhYBgwR6QIKDEYBRRUXkzslZ05eW9l5ffH2d9a5+99z1n733WugCQvP25vHRYCoA0noAf4uVKj4yKpmP7AQzwAAPMAGCyMjMCQj3DgEg+Hm70TJET+CIIgDd3xCsAN428g+h08P9JmpXBF4jSBInYgs3JZIm4UMSp2YIMsX1GxNT4FDHDKDHzRQcUsbyYExfZ8LPPIjuLmZ3GY4tYfOYMdhpbzD0i3pol5IgY8RdxURaXky3iWyLWTBWmcUX8VhybxmFmAoAiie0CDitJxKYiJvHDQtxEvBQAHCnxK47/igWcHIH4Um7pGbl8bmKSgK7L0qOb2doy6N6c7FSOQGAUxGSlMPlsult6WgaTlwvA4p0/S0ZcW7qoyNZmttbWRubGZl8V6r9u/k2Je7tIr4I/9wyi9X2x/ZVfej0AjFlRbXZ8scXvBaBjMwDy97/YNA8CICnqW/vAV/ehieclSSDIsDMxyc7ONuZyWMbigv6h/+nwN/TV94zF6f4oD92dk8AUpgro4rqx0lPThXx6ZgaTxaEb/XmI/3HgX5/DMISTwOFzeKKIcNGUcXmJonbz2FwBN51H5/L+UxP/YdiftDjXIlEaPgFqrDGQGqAC5Nc+gKIQARJzQLQD/dE3f3w4EL+8CNWJxbn/LOjfs8Jl4iWTm/g5zi0kjM4S8rMW98TPEqABAUgCKlAAKkAD6AIjYA5sgD1wBh7AFwSCMBAFVgEWSAJpgA+yQT7YCIpACdgBdoNqUAsaQBNoASdABzgNLoDL4Dq4AW6DB2AEjIPnYAa8AfMQBGEhMkSBFCBVSAsygMwhBuQIeUD+UAgUBcVBiRAPEkL50CaoBCqHqqE6qAn6HjoFXYCuQoPQPWgUmoJ+h97DCEyCqbAyrA2bwAzYBfaDw+CVcCK8Gs6DC+HtcBVcDx+D2+EL8HX4NjwCP4dnEYAQERqihhghDMQNCUSikQSEj6xDipFKpB5pQbqQXuQmMoJMI+9QGBQFRUcZoexR3qjlKBZqNWodqhRVjTqCakf1oG6iRlEzqE9oMloJbYC2Q/ugI9GJ6Gx0EboS3YhuQ19C30aPo99gMBgaRgdjg/HGRGGSMWswpZj9mFbMecwgZgwzi8ViFbAGWAdsIJaJFWCLsHuxx7DnsEPYcexbHBGnijPHeeKicTxcAa4SdxR3FjeEm8DN46XwWng7fCCejc/Fl+Eb8F34Afw4fp4gTdAhOBDCCMmEjYQqQgvhEuEh4RWRSFQn2hKDiVziBmIV8TjxCnGU+I4kQ9InuZFiSELSdtJh0nnSPdIrMpmsTXYmR5MF5O3kJvJF8mPyWwmKhLGEjwRbYr1EjUS7xJDEC0m8pJaki+QqyTzJSsmTkgOS01J4KW0pNymm1DqpGqlTUsNSs9IUaTPpQOk06VLpo9JXpSdlsDLaMh4ybJlCmUMyF2XGKAhFg+JGYVE2URoolyjjVAxVh+pDTaaWUL+j9lNnZGVkLWXDZXNka2TPyI7QEJo2zYeWSiujnaDdob2XU5ZzkePIbZNrkRuSm5NfIu8sz5Evlm+Vvy3/XoGu4KGQorBToUPhkSJKUV8xWDFb8YDiJcXpJdQl9ktYS4qXnFhyXwlW0lcKUVqjdEipT2lWWUXZSzlDea/yReVpFZqKs0qySoXKWZUpVYqqoypXtUL1nOozuizdhZ5Kr6L30GfUlNS81YRqdWr9avPqOurL1QvUW9UfaRA0GBoJGhUa3RozmqqaAZr5ms2a97XwWgytJK09Wr1ac9o62hHaW7Q7tCd15HV8dPJ0mnUe6pJ1nXRX69br3tLD6DH0UvT2693Qh/Wt9JP0a/QHDGADawOuwX6DQUO0oa0hz7DecNiIZORilGXUbDRqTDP2Ny4w7jB+YaJpEm2y06TX5JOplWmqaYPpAzMZM1+zArMus9/N9c1Z5jXmtyzIFp4W6y06LV5aGlhyLA9Y3rWiWAVYbbHqtvpobWPNt26xnrLRtImz2WczzKAyghiljCu2aFtX2/W2p23f2VnbCexO2P1mb2SfYn/UfnKpzlLO0oalYw7qDkyHOocRR7pjnONBxxEnNSemU73TE2cNZ7Zzo/OEi55Lsssxlxeupq581zbXOTc7t7Vu590Rdy/3Yvd+DxmP5R7VHo891T0TPZs9Z7ysvNZ4nfdGe/t57/Qe9lH2Yfk0+cz42viu9e3xI/mF+lX7PfHX9+f7dwXAAb4BuwIeLtNaxlvWEQgCfQJ3BT4K0glaHfRjMCY4KLgm+GmIWUh+SG8oJTQ29GjomzDXsLKwB8t1lwuXd4dLhseEN4XPRbhHlEeMRJpEro28HqUYxY3qjMZGh0c3Rs+u8Fixe8V4jFVMUcydlTorc1ZeXaW4KnXVmVjJWGbsyTh0XETc0bgPzEBmPXM23id+X/wMy421h/Wc7cyuYE9xHDjlnIkEh4TyhMlEh8RdiVNJTkmVSdNcN24192Wyd3Jt8lxKYMrhlIXUiNTWNFxaXNopngwvhdeTrpKekz6YYZBRlDGy2m717tUzfD9+YyaUuTKzU0AV/Uz1CXWFm4WjWY5ZNVlvs8OzT+ZI5/By+nL1c7flTuR55n27BrWGtaY7Xy1/Y/7oWpe1deugdfHrutdrrC9cP77Ba8ORjYSNKRt/KjAtKC94vSliU1ehcuGGwrHNXpubiySK+EXDW+y31G5FbeVu7d9msW3vtk/F7OJrJaYllSUfSlml174x+6bqm4XtCdv7y6zLDuzA7ODtuLPTaeeRcunyvPKxXQG72ivoFcUVr3fH7r5aaVlZu4ewR7hnpMq/qnOv5t4dez9UJ1XfrnGtad2ntG/bvrn97P1DB5wPtNQq15bUvj/IPXi3zquuvV67vvIQ5lDWoacN4Q293zK+bWpUbCxp/HiYd3jkSMiRniabpqajSkfLmuFmYfPUsZhjN75z/66zxailrpXWWnIcHBcef/Z93Pd3Tvid6D7JONnyg9YP+9oobcXtUHtu+0xHUsdIZ1Tn4CnfU91d9l1tPxr/ePi02umaM7Jnys4SzhaeXTiXd272fMb56QuJF8a6Y7sfXIy8eKsnuKf/kt+lK5c9L1/sdek9d8XhyumrdldPXWNc67hufb29z6qv7Sern9r6rfvbB2wGOm/Y3ugaXDp4dshp6MJN95uXb/ncun572e3BO8vv3B2OGR65y747eS/13sv7WffnH2x4iH5Y/EjqUeVjpcf1P+v93DpiPXJm1H2070nokwdjrLHnv2T+8mG88Cn5aeWE6kTTpPnk6SnPqRvPVjwbf57xfH666FfpX/e90H3xw2/Ov/XNRM6Mv+S/XPi99JXCq8OvLV93zwbNPn6T9mZ+rvitwtsj7xjvet9HvJ+Yz/6A/VD1Ue9j1ye/Tw8X0hYW/gUDmPP8uaxzGQAAArtJREFUeNrtlr1KLEEQhU9Xj4I74s8sIssqq+O6z6CCP4mImU9iYqIGPoCRYqBgZGJqIIu5gQ9hNIEumDgbqANjd58byAx6L7rjH3LBhmaCbppTZ+qrKkUSP7kEP7x+BfwK8IpeJInXiHl+prWGUqqwAPUdGDrnICJf44C1FlprnJyccH9/HyKCJEnyiEUEvu9jcnISMzMzWFpaUv39/cVFZPa9th8fH0ES29vbBEAADIKA5XKZ5XKZg4OD9DwvP6vVajw7OyNJWGs7vl9YwN7eHrXWHBkZYbvdhnMO1loYYxDHMc7Pzzk9PU0ALJVKjKIov/PW+/KeJLTWwloLEYFSCiICrTUGBgYwOzurjo+PVV9fHx4eHnB6ekqlFJxzX4+hcw4k86+1FmmaolaroVKpQEQQx/HXYWitfTMSrTW01oiiCNfX13DOYX5+/gmzDkh2dCCz2ff9/MFSqZT/AqUU0jTFxcUFV1ZWeHd3h/X1dczNzSnnHLTWH6MgS55Wq4WFhQWGYUilFD3PY71eZ6PRYKPR4MTEBIMgIACGYfguAkgWr4TP7R4dHYXneS9+0c3NDaIowubmJi4vL7m6uqoK1YJOCrNIDg8PCYDVapWv3Ws2m+zt7SUAbm1tkSSMMZ+vA8YY7OzsEAArlQpvb29hjMnPsk0SBwcH1FozCALGcfyClg/XAa31CytF5J+doRiGIay1SJIE7XY7d/nT3fBvQUqpF4h1d3cDAJrNJkQEQ0NDGB4eBsk3USwsQCmV826MyXMjw7DVauHo6Ii7u7sAgLW1NfT09OTN7NMCkiSBtRZXV1cYHx+niOTWpmmK+/t7AIDv+9jY2EBGQac64BWJHADq9ToWFxfzdvx8dXV1oVqtYmpqCsvLy2psbOwpwQq0428ZSDrZ/iEBRUeyjIofHcl+x/JfAf+VgD+3oov9WO5XCwAAAABJRU5ErkJggg==" alt="Binder">
+    <span>Studio</span>
+  </div>
+  <div class="header-sep"></div>
+  <input type="text" id="book-title-input" value="My Photobook">
+  <div class="header-spacer"></div>
+  <div class="header-sep" style="display:none" id="hdr-sep-2"></div>
+  <a href="blog.html" class="header-btn outline" style="text-decoration:none;font-size:12px;display:none" id="ed-blog-link">Blog</a>
+  <a href="my-orders.html" class="header-btn outline" style="text-decoration:none;font-size:12px">My Orders</a>
+  <a href="admin-cms.html" class="header-btn outline" style="text-decoration:none;font-size:12px;display:none" id="cms-link">Admin CMS</a>
+  <button class="header-btn outline" onclick="showCheckout()" id="hdr-order-btn">Order</button>
+  <button class="header-btn primary" onclick="saveProject()" id="hdr-save-btn">Save</button>
+</div>
+
+<!-- APP BODY -->
+<div id="app-body" style="display:none">
+
+  <!-- LEFT SIDEBAR -->
+  <div id="sidebar">
+
+    <!-- PAGES PANEL: flex-grows, scrolls internally -->
+    <div id="pages-panel">
+      <div id="pages-panel-header">
+        <div class="sidebar-label">Book Pages</div>
+      </div>
+      <div id="pages-list"></div>
+      <div id="pages-panel-footer">
+        <button class="add-page-btn" onclick="addSpread()">+ Add 2 spreads</button>
+      </div>
+    </div>
+
+    <!-- BOTTOM: upload + stock images, fixed height, own scroll -->
+    <div id="sidebar-bottom">
+      <div class="sidebar-section">
+        <!-- Image source tabs -->
+        <div class="img-tabs">
+          <button class="img-tab active" onclick="switchImgTab('upload',this)">My Photos</button>
+          <button class="img-tab" onclick="switchImgTab('stock',this)">Stock</button>
+
+        </div>
+        <!-- Upload panel -->
+        <div id="img-tab-upload">
+          <div class="upload-zone"
+            id="sidebar-upload-zone"
+            onclick="document.getElementById('img-upload').click()"
+            ondragover="handleUploadZoneDragOver(event)"
+            ondragleave="handleUploadZoneDragLeave(event)"
+            ondrop="handleUploadZoneDrop(event)">
+            <input type="file" id="img-upload" accept="image/*" multiple onchange="handleImageUpload(event)" style="display:none">
+            <div class="upload-zone-icon">📷</div>
+            <div class="upload-zone-text" id="upload-zone-text">Click or drag photos here<br>PNG, JPG, HEIC · Multiple at once</div>
+          </div>
+        </div>
+        <!-- Stock panel -->
+        <div id="img-tab-stock" style="display:none">
+          <div class="stock-source-badge unsplash">Unsplash · Pexels · Pixabay</div>
+          <div class="stock-search-row">
+            <input class="stock-search-input" type="text" id="stock-query" placeholder="Search free photos…" onkeydown="if(event.key==='Enter')searchStock()">
+            <button class="stock-search-btn" onclick="searchStock()" title="Search">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="white" stroke-width="1.5"/><path d="M11 11l3 3" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div id="stock-grid-wrap">
+            <div class="stock-empty">Search for a keyword above — e.g. <em>mountains</em>, <em>family</em>, <em>flowers</em>, <em>textures</em>.<br><br>All photos are free for print use (CC0 / Unsplash licence).</div>
+          </div>
+        </div>
+      </div>
+      <div id="assets-grid"></div>
+    </div>
+
+  </div>
+
+  <!-- CANVAS AREA -->
+  <div id="canvas-area">
+    <div class="canvas-bg-pattern"></div>
+    <!-- Drag-and-drop overlay — appears when files are dragged over the canvas -->
+    <div id="canvas-drop-overlay">
+      <div class="canvas-drop-inner">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <path d="M20 8v16M12 16l8-8 8 8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 28h24v4H8z" fill="white" opacity="0.5" rx="2"/>
+        </svg>
+        Drop photos here
+        <div style="font-size:12px;opacity:0.8;margin-top:4px">All images will be added to this spread</div>
+      </div>
+    </div>
+    <div id="toolbar">
+      <button class="tool-btn active" id="tool-select" onclick="setTool('select')" title="Select">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 2l10 6-5 1-2 5L3 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="tool-btn" id="tool-image" onclick="setTool('image')" title="Add Image">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><circle cx="5.5" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M2 11l4-3.5 3 3 2-2 3 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="tool-btn" id="tool-text" onclick="setTool('text')" title="Add Text">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M8 4v9M6 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+      <div class="tool-sep"></div>
+      <button class="tool-btn" onclick="deleteSelected()" title="Delete selected">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 5h10M6 5V3.5h4V5M6.5 8v4M9.5 8v4M4.5 5l.5 8h6l.5-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="tool-btn" onclick="duplicateSelected()" title="Duplicate">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="6" y="6" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M3 10V3h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="tool-sep"></div>
+      <button class="tool-btn" onclick="bringForward()" title="Bring forward">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="4" y="6" width="8" height="7" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M6 6V3h7v7h-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="tool-btn" onclick="sendBackward()" title="Send backward">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="3" width="8" height="7" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M8 10v3H3V6h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="tool-sep"></div>
+      <button class="tool-btn" onclick="toggleBleed()" id="btn-bleed" title="Toggle bleed/trim guides">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="1.5" width="13" height="13" rx="1" stroke="currentColor" stroke-width="1.3" stroke-dasharray="2 1.5"/><rect x="3.5" y="3.5" width="9" height="9" rx="0.5" stroke="currentColor" stroke-width="1.3"/></svg>
+      </button>
+      <button class="tool-btn" onclick="zoomIn()" title="Zoom in">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 7h4M7 5v4M11 11l2.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </button>
+      <button class="tool-btn" onclick="zoomOut()" title="Zoom out">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 7h4M11 11l2.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="spread-container">
+      <canvas id="main-canvas"></canvas>
+      <div id="quality-overlays" style="position:absolute;inset:0;pointer-events:none;z-index:25"></div>
+      <div id="selection-overlay" style="position:absolute;pointer-events:none;z-index:20;display:none">
+        <div style="position:absolute;border:2px solid #0091ff;pointer-events:none" id="sel-box"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right-panel">
+    <div class="panel-section">
+      <div class="panel-title">Properties</div>
+      <div id="no-selection" style="font-size:12px;color:var(--gray-400);text-align:center;padding:12px 0">Select an element to edit</div>
+      <div id="element-props" style="display:none">
+        <div class="prop-row"><span class="prop-label">X</span><input class="prop-input" type="number" id="prop-x" onchange="updatePropX()"></div>
+        <div class="prop-row"><span class="prop-label">Y</span><input class="prop-input" type="number" id="prop-y" onchange="updatePropY()"></div>
+        <div class="prop-row"><span class="prop-label">Width</span><input class="prop-input" type="number" id="prop-w" onchange="updatePropW()"></div>
+        <div class="prop-row"><span class="prop-label">Height</span><input class="prop-input" type="number" id="prop-h" onchange="updatePropH()"></div>
+        <div class="prop-row"><span class="prop-label">Opacity</span><input class="prop-input" type="number" id="prop-opacity" min="0" max="100" onchange="updatePropOpacity()"></div>
+      </div>
+    </div>
+
+    <div class="panel-section" id="text-props-section" style="display:none">
+      <div class="panel-title">Text Formatting</div>
+      <!-- Font family -->
+      <div style="margin-bottom:6px">
+        <select class="font-select" id="font-select" onchange="updateFont()" style="font-size:12px">
+          <optgroup label="── Sans-serif ──" disabled style="font-size:10px;color:var(--gray-400)"></optgroup>
+          <option value="Inter, sans-serif">Inter</option>
+          <option value="Montserrat, sans-serif">Montserrat</option>
+          <option value="Raleway, sans-serif">Raleway</option>
+          <option value="Poppins, sans-serif">Poppins</option>
+          <option value="'DM Sans', sans-serif">DM Sans</option>
+          <option value="Nunito, sans-serif">Nunito</option>
+          <option value="'Work Sans', sans-serif">Work Sans</option>
+          <option value="'Josefin Sans', sans-serif">Josefin Sans</option>
+          <option value="Oswald, sans-serif">Oswald</option>
+          <optgroup label="── Serif ──" disabled style="font-size:10px;color:var(--gray-400)"></optgroup>
+          <option value="'Playfair Display', serif">Playfair Display</option>
+          <option value="Lora, serif">Lora</option>
+          <option value="'Source Serif 4', serif">Source Serif 4</option>
+          <option value="'Cormorant Garamond', serif">Cormorant Garamond</option>
+          <option value="'EB Garamond', serif">EB Garamond</option>
+          <option value="Merriweather, serif">Merriweather</option>
+          <option value="'Crimson Text', serif">Crimson Text</option>
+          <option value="'Libre Baskerville', serif">Libre Baskerville</option>
+          <option value="'Abril Fatface', serif">Abril Fatface</option>
+          <optgroup label="── Handwritten ──" disabled style="font-size:10px;color:var(--gray-400)"></optgroup>
+          <option value="'Dancing Script', cursive">Dancing Script</option>
+          <option value="Pacifico, cursive">Pacifico</option>
+          <option value="'Great Vibes', cursive">Great Vibes</option>
+          <option value="Satisfy, cursive">Satisfy</option>
+          <option value="Caveat, cursive">Caveat</option>
+          <option value="Sacramento, cursive">Sacramento</option>
+          <option value="Yellowtail, cursive">Yellowtail</option>
+          <option value="Courgette, cursive">Courgette</option>
+          <option value="'Kaushan Script', cursive">Kaushan Script</option>
+          <option value="Lobster, cursive">Lobster</option>
+        </select>
+      </div>
+      <!-- Format toolbar row 1: size + B I U S -->
+      <div class="fmt-toolbar">
+        <input class="fmt-size" type="number" id="font-size" value="24" onchange="updateFontSize()" min="6" max="300" title="Font size">
+        <div class="fmt-sep"></div>
+        <button class="fmt-btn" id="btn-bold" onclick="toggleBold()" title="Bold"><b>B</b></button>
+        <button class="fmt-btn" id="btn-italic" onclick="toggleItalic()" title="Italic"><i>I</i></button>
+        <button class="fmt-btn" id="btn-underline" onclick="toggleUnderline()" title="Underline"><u>U</u></button>
+        <button class="fmt-btn" id="btn-strike" onclick="toggleStrike()" title="Strikethrough"><s>S</s></button>
+        <div class="fmt-sep"></div>
+        <!-- Text colour -->
+        <div class="fmt-color-wrap" title="Text colour" style="background:linear-gradient(to bottom, white 60%, #000 60%)">
+          <input type="color" id="text-color" value="#000000" onchange="updateTextColor()">
+        </div>
+        <!-- Highlight/background colour -->
+        <div class="fmt-color-wrap" title="Highlight colour" style="background:linear-gradient(to bottom, white 60%, #ffff00 60%)" id="highlight-wrap">
+          <input type="color" id="text-highlight" value="#ffff00" onchange="updateTextHighlight()">
+        </div>
+        <div class="fmt-sep"></div>
+        <!-- Alignment -->
+        <button class="fmt-btn" id="btn-align-left" onclick="setAlign('left')" title="Align left">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 2h11M1 5h7M1 8h9M1 11h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </button>
+        <button class="fmt-btn" id="btn-align-center" onclick="setAlign('center')" title="Align centre">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 2h11M3 5h7M2 8h9M3.5 11h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </button>
+        <button class="fmt-btn" id="btn-align-right" onclick="setAlign('right')" title="Align right">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 2h11M5 5h7M3 8h9M6 11h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </button>
+        <div class="fmt-sep"></div>
+        <!-- Line spacing -->
+        <select class="fmt-select" id="line-spacing" onchange="updateLineSpacing()" title="Line spacing">
+          <option value="1.0">1.0×</option>
+          <option value="1.2">1.2×</option>
+          <option value="1.4" selected>1.4×</option>
+          <option value="1.6">1.6×</option>
+          <option value="1.8">1.8×</option>
+          <option value="2.0">2.0×</option>
+        </select>
+        <!-- Letter spacing -->
+        <select class="fmt-select" id="letter-spacing" onchange="updateLetterSpacing()" title="Letter spacing">
+          <option value="-1">-1px</option>
+          <option value="0" selected>0</option>
+          <option value="1">+1px</option>
+          <option value="2">+2px</option>
+          <option value="4">+4px</option>
+          <option value="8">+8px</option>
+        </select>
+        <div class="fmt-sep"></div>
+        <!-- Text transform -->
+        <button class="fmt-btn" id="btn-caps" onclick="toggleTextTransform('uppercase')" title="ALL CAPS" style="font-size:8px;letter-spacing:0.5px;font-weight:600">AA</button>
+        <button class="fmt-btn" id="btn-lowercase" onclick="toggleTextTransform('lowercase')" title="lowercase" style="font-size:9px">aa</button>
+        <button class="fmt-btn" id="btn-capitalize" onclick="toggleTextTransform('capitalize')" title="Capitalise" style="font-size:9px">Aa</button>
+      </div>
+      <!-- Text content textarea -->
+      <div>
+        <div class="prop-label" style="margin-bottom:5px">Text content</div>
+        <textarea id="text-content" rows="3" style="width:100%;padding:8px;border:1px solid var(--gray-200);border-radius:6px;font-size:12px;resize:vertical;outline:none;line-height:1.5" onchange="updateTextContent()" oninput="updateTextContent()"></textarea>
+      </div>
+    </div>
+
+    <div class="panel-section" id="image-props-section" style="display:none">
+      <div class="panel-title">Image</div>
+      <div class="prop-row"><span class="prop-label">Rotation °</span><input class="prop-input" type="number" id="prop-rotation" value="0" onchange="updateRotation()"></div>
+      <!-- Quality indicator -->
+      <div id="quality-indicator">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M8 2l1.5 3 3.3.5-2.4 2.3.6 3.2L8 9.5l-3 1.5.6-3.2L3.2 5.5l3.3-.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        <span id="quality-text">Checking…</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="openCropModal()">✂ Crop</button>
+        <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="fitToPage()">Fit page</button>
+        <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="centerOnPage()">Centre</button>
+        <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="resetCrop()">Reset crop</button>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">Layers</div>
+      <div id="layers-list" style="display:flex;flex-direction:column;gap:2px"></div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">Page Background</div>
+      <div class="prop-row">
+        <span class="prop-label">Color</span>
+        <div class="color-swatch"><input type="color" id="bg-color" value="#ffffff" onchange="updateBgColor()"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="admin-panel">
+    <div class="admin-header">
+      <h1>Print Dashboard</h1>
+      <div style="display:flex;gap:8px">
+        <button class="header-btn outline" onclick="exportAllOrders()">Export CSV</button>
+        <button class="header-btn primary" onclick="refreshOrders()">Refresh</button>
+      </div>
+    </div>
+    <div class="admin-stats" id="admin-stats"></div>
+    <div class="orders-table">
+      <div class="orders-table-wrap">
+      <table>
+        <thead><tr>
+          <th>Order ID</th><th>Customer</th><th>Address</th><th>Country</th><th>Book</th><th>Qty</th><th>Amount</th><th>Status</th><th>PDF</th>
+        </tr></thead>
+        <tbody id="orders-tbody"></tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CROP MODAL ═══ -->
+<div id="crop-modal">
+  <div class="crop-ratios">
+    <button class="crop-ratio active" onclick="setCropRatio(0)" data-r="0">Free</button>
+    <button class="crop-ratio" onclick="setCropRatio(1)" data-r="1">1:1</button>
+    <button class="crop-ratio" onclick="setCropRatio(4/3)" data-r="1.333">4:3</button>
+    <button class="crop-ratio" onclick="setCropRatio(3/2)" data-r="1.5">3:2</button>
+    <button class="crop-ratio" onclick="setCropRatio(16/9)" data-r="1.778">16:9</button>
+    <button class="crop-ratio" onclick="setCropRatio(2/3)" data-r="0.667">2:3</button>
+  </div>
+  <div id="crop-wrap">
+    <img id="crop-img" src="" alt="Crop">
+    <div id="crop-box">
+      <div class="crop-handle tl" data-h="tl"></div>
+      <div class="crop-handle tm" data-h="tm"></div>
+      <div class="crop-handle tr" data-h="tr"></div>
+      <div class="crop-handle ml" data-h="ml"></div>
+      <div class="crop-handle mr" data-h="mr"></div>
+      <div class="crop-handle bl" data-h="bl"></div>
+      <div class="crop-handle bm" data-h="bm"></div>
+      <div class="crop-handle br" data-h="br"></div>
+      <!-- rule-of-thirds lines -->
+      <div class="crop-rule h" style="top:33.3%"></div>
+      <div class="crop-rule h" style="top:66.6%"></div>
+      <div class="crop-rule v" style="left:33.3%"></div>
+      <div class="crop-rule v" style="left:66.6%"></div>
+    </div>
+  </div>
+  <div id="crop-hint">Drag corners to crop · Drag inside box to reposition</div>
+  <div id="crop-footer">
+    <button class="crop-btn cancel" onclick="closeCropModal()">Cancel</button>
+    <button class="crop-btn apply" onclick="applyCrop()">Apply crop</button>
+  </div>
+</div>
+
+<!-- ═══ MOBILE PAGES STRIP ═══ -->
+<div id="mob-pages-strip"></div>
+
+<!-- ═══ MOBILE FLOATING TOOLBAR ═══ -->
+<div id="mob-toolbar">
+  <button class="mob-tool-btn active" id="mob-tool-select" onclick="setTool('select')" aria-label="Select">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M3 2l10 6-5 1-2 5L3 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+  </button>
+  <button class="mob-tool-btn" id="mob-tool-text" onclick="setTool('text')" aria-label="Add text">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M8 4v9M6 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </button>
+  <button class="mob-tool-btn" onclick="document.getElementById('img-upload-mob').click()" aria-label="Add image">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><circle cx="5.5" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M2 11l4-3.5 3 3 2-2 3 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <input type="file" id="img-upload-mob" accept="image/*" multiple onchange="handleImageUpload(event)" style="display:none">
+  <div class="mob-tool-sep"></div>
+  <button class="mob-tool-btn" onclick="deleteSelected()" aria-label="Delete">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M3 5h10M6 5V3.5h4V5M6.5 8v4M9.5 8v4M4.5 5l.5 8h6l.5-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <button class="mob-tool-btn" onclick="duplicateSelected()" aria-label="Duplicate">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none"><rect x="6" y="6" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M3 10V3h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div class="mob-tool-sep"></div>
+  <button class="mob-tool-btn" onclick="bringForward()" aria-label="Bring forward">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none"><rect x="4" y="6" width="8" height="7" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M6 6V3h7v7h-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <button class="mob-tool-btn" onclick="sendBackward()" aria-label="Send backward">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none"><rect x="3" y="3" width="8" height="7" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M8 10v3H3V6h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div class="mob-tool-sep"></div>
+  <button class="mob-tool-btn" onclick="zoomIn()" aria-label="Zoom in">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 7h4M7 5v4M11 11l2.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+  </button>
+  <button class="mob-tool-btn" onclick="zoomOut()" aria-label="Zoom out">
+    <svg width="20" height="20" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 7h4M11 11l2.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+  </button>
+</div>
+
+<!-- ═══ MOBILE BOTTOM NAV ═══ -->
+<div id="mob-nav">
+  <button class="mob-nav-btn" onclick="mobOpenSheet('pages')" id="mob-btn-pages" aria-label="Pages">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/><rect x="14" y="16" width="7" height="5" rx="1"/></svg>
+    Pages
+  </button>
+  <button class="mob-nav-btn" onclick="mobOpenSheet('images')" id="mob-btn-images" aria-label="Images">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    Images
+  </button>
+  <button class="mob-nav-btn" onclick="mobOpenSheet('props')" id="mob-btn-props" aria-label="Properties">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+    Properties
+  </button>
+  <button class="mob-nav-btn" onclick="showCheckout()" aria-label="Order">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    Order
+  </button>
+</div>
+
+<!-- ═══ MOBILE BOTTOM SHEET ═══ -->
+<div id="mob-sheet">
+  <div class="mob-sheet-handle"></div>
+  <div class="mob-sheet-header">
+    <span class="mob-sheet-title" id="mob-sheet-title">Pages</span>
+    <button class="mob-sheet-close" onclick="mobCloseSheet()" aria-label="Close">✕</button>
+  </div>
+  <div class="mob-sheet-body" id="mob-sheet-body"></div>
+</div>
+<div id="status-bar" style="display:none">
+  <div class="status-item" id="status-page">Page 1 of 1</div>
+  <div class="status-item">|</div>
+  <div class="status-item" id="status-size">—</div>
+  <div class="status-item">|</div>
+  <div class="status-item" id="status-zoom">100%</div>
+  <div class="status-item">|</div>
+  <div class="status-item" id="status-dpi">300 DPI</div>
+  <div class="status-item" id="status-bleed" style="color:var(--bleed-color)">| Bleed: 3mm</div>
+  <div class="status-item" id="status-trim" style="color:var(--trim-color)">| Trim marks</div>
+  <div class="status-item" style="color:#0064ff;opacity:0.7">| Safe: 5mm</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+const GOOGLE_FONTS = ['Inter','Playfair Display','Montserrat','Raleway','Lora','Nunito','Poppins','DM Sans','Source Serif 4'];
+
+const BOOK_SIZES = {
+  '6x6':  {w:6,  h:6,  label:'6×6"'},
+  '8x8':  {w:8,  h:8,  label:'8×8"'},
+  '12x12':{w:12, h:12, label:'12×12"'}
+};
+
+const BLEED_MM = 3;      // 3mm bleed
+const TRIM_MM  = 0.25;   // 0.25mm trim marks thickness
+const DPI = 300;
+
+const CURRENCY = { symbol: '₹', code: 'INR' };
+const BASE_PRICES = {'6x6':1999,'8x8':2999,'12x12':4499};
+const QTY_TIERS   = [
+  {qty:1,  discount:0,    label:'1 book'},
+  {qty:10, discount:0.20, label:'10 books'},
+  {qty:50, discount:0.40, label:'50 books'},
+  {qty:100,discount:0.55, label:'100 books'},
+];
+
+let state = {
+  currentSize: '6x6',
+  bookTitle: 'My Photobook',
+  currentPage: 0,       // 0 = cover, 1+ = spreads
+  zoom: 1,
+  showBleed: true,
+  selectedElementId: null,
+  activeTool: 'select',
+  pages: [],            // [{type:'cover'|'spread', elements:[], bg:'#fff'}]
+  assets: [],           // [{id, src, name}]
+  orders: [],
+  isDragging: false,
+  dragStartX: 0,
+  dragStartY: 0,
+  dragElementOriginX: 0,
+  dragElementOriginY: 0,
+  isResizing: false,
+  resizeHandle: null,
+  nextId: 1,
+  selectedQty: 1,
+};
+
+let canvas, ctx;
+let displayScale = 1; // px per pt at current zoom
+let pageWidthPt, pageHeightPt; // in "canvas points" (screen px / displayScale)
+
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
+function selectSize(el, size) {
+  document.querySelectorAll('.size-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.currentSize = size;
+}
+
+function initEditor() {
+  const nameInput = document.getElementById('book-name-input');
+  state.bookTitle = nameInput.value || 'My Photobook';
+  document.getElementById('book-title-input').value = state.bookTitle;
+
+  document.getElementById('setup-modal').style.display = 'none';
+  document.getElementById('header').style.display = 'flex';
+  document.getElementById('app-body').style.display = 'flex';
+  document.getElementById('status-bar').style.display = 'flex';
+
+  // Init canvas
+  canvas = document.getElementById('main-canvas');
+  ctx = canvas.getContext('2d');
+
+  // 20 pages default: 1 cover + 10 spreads (each spread = 2 pages)
+  const defaultSpreads = [];
+  for (let i = 0; i < 10; i++) defaultSpreads.push({type:'spread', elements:[], bg:'#ffffff'});
+  state.pages = [
+    {type:'cover', elements:[], bg:'#ffffff'},
+    ...defaultSpreads,
+  ];
+
+  computeCanvasDimensions();
+  bindCanvasEvents();
+  bindTouchEvents();
+  initCanvasDragDrop();
+  renderPage();
+  renderPagesList();
+  renderMobPagesStrip();
+  updateStatusBar();
+  updatePricingModal();
+  loadSampleOrders();
+  initCoverDefaults();
+  applyResponsiveLayout();
+  showToast('Welcome! Upload photos or search free stock images.');
+}
+
+function computeCanvasDimensions() {
+  const sz = BOOK_SIZES[state.currentSize];
+  const areaEl = document.getElementById('canvas-area');
+  const areaW = areaEl.clientWidth - 80;
+  const areaH = areaEl.clientHeight - 100;
+
+  const isSpread = state.pages[state.currentPage].type === 'spread';
+  // Cover = 1 page, Spread = 2 pages side by side
+  // in inches at 1 unit per inch
+  const pageW = isSpread ? sz.w * 2 : sz.w;
+  const pageH = sz.h;
+  const bleedIn = BLEED_MM / 25.4;
+  const totalW = pageW + bleedIn * 2;
+  const totalH = pageH + bleedIn * 2;
+
+  const scaleW = areaW / totalW;
+  const scaleH = areaH / totalH;
+  displayScale = Math.min(scaleW, scaleH, 160) * state.zoom;
+
+  const canvasW = Math.round(totalW * displayScale);
+  const canvasH = Math.round(totalH * displayScale);
+  canvas.width = canvasW;
+  canvas.height = canvasH;
+  canvas.style.width  = canvasW + 'px';
+  canvas.style.height = canvasH + 'px';
+
+  pageWidthPt  = pageW  * displayScale;
+  pageHeightPt = pageH  * displayScale;
+
+  // Center canvas in area
+  canvas.style.margin = 'auto';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RENDERING
+// ═══════════════════════════════════════════════════════════════════
+function renderPage() {
+  if (!canvas) return;
+  computeCanvasDimensions();
+  const pg = state.pages[state.currentPage];
+  const sz = BOOK_SIZES[state.currentSize];
+  const bleedPx = (BLEED_MM / 25.4) * displayScale;
+  const isSpread = pg.type === 'spread';
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // ─ Background (bleed area) ─
+  ctx.fillStyle = '#f0f0f0';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // ─ Page white area ─
+  ctx.fillStyle = pg.bg || '#ffffff';
+  ctx.fillRect(bleedPx, bleedPx, pageWidthPt, pageHeightPt);
+
+  // ─ Elements ─
+  const sorted = [...pg.elements].sort((a,b) => (a.zIndex||0)-(b.zIndex||0));
+  sorted.forEach(el => drawElement(el, bleedPx));
+
+  // ─ Center gutter line for spreads ─
+  if (isSpread) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(180,180,180,0.4)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4,4]);
+    const centerX = bleedPx + pageWidthPt / 2;
+    ctx.beginPath();
+    ctx.moveTo(centerX, bleedPx);
+    ctx.lineTo(centerX, bleedPx + pageHeightPt);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // ─ Bleed & Trim Marks ─
+  if (state.showBleed) drawBleedTrimMarks(bleedPx);
+
+  // ─ Snap guides (only while dragging) ─
+  if (state.isDragging) drawSnapGuides(bleedPx);
+
+  // ─ Selection highlight ─
+  if (state.selectedElementId) {
+    const el = pg.elements.find(e => e.id === state.selectedElementId);
+    if (el) drawSelection(el, bleedPx);
+  }
+
+  // ─ Quality overlays ─
+  renderQualityOverlays();
+}
+
+function drawElement(el, bleedPx) {
+  // ── IMAGE PLACEHOLDER ──
+  if (el.type === 'image-placeholder') {
+    const x = bleedPx + el.x * displayScale;
+    const y = bleedPx + el.y * displayScale;
+    const w = el.w * displayScale;
+    const h = el.h * displayScale;
+    ctx.save();
+    ctx.globalAlpha = (el.opacity||100)/100;
+
+    // 30% solid black background
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.30)';
+    ctx.fillRect(x, y, w, h);
+
+    // "Upload image here" — 12pt Inter, white, centred
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '500 12pt Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Upload image here', x + w / 2, y + h / 2);
+    ctx.textBaseline = 'alphabetic';
+
+    ctx.restore();
+    return;
+  }
+  ctx.save();
+  ctx.globalAlpha = (el.opacity !== undefined ? el.opacity : 100) / 100;
+
+  const x = bleedPx + el.x * displayScale;
+  const y = bleedPx + el.y * displayScale;
+  const w = el.w * displayScale;
+  const h = el.h * displayScale;
+
+  if (el.rotation) {
+    ctx.translate(x + w/2, y + h/2);
+    ctx.rotate((el.rotation * Math.PI) / 180);
+    ctx.translate(-(x + w/2), -(y + h/2));
+  }
+
+  if (el.type === 'image' && el.imgEl) {
+    if (el.crop) {
+      // Draw cropped region using clip
+      const c = el.crop; // {x,y,w,h} normalised 0-1 relative to original image
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x, y, w, h);
+      ctx.clip();
+      // Source region
+      const sw = el.imgEl.naturalWidth  * c.w;
+      const sh = el.imgEl.naturalHeight * c.h;
+      const sx = el.imgEl.naturalWidth  * c.x;
+      const sy = el.imgEl.naturalHeight * c.y;
+      // Cover-fit: scale crop region to fill destination proportionally
+      const scaleX = w / sw;
+      const scaleY = h / sh;
+      const scale  = Math.max(scaleX, scaleY);
+      const dw = sw * scale;
+      const dh = sh * scale;
+      const dx = x + (w - dw) / 2;
+      const dy = y + (h - dh) / 2;
+      ctx.drawImage(el.imgEl, sx, sy, sw, sh, dx, dy, dw, dh);
+      ctx.restore();
+    } else {
+      // Cover-fit: scale image to fill the box, centred, no stretching
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x, y, w, h);
+      ctx.clip();
+      const iw = el.imgEl.naturalWidth;
+      const ih = el.imgEl.naturalHeight;
+      const scaleX = w / iw;
+      const scaleY = h / ih;
+      const scale  = Math.max(scaleX, scaleY);
+      const dw = iw * scale;
+      const dh = ih * scale;
+      const dx = x + (w - dw) / 2;
+      const dy = y + (h - dh) / 2;
+      ctx.drawImage(el.imgEl, dx, dy, dw, dh);
+      ctx.restore();
+    }
+  } else if (el.type === 'image') {
+    ctx.fillStyle = '#e0e0e0';
+    ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = '#a0a0a0';
+    ctx.font = `${11}px Inter, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('Image', x + w/2, y + h/2);
+  } else if (el.type === 'text') {
+    const fontSize = (el.fontSize || 24) * displayScale / 80;
+    const lsScale  = (el.letterSpacing || 0) * displayScale / 80;
+    const lineH    = fontSize * (el.lineSpacing || 1.4);
+    let fontStr = '';
+    if (el.italic) fontStr += 'italic ';
+    fontStr += `${el.bold ? '700' : '400'} ${fontSize}px ${el.fontFamily || 'Inter, sans-serif'}`;
+    ctx.font = fontStr;
+    ctx.fillStyle = el.color || '#000000';
+
+    const align = el.align || 'left';
+    ctx.textAlign = align;
+    const textX = align === 'center' ? x + w/2 : align === 'right' ? x + w : x;
+
+    let rawLines = (el.text || '').split('\n');
+    // Apply text transform
+    if (el.textTransform === 'uppercase')   rawLines = rawLines.map(l => l.toUpperCase());
+    else if (el.textTransform === 'lowercase')  rawLines = rawLines.map(l => l.toLowerCase());
+    else if (el.textTransform === 'capitalize') rawLines = rawLines.map(l => l.replace(/\b\w/g, c => c.toUpperCase()));
+
+    rawLines.forEach((line, i) => {
+      const lineY = y + fontSize + i * lineH;
+
+      // Highlight background
+      if (el.highlight && el.highlight !== '#ffff00' || (el.highlight === '#ffff00' && el.useHighlight)) {
+        const metrics = ctx.measureText(line);
+        const lx = align === 'center' ? textX - metrics.width/2 :
+                   align === 'right'  ? textX - metrics.width : textX;
+        ctx.fillStyle = el.highlight || '#ffff00';
+        ctx.globalAlpha *= 0.4;
+        ctx.fillRect(lx - 2, lineY - fontSize, metrics.width + 4, fontSize * 1.2);
+        ctx.globalAlpha = (el.opacity !== undefined ? el.opacity : 100) / 100;
+        ctx.fillStyle = el.color || '#000000';
+      }
+
+      // Letter spacing (simulate by drawing char by char for small spacing vals)
+      if (lsScale !== 0 && line.length > 0) {
+        let cx2 = textX;
+        if (align === 'center') cx2 = textX - ctx.measureText(line).width / 2 + (lsScale * (line.length-1)) / 2;
+        if (align === 'right')  cx2 = textX  - ctx.measureText(line).width - (lsScale * (line.length-1));
+        for (let ci = 0; ci < line.length; ci++) {
+          const charW = ctx.measureText(line[ci]).width;
+          ctx.fillText(line[ci], cx2, lineY);
+          cx2 += charW + lsScale;
+        }
+      } else {
+        ctx.fillText(line, textX, lineY);
+      }
+
+      // Underline
+      if (el.underline) {
+        const metrics = ctx.measureText(line);
+        const lx = align === 'center' ? textX - metrics.width/2 :
+                   align === 'right'  ? textX - metrics.width : textX;
+        ctx.save();
+        ctx.strokeStyle = el.color || '#000000';
+        ctx.lineWidth = Math.max(1, fontSize * 0.06);
+        ctx.beginPath();
+        ctx.moveTo(lx, lineY + 2);
+        ctx.lineTo(lx + metrics.width, lineY + 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+      // Strikethrough
+      if (el.strike) {
+        const metrics = ctx.measureText(line);
+        const lx = align === 'center' ? textX - metrics.width/2 :
+                   align === 'right'  ? textX - metrics.width : textX;
+        ctx.save();
+        ctx.strokeStyle = el.color || '#000000';
+        ctx.lineWidth = Math.max(1, fontSize * 0.06);
+        ctx.beginPath();
+        ctx.moveTo(lx, lineY - fontSize * 0.35);
+        ctx.lineTo(lx + metrics.width, lineY - fontSize * 0.35);
+        ctx.stroke();
+        ctx.restore();
+      }
+    });
+  }
+  ctx.restore();
+}
+
+function drawBleedTrimMarks(bleedPx) {
+  const W = canvas.width;
+  const H = canvas.height;
+  const pW = pageWidthPt;
+  const pH = pageHeightPt;
+  const markLen = 20;
+  const gap = 4;
+
+  // ─ SAFE MARGIN ZONE (blue dotted) ─ inside the trim, 0.125" in
+  const safeOffPx = SAFE_MARGIN_IN * displayScale;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,100,255,0.25)';
+  ctx.lineWidth = 0.8;
+  ctx.setLineDash([3, 3]);
+  ctx.strokeRect(bleedPx + safeOffPx, bleedPx + safeOffPx, pW - safeOffPx*2, pH - safeOffPx*2);
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // ─ BLEED BORDER (RED) ─
+  ctx.save();
+  ctx.strokeStyle = '#e53e3e';
+  ctx.lineWidth = 0.8;
+  ctx.setLineDash([]);
+  ctx.strokeRect(bleedPx, bleedPx, pW, pH);
+  ctx.restore();
+
+  // ─ TRIM MARKS (BLACK) — corner ticks outside bleed ─
+  ctx.save();
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 0.75;
+  ctx.setLineDash([]);
+  const corners = [
+    [bleedPx, bleedPx],             // TL
+    [bleedPx + pW, bleedPx],        // TR
+    [bleedPx, bleedPx + pH],        // BL
+    [bleedPx + pW, bleedPx + pH],   // BR
+  ];
+  corners.forEach(([cx, cy], i) => {
+    const dirX = i % 2 === 0 ? -1 : 1;
+    const dirY = i < 2 ? -1 : 1;
+    ctx.beginPath();
+    ctx.moveTo(cx + dirX * gap, cy);
+    ctx.lineTo(cx + dirX * (gap + markLen), cy);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + dirY * gap);
+    ctx.lineTo(cx, cy + dirY * (gap + markLen));
+    ctx.stroke();
+  });
+
+  // ─ Labels ─
+  ctx.fillStyle = '#e53e3e';
+  ctx.font = `bold 8px Inter, sans-serif`;
+  ctx.fillText('BLEED', bleedPx + 2, bleedPx - 2);
+  ctx.fillStyle = '#000000';
+  ctx.fillText('TRIM', 2, bleedPx - 2 - 10);
+  ctx.fillStyle = 'rgba(0,100,255,0.5)';
+  ctx.font = `8px Inter, sans-serif`;
+  ctx.fillText('SAFE 5mm', bleedPx + safeOffPx + 2, bleedPx + safeOffPx + 10);
+  ctx.restore();
+}
+
+// Resize handle hit areas (canvas px relative to element bounds)
+const HANDLE_SIZE = 9;
+function getResizeHandles(x, y, w, h) {
+  return [
+    {id:'tl', cx:x,     cy:y,     cursor:'nw-resize'},
+    {id:'tm', cx:x+w/2, cy:y,     cursor:'n-resize'},
+    {id:'tr', cx:x+w,   cy:y,     cursor:'ne-resize'},
+    {id:'ml', cx:x,     cy:y+h/2, cursor:'w-resize'},
+    {id:'mr', cx:x+w,   cy:y+h/2, cursor:'e-resize'},
+    {id:'bl', cx:x,     cy:y+h,   cursor:'sw-resize'},
+    {id:'bm', cx:x+w/2, cy:y+h,   cursor:'s-resize'},
+    {id:'br', cx:x+w,   cy:y+h,   cursor:'se-resize'},
+  ];
+}
+
+function drawSelection(el, bleedPx) {
+  const x = bleedPx + el.x * displayScale;
+  const y = bleedPx + el.y * displayScale;
+  const w = el.w * displayScale;
+  const h = el.h * displayScale;
+
+  ctx.save();
+  ctx.strokeStyle = '#0091ff';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([]);
+  ctx.strokeRect(x, y, w, h);
+
+  const handles = getResizeHandles(x, y, w, h);
+  handles.forEach(hd => {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(hd.cx - HANDLE_SIZE/2, hd.cy - HANDLE_SIZE/2, HANDLE_SIZE, HANDLE_SIZE);
+    ctx.strokeStyle = '#0091ff';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(hd.cx - HANDLE_SIZE/2, hd.cy - HANDLE_SIZE/2, HANDLE_SIZE, HANDLE_SIZE);
+  });
+  ctx.restore();
+}
+
+function hitTestResizeHandle(coords) {
+  if (!state.selectedElementId) return null;
+  const pg = state.pages[state.currentPage];
+  const el = pg.elements.find(e => e.id === state.selectedElementId);
+  if (!el) return null;
+  const bleedPx = (BLEED_MM / 25.4) * displayScale;
+  const x = el.x * displayScale;
+  const y = el.y * displayScale;
+  const w = el.w * displayScale;
+  const h = el.h * displayScale;
+  const handles = getResizeHandles(x, y, w, h);
+  const mx = coords.px * displayScale;
+  const my = coords.py * displayScale;
+  const thresh = HANDLE_SIZE + 2;
+  for (const hd of handles) {
+    if (Math.abs(mx - hd.cx) <= thresh && Math.abs(my - hd.cy) <= thresh) return hd.id;
+  }
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CANVAS EVENTS
+// ═══════════════════════════════════════════════════════════════════
+function bindCanvasEvents() {
+  canvas.addEventListener('mousedown', onMouseDown);
+  canvas.addEventListener('mousemove', onMouseMove);
+  canvas.addEventListener('mouseup',   onMouseUp);
+  canvas.addEventListener('dblclick',  onDblClick);
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', onKeyDown);
+}
+
+function getCanvasCoords(e) {
+  const rect = canvas.getBoundingClientRect();
+  const pg = state.pages[state.currentPage];
+  const sz = BOOK_SIZES[state.currentSize];
+  const bleedPx = (BLEED_MM / 25.4) * displayScale;
+  const mx = (e.clientX - rect.left);
+  const my = (e.clientY - rect.top);
+  // Convert to page coordinates (inches * displayScale)
+  const px = (mx - bleedPx) / displayScale;
+  const py = (my - bleedPx) / displayScale;
+  return {mx, my, px, py};
+}
+
+function hitTest(coords) {
+  const pg = state.pages[state.currentPage];
+  const reversed = [...pg.elements].reverse();
+  for (const el of reversed) {
+    if (coords.px >= el.x && coords.px <= el.x + el.w &&
+        coords.py >= el.y && coords.py <= el.y + el.h) {
+      return el;
+    }
+  }
+  return null;
+}
+
+function onMouseDown(e) {
+  const coords = getCanvasCoords(e);
+  if (state.activeTool === 'select') {
+    // Check for image-placeholder click first
+    const pg0 = state.pages[state.currentPage];
+    const phHit = pg0.elements.slice().reverse().find(el =>
+      el.type === 'image-placeholder' &&
+      coords.px >= el.x && coords.px <= el.x + el.w &&
+      coords.py >= el.y && coords.py <= el.y + el.h
+    );
+    if (phHit) {
+      state._replacingPlaceholderId = phHit.id;
+      document.getElementById('img-upload').click();
+      return;
+    }
+    // First check if we're on a resize handle
+    const handleId = hitTestResizeHandle(coords);
+    if (handleId) {
+      const pg = state.pages[state.currentPage];
+      const el = pg.elements.find(e2 => e2.id === state.selectedElementId);
+      state.isResizing = true;
+      state.resizeHandle = handleId;
+      state.resizeStartX = coords.px;
+      state.resizeStartY = coords.py;
+      state.resizeOrigin = {x: el.x, y: el.y, w: el.w, h: el.h, aspect: el.w / el.h};
+      return;
+    }
+    const hit = hitTest(coords);
+    if (hit) {
+      selectElement(hit.id);
+      state.isDragging = true;
+      state.dragStartX = coords.px;
+      state.dragStartY = coords.py;
+      state.dragElementOriginX = hit.x;
+      state.dragElementOriginY = hit.y;
+    } else {
+      deselectAll();
+    }
+  } else if (state.activeTool === 'text') {
+    addTextElement(coords.px, coords.py);
+    setTool('select');
+  } else if (state.activeTool === 'image') {
+    document.getElementById('img-upload').click();
+    setTool('select');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SNAPPING ENGINE
+// ═══════════════════════════════════════════════════════════════════
+// Safe margin = 5mm (inside bleed, keeps content clear of trim edge)
+const SAFE_MARGIN_IN = 5 / 25.4; // 5mm converted to inches
+// Snap threshold in screen pixels
+const SNAP_PX = 8;
+
+let activeSnapLines = []; // drawn this frame
+
+function computeSnapGuides(pg, el) {
+  const sz = BOOK_SIZES[state.currentSize];
+  const pw = pg.type === 'spread' ? sz.w * 2 : sz.w;
+  const ph = sz.h;
+  const safe = SAFE_MARGIN_IN;
+
+  // Anchor lines (X = vertical lines, Y = horizontal lines)
+  // All values are in inch-space (page coordinates)
+  const xLines = [
+    { v: safe,            label: 'safe-left' },
+    { v: pw / 2,          label: 'center-x'  },
+    { v: pw - safe,       label: 'safe-right' },
+    // For spreads: each page's center and inner edge
+    ...(pg.type === 'spread' ? [
+      { v: pw / 4,        label: 'left-center' },
+      { v: pw * 3 / 4,   label: 'right-center' },
+    ] : []),
+  ];
+  const yLines = [
+    { v: safe,            label: 'safe-top'    },
+    { v: ph / 2,          label: 'center-y'    },
+    { v: ph - safe,       label: 'safe-bottom' },
+  ];
+  return { xLines, yLines, pw, ph, safe };
+}
+
+function applySnap(el, pg) {
+  const { xLines, yLines, pw, ph, safe } = computeSnapGuides(pg, el);
+  const snapThreshIn = SNAP_PX / displayScale;
+  activeSnapLines = [];
+
+  let sx = el.x;
+  let sy = el.y;
+  let snappedX = false;
+  let snappedY = false;
+
+  // Candidate x positions of the element: left edge, center, right edge
+  const elXCandidates = [
+    { pos: el.x,           anchor: 'left'   },
+    { pos: el.x + el.w/2,  anchor: 'center' },
+    { pos: el.x + el.w,    anchor: 'right'  },
+  ];
+  const elYCandidates = [
+    { pos: el.y,           anchor: 'top'    },
+    { pos: el.y + el.h/2,  anchor: 'center' },
+    { pos: el.y + el.h,    anchor: 'bottom' },
+  ];
+
+  // Find closest X snap
+  let bestXDist = snapThreshIn;
+  for (const guide of xLines) {
+    for (const cand of elXCandidates) {
+      const dist = Math.abs(cand.pos - guide.v);
+      if (dist < bestXDist) {
+        bestXDist = dist;
+        // Reposition element so this anchor aligns to guide
+        if (cand.anchor === 'left')   sx = guide.v;
+        if (cand.anchor === 'center') sx = guide.v - el.w / 2;
+        if (cand.anchor === 'right')  sx = guide.v - el.w;
+        snappedX = true;
+        activeSnapLines.push({ axis: 'x', v: guide.v, label: guide.label });
+      }
+    }
+  }
+
+  // Find closest Y snap
+  let bestYDist = snapThreshIn;
+  for (const guide of yLines) {
+    for (const cand of elYCandidates) {
+      const dist = Math.abs(cand.pos - guide.v);
+      if (dist < bestYDist) {
+        bestYDist = dist;
+        if (cand.anchor === 'top')    sy = guide.v;
+        if (cand.anchor === 'center') sy = guide.v - el.h / 2;
+        if (cand.anchor === 'bottom') sy = guide.v - el.h;
+        snappedY = true;
+        activeSnapLines.push({ axis: 'y', v: guide.v, label: guide.label });
+      }
+    }
+  }
+
+  // Clamp to safe margin zone (soft clamp — allow outside, but prefer inside)
+  el.x = snappedX ? sx : el.x;
+  el.y = snappedY ? sy : el.y;
+
+  // Hard clamp: keep element within page bounds
+  const pw2 = pg.type === 'spread' ? BOOK_SIZES[state.currentSize].w * 2 : BOOK_SIZES[state.currentSize].w;
+  el.x = Math.max(0, Math.min(pw2 - el.w, el.x));
+  el.y = Math.max(0, Math.min(BOOK_SIZES[state.currentSize].h - el.h, el.y));
+}
+
+function drawSnapGuides(bleedPx) {
+  if (activeSnapLines.length === 0) return;
+  ctx.save();
+  activeSnapLines.forEach(line => {
+    ctx.beginPath();
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 3]);
+    if (line.axis === 'x') {
+      // Vertical guide line
+      const screenX = bleedPx + line.v * displayScale;
+      ctx.strokeStyle = line.label.includes('safe') ? 'rgba(0,145,255,0.7)' : 'rgba(0,200,100,0.8)';
+      ctx.moveTo(screenX, 0);
+      ctx.lineTo(screenX, canvas.height);
+    } else {
+      // Horizontal guide line
+      const screenY = bleedPx + line.v * displayScale;
+      ctx.strokeStyle = line.label.includes('safe') ? 'rgba(0,145,255,0.7)' : 'rgba(0,200,100,0.8)';
+      ctx.moveTo(0, screenY);
+      ctx.lineTo(canvas.width, screenY);
+    }
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+function onMouseMove(e) {
+  const coords = getCanvasCoords(e);
+
+  // Handle resize dragging
+  if (state.isResizing && state.selectedElementId) {
+    const pg = state.pages[state.currentPage];
+    const el = pg.elements.find(e2 => e2.id === state.selectedElementId);
+    if (!el) return;
+    const dx = coords.px - state.resizeStartX;
+    const dy = coords.py - state.resizeStartY;
+    const o  = state.resizeOrigin;
+    const MIN = 0.2;
+    const h   = state.resizeHandle;
+    // Original aspect ratio — for images always maintained; text boxes resize freely
+    const isImg = el.type === 'image';
+    const aspect = o.aspect || (o.w / o.h);
+    let nx = o.x, ny = o.y, nw = o.w, nh = o.h;
+
+    if (isImg) {
+      // Corner handles: proportional resize driven by the dominant axis
+      if (h === 'br') {
+        nw = Math.max(MIN, o.w + dx);
+        nh = nw / aspect;
+      } else if (h === 'bl') {
+        nw = Math.max(MIN, o.w - dx);
+        nh = nw / aspect;
+        nx = o.x + o.w - nw;
+      } else if (h === 'tr') {
+        nw = Math.max(MIN, o.w + dx);
+        nh = nw / aspect;
+        ny = o.y + o.h - nh;
+      } else if (h === 'tl') {
+        nw = Math.max(MIN, o.w - dx);
+        nh = nw / aspect;
+        nx = o.x + o.w - nw;
+        ny = o.y + o.h - nh;
+      }
+      // Edge handles: proportional, centred on the opposite axis
+      else if (h === 'mr') {
+        nw = Math.max(MIN, o.w + dx);
+        nh = nw / aspect;
+        ny = o.y + (o.h - nh) / 2;
+      } else if (h === 'ml') {
+        nw = Math.max(MIN, o.w - dx);
+        nh = nw / aspect;
+        nx = o.x + o.w - nw;
+        ny = o.y + (o.h - nh) / 2;
+      } else if (h === 'bm') {
+        nh = Math.max(MIN, o.h + dy);
+        nw = nh * aspect;
+        nx = o.x + (o.w - nw) / 2;
+      } else if (h === 'tm') {
+        nh = Math.max(MIN, o.h - dy);
+        nw = nh * aspect;
+        nx = o.x + (o.w - nw) / 2;
+        ny = o.y + o.h - nh;
+      }
+    } else {
+      // Text/free resize — each handle moves its own edges independently
+      if (h === 'br')      { nw = Math.max(MIN, o.w + dx); nh = Math.max(MIN, o.h + dy); }
+      else if (h === 'bl') { nx = o.x+dx; nw = Math.max(MIN, o.w-dx); if(nw===MIN)nx=o.x+o.w-MIN; nh = Math.max(MIN, o.h+dy); }
+      else if (h === 'tr') { nw = Math.max(MIN, o.w+dx); ny = o.y+dy; nh = Math.max(MIN, o.h-dy); if(nh===MIN)ny=o.y+o.h-MIN; }
+      else if (h === 'tl') { nx = o.x+dx; nw = Math.max(MIN, o.w-dx); if(nw===MIN)nx=o.x+o.w-MIN; ny = o.y+dy; nh = Math.max(MIN, o.h-dy); if(nh===MIN)ny=o.y+o.h-MIN; }
+      else if (h === 'mr') { nw = Math.max(MIN, o.w+dx); }
+      else if (h === 'ml') { nx = o.x+dx; nw = Math.max(MIN, o.w-dx); if(nw===MIN)nx=o.x+o.w-MIN; }
+      else if (h === 'bm') { nh = Math.max(MIN, o.h+dy); }
+      else if (h === 'tm') { ny = o.y+dy; nh = Math.max(MIN, o.h-dy); if(nh===MIN)ny=o.y+o.h-MIN; }
+    }
+
+    el.x = nx; el.y = ny; el.w = nw; el.h = nh;
+    updatePropsPanel(el);
+    renderPage();
+    return;
+  }
+
+  // Handle drag moving
+  if (state.isDragging && state.selectedElementId) {
+    const pg = state.pages[state.currentPage];
+    const el = pg.elements.find(e2 => e2.id === state.selectedElementId);
+    if (!el) return;
+    el.x = state.dragElementOriginX + (coords.px - state.dragStartX);
+    el.y = state.dragElementOriginY + (coords.py - state.dragStartY);
+    applySnap(el, pg);
+    updatePropsPanel(el);
+    renderPage();
+    return;
+  }
+
+  // Hover cursor update
+  if (state.activeTool === 'select') {
+    const hd = hitTestResizeHandle(coords);
+    if (hd) {
+      const cursors = {tl:'nw-resize',tm:'n-resize',tr:'ne-resize',ml:'w-resize',mr:'e-resize',bl:'sw-resize',bm:'s-resize',br:'se-resize'};
+      canvas.style.cursor = cursors[hd] || 'default';
+    } else {
+      canvas.style.cursor = hitTest(coords) ? 'move' : 'default';
+    }
+  }
+}
+
+function onMouseUp(e) {
+  state.isDragging = false;
+  state.isResizing = false;
+  state.resizeHandle = null;
+  activeSnapLines = [];
+  renderPage();
+}
+
+function onDblClick(e) {
+  const coords = getCanvasCoords(e);
+  const hit = hitTest(coords);
+  if (hit && hit.type === 'text') {
+    const newText = prompt('Edit text:', hit.text || '');
+    if (newText !== null) {
+      hit.text = newText;
+      renderPage();
+    }
+  }
+}
+
+function onKeyDown(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if ((e.key === 'Delete' || e.key === 'Backspace') && state.selectedElementId) {
+    deleteSelected();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+    e.preventDefault();
+    duplicateSelected();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+    e.preventDefault();
+    showToast('Undo coming soon — save frequently!');
+  }
+  // Arrow keys nudge
+  if (state.selectedElementId) {
+    const delta = e.shiftKey ? 10 : 1;
+    const pg = state.pages[state.currentPage];
+    const el = pg.elements.find(e2 => e2.id === state.selectedElementId);
+    if (!el) return;
+    if (e.key === 'ArrowLeft')  { el.x -= delta / displayScale; renderPage(); }
+    if (e.key === 'ArrowRight') { el.x += delta / displayScale; renderPage(); }
+    if (e.key === 'ArrowUp')    { el.y -= delta / displayScale; renderPage(); }
+    if (e.key === 'ArrowDown')  { el.y += delta / displayScale; renderPage(); }
+    updatePropsPanel(el);
+    e.preventDefault();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ELEMENTS
+// ═══════════════════════════════════════════════════════════════════
+function addTextElement(px, py) {
+  const pg = state.pages[state.currentPage];
+  const sz = BOOK_SIZES[state.currentSize];
+  const el = {
+    id: state.nextId++,
+    type: 'text',
+    x: Math.max(0, px),
+    y: Math.max(0, py),
+    w: 3,   // inches
+    h: 1,
+    text: 'Your text here',
+    fontFamily: 'Inter, sans-serif',
+    fontSize: 24,
+    color: '#000000',
+    bold: false,
+    italic: false,
+    align: 'left',
+    opacity: 100,
+    zIndex: pg.elements.length,
+  };
+  pg.elements.push(el);
+  selectElement(el.id);
+  renderPage();
+  renderLayersList();
+  showToast('Text added — double-click to edit');
+}
+
+function addImageElement(src, name) {
+  const pg = state.pages[state.currentPage];
+  const sz = BOOK_SIZES[state.currentSize];
+  const pw = pg.type === 'spread' ? sz.w * 2 : sz.w;
+  const img = new Image();
+  img.onload = () => {
+    const aspect = img.naturalWidth / img.naturalHeight;
+    const w = Math.min(pw * 0.5, 4);
+    const h = w / aspect;
+    const el = {
+      id: state.nextId++,
+      type: 'image',
+      x: (pw - w) / 2,
+      y: (sz.h - h) / 2,
+      w, h,
+      src,
+      imgEl: img,
+      name,
+      rotation: 0,
+      opacity: 100,
+      zIndex: pg.elements.length,
+    };
+    pg.elements.push(el);
+    selectElement(el.id);
+    renderPage();
+    renderLayersList();
+    renderPagesList();
+  };
+  img.src = src;
+}
+
+function selectElement(id) {
+  state.selectedElementId = id;
+  const pg = state.pages[state.currentPage];
+  const el = pg.elements.find(e => e.id === id);
+  if (el) {
+    updatePropsPanel(el);
+    document.getElementById('no-selection').style.display = 'none';
+    document.getElementById('element-props').style.display = 'block';
+    if (el.type === 'text') {
+      document.getElementById('text-props-section').style.display = 'block';
+      document.getElementById('image-props-section').style.display = 'none';
+      document.getElementById('text-content').value = el.text || '';
+      document.getElementById('font-select').value = el.fontFamily || 'Inter, sans-serif';
+      document.getElementById('font-size').value = el.fontSize || 24;
+      document.getElementById('text-color').value = el.color || '#000000';
+      if (document.getElementById('text-highlight')) document.getElementById('text-highlight').value = el.highlight || '#ffff00';
+      if (document.getElementById('line-spacing')) document.getElementById('line-spacing').value = el.lineSpacing || 1.4;
+      if (document.getElementById('letter-spacing')) document.getElementById('letter-spacing').value = el.letterSpacing || 0;
+      document.getElementById('btn-bold').classList.toggle('active', !!el.bold);
+      document.getElementById('btn-italic').classList.toggle('active', !!el.italic);
+      document.getElementById('btn-underline')?.classList.toggle('active', !!el.underline);
+      document.getElementById('btn-strike')?.classList.toggle('active', !!el.strike);
+      ['left','center','right'].forEach(a => document.getElementById('btn-align-'+a)?.classList.toggle('active', (el.align||'left')===a));
+      ['caps','lowercase','capitalize'].forEach(b => {
+        const map={caps:'uppercase',lowercase:'lowercase',capitalize:'capitalize'};
+        document.getElementById('btn-'+b)?.classList.toggle('active', el.textTransform===map[b]);
+      });
+    } else {
+      document.getElementById('text-props-section').style.display = 'none';
+      document.getElementById('image-props-section').style.display = 'block';
+      document.getElementById('prop-rotation').value = el.rotation || 0;
+      // Show quality indicator for images
+      updateQualityIndicator(el);
+    }
+  }
+  renderLayersList();
+  renderPage();
+}
+
+function deselectAll() {
+  state.selectedElementId = null;
+  document.getElementById('no-selection').style.display = 'block';
+  document.getElementById('element-props').style.display = 'none';
+  document.getElementById('text-props-section').style.display = 'none';
+  document.getElementById('image-props-section').style.display = 'none';
+  renderLayersList();
+  renderPage();
+}
+
+function updatePropsPanel(el) {
+  document.getElementById('prop-x').value = Math.round(el.x * 100) / 100;
+  document.getElementById('prop-y').value = Math.round(el.y * 100) / 100;
+  document.getElementById('prop-w').value = Math.round(el.w * 100) / 100;
+  document.getElementById('prop-h').value = Math.round(el.h * 100) / 100;
+  document.getElementById('prop-opacity').value = el.opacity !== undefined ? el.opacity : 100;
+  // Update quality indicator whenever props change
+  if (el.type === 'image') updateQualityIndicator(el);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// IMAGE QUALITY WARNING SYSTEM
+// ═══════════════════════════════════════════════════════════════════
+// At 300 DPI: required pixels = physical inches × 300
+// Effective DPI = image pixel width / element width in inches
+// We warn at < 300 DPI (yellow) and danger at < 150 DPI (red)
+const DPI_MIN_WARN   = 300;  // yellow warning threshold
+const DPI_MIN_DANGER = 150;  // red danger threshold
+
+function calcEffectiveDPI(el) {
+  if (!el || el.type !== 'image' || !el.imgEl) return null;
+  const img = el.imgEl;
+  // Account for crop — visible pixel region
+  const crop = el.crop || {x:0,y:0,w:1,h:1};
+  const visiblePxW = img.naturalWidth  * crop.w;
+  const visiblePxH = img.naturalHeight * crop.h;
+  // Element display size in inches
+  const dispW = el.w; // inches
+  const dispH = el.h; // inches
+  // Effective DPI is the lower of the two axes
+  const dpiX = visiblePxW / dispW;
+  const dpiY = visiblePxH / dispH;
+  return Math.min(dpiX, dpiY);
+}
+
+function getDPILevel(dpi) {
+  if (dpi === null) return 'unknown';
+  if (dpi >= DPI_MIN_WARN)   return 'ok';
+  if (dpi >= DPI_MIN_DANGER) return 'warn';
+  return 'danger';
+}
+
+function updateQualityIndicator(el) {
+  const indicator = document.getElementById('quality-indicator');
+  const textEl    = document.getElementById('quality-text');
+  if (!indicator || !textEl) return;
+
+  const dpi = calcEffectiveDPI(el);
+  if (dpi === null) { indicator.style.display = 'none'; return; }
+
+  const level = getDPILevel(dpi);
+  const rounded = Math.round(dpi);
+
+  indicator.className = level; // sets class to 'ok', 'warn', or 'danger'
+
+  if (level === 'ok') {
+    textEl.textContent = `Print quality good — ${rounded} DPI`;
+  } else if (level === 'warn') {
+    textEl.textContent = `Low resolution — ${rounded} DPI. Shrink the image for better print quality.`;
+  } else {
+    textEl.textContent = `Too low for print — ${rounded} DPI. Use a higher resolution image or reduce its size.`;
+  }
+}
+
+// Called after every renderPage — draws quality badge overlays on canvas
+function renderQualityOverlays() {
+  const container = document.getElementById('quality-overlays');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const pg = state.pages[state.currentPage];
+  if (!pg) return;
+  const bleedPx = (BLEED_MM / 25.4) * displayScale;
+
+  pg.elements.forEach(el => {
+    if (el.type !== 'image' || !el.imgEl) return;
+    const dpi = calcEffectiveDPI(el);
+    if (dpi === null || dpi >= DPI_MIN_WARN) return;
+
+    const level = getDPILevel(dpi);
+    const rounded = Math.round(dpi);
+
+    // Position badge at top-left of image element
+    const ex = bleedPx + el.x * displayScale;
+    const ey = bleedPx + el.y * displayScale;
+    const ew = el.w * displayScale;
+
+    const badge = document.createElement('div');
+    badge.className = `quality-badge ${level}`;
+    badge.style.left = (ex + 4) + 'px';
+    badge.style.top  = (ey + 4) + 'px';
+
+    const icon = level === 'danger'
+      ? `<svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M8 2L2 14h12L8 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 7v3M8 12v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`
+      : `<svg width="10" height="10" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.8"/><path d="M8 5v3.5M8 11v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+
+    badge.innerHTML = icon + `<span>${rounded} DPI</span>`;
+    container.appendChild(badge);
+  });
+}
+
+function deleteSelected() {
+  if (!state.selectedElementId) return;
+  const pg = state.pages[state.currentPage];
+  pg.elements = pg.elements.filter(e => e.id !== state.selectedElementId);
+  deselectAll();
+  renderPage();
+  renderLayersList();
+}
+
+function duplicateSelected() {
+  if (!state.selectedElementId) return;
+  const pg = state.pages[state.currentPage];
+  const el = pg.elements.find(e => e.id === state.selectedElementId);
+  if (!el) return;
+  const copy = JSON.parse(JSON.stringify(el));
+  copy.id = state.nextId++;
+  copy.x += 0.3;
+  copy.y += 0.3;
+  if (el.imgEl) copy.imgEl = el.imgEl;
+  pg.elements.push(copy);
+  selectElement(copy.id);
+  renderPage();
+  renderLayersList();
+}
+
+function bringForward() {
+  if (!state.selectedElementId) return;
+  const pg = state.pages[state.currentPage];
+  const el = pg.elements.find(e => e.id === state.selectedElementId);
+  if (el) { el.zIndex = (el.zIndex||0) + 1; renderPage(); }
+}
+
+function sendBackward() {
+  if (!state.selectedElementId) return;
+  const pg = state.pages[state.currentPage];
+  const el = pg.elements.find(e => e.id === state.selectedElementId);
+  if (el) { el.zIndex = Math.max(0,(el.zIndex||0) - 1); renderPage(); }
+}
+
+function fitToPage() {
+  if (!state.selectedElementId) return;
+  const pg = state.pages[state.currentPage];
+  const el = pg.elements.find(e => e.id === state.selectedElementId);
+  const sz = BOOK_SIZES[state.currentSize];
+  const pw = pg.type === 'spread' ? sz.w * 2 : sz.w;
+  if (!el) return;
+  const aspect = el.w / el.h;
+  el.x = 0; el.y = 0; el.w = pw; el.h = pw / aspect;
+  if (el.h > sz.h) { el.h = sz.h; el.w = sz.h * aspect; }
+  updatePropsPanel(el); renderPage();
+}
+
+function centerOnPage() {
+  if (!state.selectedElementId) return;
+  const pg = state.pages[state.currentPage];
+  const el = pg.elements.find(e => e.id === state.selectedElementId);
+  const sz = BOOK_SIZES[state.currentSize];
+  const pw = pg.type === 'spread' ? sz.w * 2 : sz.w;
+  if (!el) return;
+  el.x = (pw - el.w) / 2;
+  el.y = (sz.h - el.h) / 2;
+  updatePropsPanel(el); renderPage();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PROPERTY UPDATES
+// ═══════════════════════════════════════════════════════════════════
+function getSelected() {
+  if (!state.selectedElementId) return null;
+  return state.pages[state.currentPage].elements.find(e => e.id === state.selectedElementId);
+}
+
+function updatePropX() { const el=getSelected(); if(el){el.x=parseFloat(document.getElementById('prop-x').value)||0; renderPage();} }
+function updatePropY() { const el=getSelected(); if(el){el.y=parseFloat(document.getElementById('prop-y').value)||0; renderPage();} }
+function updatePropW() { const el=getSelected(); if(el){el.w=parseFloat(document.getElementById('prop-w').value)||1; renderPage();} }
+function updatePropH() { const el=getSelected(); if(el){el.h=parseFloat(document.getElementById('prop-h').value)||1; renderPage();} }
+function updatePropOpacity() { const el=getSelected(); if(el){el.opacity=parseFloat(document.getElementById('prop-opacity').value)||100; renderPage();} }
+function updateRotation() { const el=getSelected(); if(el){el.rotation=parseFloat(document.getElementById('prop-rotation').value)||0; renderPage();} }
+function updateFont() { const el=getSelected(); if(el&&el.type==='text'){el.fontFamily=document.getElementById('font-select').value; renderPage();} }
+function updateFontSize() { const el=getSelected(); if(el&&el.type==='text'){el.fontSize=parseFloat(document.getElementById('font-size').value)||24; renderPage();} }
+function updateTextColor() { const el=getSelected(); if(el&&el.type==='text'){el.color=document.getElementById('text-color').value; renderPage();} }
+function updateTextContent() { const el=getSelected(); if(el&&el.type==='text'){el.text=document.getElementById('text-content').value; renderPage();} }
+function toggleBold()      { const el=getSelected(); if(el&&el.type==='text'){el.bold=!el.bold; document.getElementById('btn-bold').classList.toggle('active',el.bold); renderPage();} }
+function toggleItalic()    { const el=getSelected(); if(el&&el.type==='text'){el.italic=!el.italic; document.getElementById('btn-italic').classList.toggle('active',el.italic); renderPage();} }
+function toggleUnderline() { const el=getSelected(); if(el&&el.type==='text'){el.underline=!el.underline; document.getElementById('btn-underline').classList.toggle('active',!!el.underline); renderPage();} }
+function toggleStrike()    { const el=getSelected(); if(el&&el.type==='text'){el.strike=!el.strike; document.getElementById('btn-strike').classList.toggle('active',!!el.strike); renderPage();} }
+function setAlign(align) {
+  const el=getSelected();
+  if(!el||el.type!=='text') return;
+  el.align=align;
+  ['left','center','right'].forEach(a => document.getElementById('btn-align-'+a)?.classList.toggle('active', a===align));
+  renderPage();
+}
+function updateTextHighlight() {
+  const el=getSelected();
+  if(!el||el.type!=='text') return;
+  el.highlight = document.getElementById('text-highlight').value;
+  renderPage();
+}
+function updateLineSpacing() {
+  const el=getSelected();
+  if(!el||el.type!=='text') return;
+  el.lineSpacing = parseFloat(document.getElementById('line-spacing').value) || 1.4;
+  renderPage();
+}
+function updateLetterSpacing() {
+  const el=getSelected();
+  if(!el||el.type!=='text') return;
+  el.letterSpacing = parseFloat(document.getElementById('letter-spacing').value) || 0;
+  renderPage();
+}
+function toggleTextTransform(mode) {
+  const el=getSelected();
+  if(!el||el.type!=='text') return;
+  el.textTransform = el.textTransform === mode ? 'none' : mode;
+  ['caps','lowercase','capitalize'].forEach(b => {
+    const map = {caps:'uppercase',lowercase:'lowercase',capitalize:'capitalize'};
+    document.getElementById('btn-'+b)?.classList.toggle('active', el.textTransform === map[b]);
+  });
+  renderPage();
+}
+function resetCrop() {
+  const el=getSelected();
+  if(!el||el.type!=='image') return;
+  el.crop = null;
+  renderPage();
+  showToast('Crop reset');
+}
+function updateBgColor() {
+  const pg = state.pages[state.currentPage];
+  const val = document.getElementById('bg-color').value;
+  pg.bg = val;
+  const mobBg = document.getElementById('mob-bg-color');
+  if (mobBg) mobBg.value = val;
+  renderPage();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TOOLS & ZOOM
+// ═══════════════════════════════════════════════════════════════════
+function setTool(tool) {
+  state.activeTool = tool;
+  document.querySelectorAll('.tool-btn[id^="tool-"]').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('tool-' + tool);
+  if (btn) btn.classList.add('active');
+  canvas.style.cursor = tool === 'text' ? 'text' : tool === 'image' ? 'cell' : 'default';
+}
+
+function zoomIn()  { state.zoom = Math.min(3, state.zoom * 1.2); updateZoom(); }
+function zoomOut() { state.zoom = Math.max(0.2, state.zoom / 1.2); updateZoom(); }
+function updateZoom() { computeCanvasDimensions(); renderPage(); updateStatusBar(); }
+
+function toggleBleed() {
+  state.showBleed = !state.showBleed;
+  document.getElementById('btn-bleed').classList.toggle('active', state.showBleed);
+  renderPage();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PAGES
+// ═══════════════════════════════════════════════════════════════════
+function addSpread() {
+  state.pages.push({type:'spread', elements:[], bg:'#ffffff'});
+  state.pages.push({type:'spread', elements:[], bg:'#ffffff'});
+  renderPagesList();
+  showToast('2 spreads added (4 pages)');
+}
+
+function goToPage(idx) {
+  state.currentPage = idx;
+  state.selectedElementId = null;
+  document.getElementById('no-selection').style.display = 'block';
+  document.getElementById('element-props').style.display = 'none';
+  document.getElementById('text-props-section').style.display = 'none';
+  document.getElementById('image-props-section').style.display = 'none';
+  document.getElementById('bg-color').value = state.pages[idx].bg || '#ffffff';
+  computeCanvasDimensions();
+  renderPage();
+  renderLayersList();
+  renderPagesList();
+  updateStatusBar();
+}
+
+function renderPagesList() {
+  const list = document.getElementById('pages-list');
+  list.innerHTML = '';
+  const dpr = Math.min(window.devicePixelRatio || 1, 3); // cap at 3× for perf
+
+  state.pages.forEach((pg, i) => {
+    const div = document.createElement('div');
+    div.className = 'page-thumb' + (i === state.currentPage ? ' active' : '');
+    div.onclick = () => goToPage(i);
+
+    const inner = document.createElement('div');
+    inner.className = 'page-thumb-inner' + (pg.type === 'spread' ? ' spread' : '');
+
+    const sz2 = BOOK_SIZES[state.currentSize];
+    const isSpread = pg.type === 'spread';
+    const pw = isSpread ? sz2.w * 2 : sz2.w;
+    const ph = sz2.h;
+
+    // Logical canvas size (CSS pixels)
+    const logW = isSpread ? 128 : 64;
+    const logH = 64;
+
+    // Physical canvas size (retina pixels)
+    const miniC = document.createElement('canvas');
+    miniC.width  = Math.round(logW * dpr);
+    miniC.height = Math.round(logH * dpr);
+    miniC.style.width  = '100%';
+    miniC.style.height = '100%';
+
+    const mc = miniC.getContext('2d');
+    mc.scale(dpr, dpr);
+
+    const scaleX = logW / pw;
+    const scaleY = logH / ph;
+
+    // Background
+    mc.fillStyle = pg.bg || '#ffffff';
+    mc.fillRect(0, 0, logW, logH);
+
+    // Draw elements sorted by zIndex
+    const sorted = [...(pg.elements || [])].sort((a,b)=>(a.zIndex||0)-(b.zIndex||0));
+    sorted.forEach(el => {
+      const ex = el.x * scaleX;
+      const ey = el.y * scaleY;
+      const ew = el.w * scaleX;
+      const eh = el.h * scaleY;
+      mc.save();
+      mc.globalAlpha = (el.opacity !== undefined ? el.opacity : 100) / 100;
+
+      if (el.type === 'image' && el.imgEl) {
+        if (el.crop) {
+          const cr = el.crop;
+          mc.save();
+          mc.beginPath(); mc.rect(ex, ey, ew, eh); mc.clip();
+          const sw = el.imgEl.naturalWidth * cr.w;
+          const sh = el.imgEl.naturalHeight * cr.h;
+          const sx = el.imgEl.naturalWidth * cr.x;
+          const sy = el.imgEl.naturalHeight * cr.y;
+          const scale = Math.max(ew / sw, eh / sh);
+          const dw = sw * scale, dh = sh * scale;
+          mc.drawImage(el.imgEl, sx, sy, sw, sh, ex + (ew-dw)/2, ey + (eh-dh)/2, dw, dh);
+          mc.restore();
+        } else {
+          mc.save();
+          mc.beginPath(); mc.rect(ex, ey, ew, eh); mc.clip();
+          const iw = el.imgEl.naturalWidth, ih = el.imgEl.naturalHeight;
+          const scale = Math.max(ew / iw, eh / ih);
+          const dw = iw * scale, dh = ih * scale;
+          mc.drawImage(el.imgEl, ex + (ew-dw)/2, ey + (eh-dh)/2, dw, dh);
+          mc.restore();
+        }
+      } else if (el.type === 'image-placeholder') {
+        mc.fillStyle = 'rgba(0,0,0,0.30)';
+        mc.fillRect(ex, ey, ew, eh);
+        mc.fillStyle = '#ffffff';
+        mc.font = `500 ${Math.max(4, Math.min(ew, eh) * 0.12)}px Inter, sans-serif`;
+        mc.textAlign = 'center';
+        mc.textBaseline = 'middle';
+        mc.fillText('Upload image here', ex + ew / 2, ey + eh / 2);
+        mc.textBaseline = 'alphabetic';
+      } else if (el.type === 'text' && el.text) {
+        const fs = Math.max(4, (el.fontSize || 16) * scaleX * 0.9);
+        let fStr = (el.italic ? 'italic ' : '') + (el.bold ? '700 ' : '400 ') + `${fs}px ${el.fontFamily || 'Inter, sans-serif'}`;
+        mc.font = fStr;
+        mc.fillStyle = el.color || '#000000';
+        mc.textAlign = el.align || 'left';
+        const tx = el.align === 'center' ? ex + ew / 2 : el.align === 'right' ? ex + ew : ex;
+        let lines = (el.text || '').split('\n');
+        if (el.textTransform === 'uppercase')   lines = lines.map(l => l.toUpperCase());
+        if (el.textTransform === 'lowercase')   lines = lines.map(l => l.toLowerCase());
+        if (el.textTransform === 'capitalize')  lines = lines.map(l => l.replace(/\b\w/g, c => c.toUpperCase()));
+        lines.forEach((ln, li) => mc.fillText(ln, tx, ey + fs + li * fs * 1.35));
+      }
+      mc.restore();
+    });
+
+    // Gutter line for spreads
+    if (isSpread) {
+      mc.save();
+      mc.strokeStyle = 'rgba(180,180,180,0.5)';
+      mc.lineWidth = 0.5;
+      mc.setLineDash([2, 2]);
+      mc.beginPath();
+      mc.moveTo(logW / 2, 0);
+      mc.lineTo(logW / 2, logH);
+      mc.stroke();
+      mc.setLineDash([]);
+      mc.restore();
+    }
+
+    // Border
+    mc.strokeStyle = '#e0e0e0';
+    mc.lineWidth = 0.5;
+    mc.strokeRect(0, 0, logW, logH);
+
+    inner.appendChild(miniC);
+    div.appendChild(inner);
+
+    const label = document.createElement('div');
+    label.className = 'page-thumb-label';
+    label.textContent = i === 0 ? 'Cover' : `Spread ${i}`;
+    div.appendChild(label);
+    list.appendChild(div);
+  });
+  // also sync mobile strip
+  if (typeof renderMobPagesStrip === 'function') renderMobPagesStrip();
+}
+
+function renderLayersList() {
+  const list = document.getElementById('layers-list');
+  list.innerHTML = '';
+  const pg = state.pages[state.currentPage];
+  const reversed = [...pg.elements].reverse();
+  reversed.forEach(el => {
+    const row = document.createElement('div');
+    row.className = 'layer-row' + (el.id === state.selectedElementId ? ' selected' : '');
+    row.onclick = () => selectElement(el.id);
+    row.innerHTML = `
+      <span class="layer-icon">${el.type === 'image' ? '🖼' : '✏️'}</span>
+      <span class="layer-name">${el.type === 'text' ? (el.text||'Text').substring(0,20) : (el.name||'Image')}</span>
+      <span class="layer-del" onclick="deleteEl(${el.id},event)">✕</span>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function deleteEl(id, e) {
+  e.stopPropagation();
+  const pg = state.pages[state.currentPage];
+  pg.elements = pg.elements.filter(el => el.id !== id);
+  if (state.selectedElementId === id) deselectAll();
+  renderPage();
+  renderLayersList();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// IMAGE UPLOAD
+// ═══════════════════════════════════════════════════════════════════
+function handleImageUpload(event) {
+  const placeholderId = state._replacingPlaceholderId || null;
+  state._replacingPlaceholderId = null;
+  const files = event.target.files;
+  Array.from(files).forEach((file, fileIdx) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const src = e.target.result;
+      const assetId = state.nextId++;
+      state.assets.push({id: assetId, src, name: file.name});
+      renderAssetsGrid();
+      // If a placeholder was clicked, replace it with the first chosen image
+      if (placeholderId && fileIdx === 0) {
+        const pg = state.pages[state.currentPage];
+        const phIdx = pg.elements.findIndex(el => el.id === placeholderId);
+        if (phIdx !== -1) {
+          const ph = pg.elements[phIdx];
+          const imgEl = new Image();
+          imgEl.onload = () => {
+            pg.elements[phIdx] = {
+              ...ph, type:'image', src, imgEl, name:file.name, rotation:0, crop:null,
+            };
+            selectElement(ph.id);
+            renderPage(); renderLayersList(); renderPagesList();
+          };
+          imgEl.src = src;
+          return;
+        }
+      }
+      addImageElement(src, file.name);
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DRAG-AND-DROP — sidebar upload zone + canvas area
+// ═══════════════════════════════════════════════════════════════════
+
+// Reads File objects (from drag or input) and processes them as images
+function processDroppedFiles(files, dropCoordsPx) {
+  const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+  if (imageFiles.length === 0) return;
+  showToast(`Adding ${imageFiles.length} photo${imageFiles.length > 1 ? 's' : ''}…`);
+
+  // Calculate where on the canvas to start placing images (if dragged to canvas)
+  const bleedPx = (BLEED_MM / 25.4) * displayScale;
+  const sz = BOOK_SIZES[state.currentSize];
+  const pg = state.pages[state.currentPage];
+  const pw = pg.type === 'spread' ? sz.w * 2 : sz.w;
+
+  // Stack images with a small offset so they don't all land on top of each other
+  const STACK_OFFSET_IN = 0.3;
+
+  imageFiles.forEach((file, idx) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const src = e.target.result;
+      const assetId = state.nextId++;
+      state.assets.push({ id: assetId, src, name: file.name });
+      renderAssetsGrid();
+
+      // Check placeholder replacement (only first image, only if placeholder was target)
+      const placeholderId = idx === 0 ? (state._replacingPlaceholderId || null) : null;
+      if (idx === 0) state._replacingPlaceholderId = null;
+
+      if (placeholderId) {
+        const pg2 = state.pages[state.currentPage];
+        const phIdx = pg2.elements.findIndex(el => el.id === placeholderId);
+        if (phIdx !== -1) {
+          const ph = pg2.elements[phIdx];
+          const imgEl2 = new Image();
+          imgEl2.onload = () => {
+            pg2.elements[phIdx] = { ...ph, type:'image', src, imgEl:imgEl2, name:file.name, rotation:0, crop:null };
+            selectElement(ph.id);
+            renderPage(); renderLayersList(); renderPagesList();
+          };
+          imgEl2.src = src;
+          return;
+        }
+      }
+
+      // Place at canvas drop position if available, else use default placement
+      const imgEl3 = new Image();
+      imgEl3.onload = () => {
+        const aspect = imgEl3.naturalWidth / imgEl3.naturalHeight;
+        const w = Math.min(pw * 0.45, 3.5);
+        const h = w / aspect;
+        let x, y;
+
+        if (dropCoordsPx && idx === 0) {
+          // First image: land at drop position (converted from screen px to inches)
+          x = Math.max(0, Math.min(pw - w, (dropCoordsPx.px - bleedPx / displayScale) - w / 2));
+          y = Math.max(0, Math.min(sz.h - h, (dropCoordsPx.py - bleedPx / displayScale) - h / 2));
+        } else {
+          // Subsequent images: offset from centre
+          x = (pw - w) / 2 + idx * STACK_OFFSET_IN;
+          y = (sz.h - h) / 2 + idx * STACK_OFFSET_IN;
+        }
+
+        const newEl = {
+          id: state.nextId++, type:'image',
+          x: Math.max(0, Math.min(pw - w, x)),
+          y: Math.max(0, Math.min(sz.h - h, y)),
+          w, h, src, imgEl: imgEl3, name: file.name,
+          rotation: 0, opacity: 100, zIndex: pg.elements.length + idx,
+          crop: null,
+        };
+        pg.elements.push(newEl);
+        if (idx === imageFiles.length - 1) {
+          selectElement(newEl.id);
+          showToast(`${imageFiles.length} photo${imageFiles.length > 1 ? 's' : ''} added ✓`);
+        }
+        renderPage();
+        renderLayersList();
+        renderPagesList();
+      };
+      imgEl3.src = src;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── SIDEBAR UPLOAD ZONE drag handlers ────────────────────────────
+function handleUploadZoneDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+  document.getElementById('sidebar-upload-zone').classList.add('drag-over');
+  document.getElementById('upload-zone-text').textContent = 'Drop to add photos';
+}
+
+function handleUploadZoneDragLeave(e) {
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    document.getElementById('sidebar-upload-zone').classList.remove('drag-over');
+    document.getElementById('upload-zone-text').textContent = 'Click or drag photos here\nPNG, JPG, HEIC · Multiple at once';
+  }
+}
+
+function handleUploadZoneDrop(e) {
+  e.preventDefault();
+  document.getElementById('sidebar-upload-zone').classList.remove('drag-over');
+  document.getElementById('upload-zone-text').textContent = 'Click or drag photos here\nPNG, JPG, HEIC · Multiple at once';
+  const files = e.dataTransfer.files;
+  if (files && files.length) processDroppedFiles(files, null);
+}
+
+// ── CANVAS AREA drag handlers ─────────────────────────────────────
+let _canvasDragCounter = 0; // prevents flickering on child element transitions
+
+function initCanvasDragDrop() {
+  const area = document.getElementById('canvas-area');
+  if (!area) return;
+
+  area.addEventListener('dragenter', (e) => {
+    // Only activate for file drags
+    if (!e.dataTransfer.types.includes('Files')) return;
+    _canvasDragCounter++;
+    document.getElementById('canvas-drop-overlay').classList.add('active');
+    e.preventDefault();
+  });
+
+  area.addEventListener('dragover', (e) => {
+    if (!e.dataTransfer.types.includes('Files')) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  });
+
+  area.addEventListener('dragleave', (e) => {
+    if (!e.dataTransfer.types.includes('Files')) return;
+    _canvasDragCounter--;
+    if (_canvasDragCounter <= 0) {
+      _canvasDragCounter = 0;
+      document.getElementById('canvas-drop-overlay').classList.remove('active');
+    }
+  });
+
+  area.addEventListener('drop', (e) => {
+    e.preventDefault();
+    _canvasDragCounter = 0;
+    document.getElementById('canvas-drop-overlay').classList.remove('active');
+
+    const files = e.dataTransfer.files;
+    if (!files || files.length === 0) return;
+
+    // Get drop coordinates relative to the canvas
+    let dropCoords = null;
+    if (canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const bleedPx = (BLEED_MM / 25.4) * displayScale;
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      dropCoords = {
+        px: (mx - bleedPx) / displayScale,
+        py: (my - bleedPx) / displayScale,
+      };
+    }
+    processDroppedFiles(files, dropCoords);
+  });
+}
+
+// Also handle page-wide drag (when user drags anywhere in the window)
+// This prevents the browser's default "open file" behavior for accidental drops
+document.addEventListener('dragover', (e) => { e.preventDefault(); });
+document.addEventListener('drop', (e) => {
+  // Only intercept if NOT already handled by canvas-area or upload-zone
+  if (!e.defaultPrevented) {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (files && files.length) {
+      processDroppedFiles(files, null);
+    }
+  }
+});
+
+function renderAssetsGrid() {
+  const grid = document.getElementById('assets-grid');
+  grid.innerHTML = '';
+  if (state.assets.length === 0) return;
+  const label = document.createElement('div');
+  label.style = 'padding:4px 12px 6px;font-size:11px;font-weight:500;color:var(--gray-400);letter-spacing:0.8px;text-transform:uppercase';
+  label.textContent = 'Your Images';
+  grid.appendChild(label);
+  const gridInner = document.createElement('div');
+  gridInner.style = 'display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 12px 12px';
+  state.assets.forEach(asset => {
+    const item = document.createElement('div');
+    item.className = 'asset-item';
+    item.title = asset.name;
+    item.onclick = () => addImageElement(asset.src, asset.name);
+    const img = document.createElement('img');
+    img.src = asset.src;
+    item.appendChild(img);
+    gridInner.appendChild(item);
+  });
+  grid.appendChild(gridInner);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// STATUS BAR
+// ═══════════════════════════════════════════════════════════════════
+function updateStatusBar() {
+  const sz = BOOK_SIZES[state.currentSize];
+  const pg = state.pages[state.currentPage];
+  const isSpread = pg.type === 'spread';
+  document.getElementById('status-page').textContent =
+    `${state.currentPage === 0 ? 'Cover' : 'Spread ' + state.currentPage} · ${state.pages.length} pages`;
+  document.getElementById('status-size').textContent =
+    isSpread ? `${sz.w*2}"×${sz.h}" (spread)` : `${sz.w}"×${sz.h}"`;
+  document.getElementById('status-zoom').textContent = Math.round(state.zoom * 100) + '%';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PRICING & CHECKOUT
+// ═══════════════════════════════════════════════════════════════════
+function updatePricingModal() {
+  const grid = document.getElementById('pricing-grid');
+  const basePrice = BASE_PRICES[state.currentSize];
+  grid.innerHTML = '';
+  QTY_TIERS.forEach(tier => {
+    const price = basePrice * tier.qty * (1 - tier.discount);
+    const perBook = Math.round(price / tier.qty);
+    const div = document.createElement('div');
+    div.className = 'price-tier' + (state.selectedQty === tier.qty ? ' selected' : '');
+    div.onclick = () => {
+      state.selectedQty = tier.qty;
+      updatePricingModal();
+      updateCheckoutSummary();
+    };
+    div.innerHTML = `
+      <div class="qty">${tier.qty}</div>
+      <div class="qty-label">book${tier.qty > 1 ? 's' : ''}</div>
+      <div class="price">₹${perBook.toLocaleString('en-IN')}/ea</div>
+      ${tier.discount > 0 ? `<div class="save">Save ${Math.round(tier.discount*100)}%</div>` : '<div class="save" style="opacity:0">—</div>'}
+    `;
+    grid.appendChild(div);
+  });
+  updateCheckoutSummary();
+}
+
+function updateCheckoutSummary() {
+  const sz = BOOK_SIZES[state.currentSize];
+  const basePrice = BASE_PRICES[state.currentSize];
+  const tier = QTY_TIERS.find(t => t.qty === state.selectedQty) || QTY_TIERS[0];
+  const total = Math.round(basePrice * tier.qty * (1 - tier.discount));
+  document.getElementById('co-size').textContent = sz.label;
+  document.getElementById('co-pages').textContent = state.pages.length + ' pages';
+  document.getElementById('co-qty').textContent = tier.qty + ' book' + (tier.qty > 1 ? 's' : '');
+  document.getElementById('co-total').textContent = '₹' + total.toLocaleString('en-IN');
+}
+
+function showCheckout() {
+  updatePricingModal();
+  document.getElementById('checkout-modal').style.display = 'flex';
+}
+
+function submitOrder() {
+  const name = document.getElementById('co-name').value.trim();
+  const email = document.getElementById('co-email').value.trim();
+  const address = document.getElementById('co-address').value.trim();
+  if (!name || !email || !address) {
+    showToast('Please fill in all fields');
+    return;
+  }
+  const basePrice = BASE_PRICES[state.currentSize];
+  const tier = QTY_TIERS.find(t => t.qty === state.selectedQty) || QTY_TIERS[0];
+  const total = Math.round(basePrice * tier.qty * (1 - tier.discount));
+  const orderId = 'PB-' + Date.now().toString(36).toUpperCase();
+  const order = {
+    id: orderId,
+    name, email, address,
+    country: address.split(',').pop().trim() || 'Unknown',
+    size: BOOK_SIZES[state.currentSize].label,
+    pages: state.pages.length,
+    qty: state.selectedQty,
+    total: total.toString(),
+    status: 'new',
+    date: new Date().toLocaleDateString(),
+    projectData: JSON.stringify({pages: state.pages.map(p => ({...p, elements: p.elements.map(e => ({...e, imgEl: undefined}))}))})
+  };
+  state.orders.unshift(order);
+  saveToStorage();
+  document.getElementById('checkout-modal').style.display = 'none';
+  document.getElementById('order-id').textContent = orderId;
+  document.getElementById('confirm-modal').style.display = 'flex';
+  renderOrdersTable();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ADMIN PANEL
+// ═══════════════════════════════════════════════════════════════════
+function switchView(view, evt) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  if (evt && evt.target) evt.target.classList.add('active');
+
+  const canvasArea = document.getElementById('canvas-area');
+  const sidebar = document.getElementById('sidebar');
+  const rightPanel = document.getElementById('right-panel');
+  const adminPanel = document.getElementById('admin-panel');
+  const mobPagesStrip = document.getElementById('mob-pages-strip');
+  const mobToolbar = document.getElementById('mob-toolbar');
+  const mobNav = document.getElementById('mob-nav');
+
+  if (view === 'admin') {
+    canvasArea.style.display = 'none';
+    sidebar.style.display = 'none';
+    if (rightPanel) rightPanel.style.display = 'none';
+    adminPanel.style.display = 'block';
+    if (mobPagesStrip) mobPagesStrip.style.display = 'none';
+    if (mobToolbar) mobToolbar.style.display = 'none';
+    renderAdminStats();
+    renderOrdersTable();
+  } else {
+    canvasArea.style.display = 'flex';
+    if (window.innerWidth > 768) {
+      sidebar.style.display = 'flex';
+      if (rightPanel && window.innerWidth > 1100) rightPanel.style.display = 'flex';
+    }
+    adminPanel.style.display = 'none';
+    if (mobPagesStrip && window.innerWidth <= 768) mobPagesStrip.style.display = 'flex';
+    if (mobToolbar && window.innerWidth <= 768) mobToolbar.style.display = 'flex';
+  }
+}
+
+function renderAdminStats() {
+  const orders = state.orders;
+  const totalRevenue = orders.reduce((s, o) => s + parseFloat(o.total), 0);
+  const totalBooks = orders.reduce((s, o) => s + o.qty, 0);
+  document.getElementById('admin-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total Orders</div><div class="stat-value">${orders.length}</div><div class="stat-sub">All time</div></div>
+    <div class="stat-card"><div class="stat-label">Revenue</div><div class="stat-value">₹${Math.round(totalRevenue).toLocaleString('en-IN')}</div><div class="stat-sub">Before costs</div></div>
+    <div class="stat-card"><div class="stat-label">Books Ordered</div><div class="stat-value">${totalBooks}</div><div class="stat-sub">Total units</div></div>
+    <div class="stat-card"><div class="stat-label">Avg Order Value</div><div class="stat-value">₹${orders.length ? Math.round(totalRevenue/orders.length).toLocaleString('en-IN') : '0'}</div><div class="stat-sub">Per order</div></div>
+  `;
+}
+
+function renderOrdersTable() {
+  const tbody = document.getElementById('orders-tbody');
+  tbody.innerHTML = '';
+  state.orders.forEach(order => {
+    const tr = document.createElement('tr');
+    const statusColors = {new:'new', processing:'ready', shipped:'shipped'};
+    tr.innerHTML = `
+      <td><code style="font-size:11px;background:var(--gray-100);padding:2px 6px;border-radius:4px">${order.id}</code></td>
+      <td>
+        <div style="font-weight:500;font-size:13px">${order.name}</div>
+        <div style="font-size:11px;color:var(--gray-400)">${order.email}</div>
+      </td>
+      <td style="font-size:12px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${order.address}</td>
+      <td>${order.country}</td>
+      <td style="font-size:12px">${order.size} · ${order.pages} pg</td>
+      <td style="text-align:center">${order.qty}</td>
+      <td style="font-weight:600">₹${parseInt(order.total).toLocaleString('en-IN')}</td>
+      <td><span class="status-badge ${order.status || 'new'}">${order.status||'New'}</span></td>
+      <td>
+        <button class="download-btn" onclick="downloadOrderPDF('${order.id}')">↓ PDF</button>
+        <select style="margin-top:4px;font-size:11px;padding:2px 4px;border:1px solid var(--gray-200);border-radius:4px;font-family:var(--font-ui);outline:none" onchange="updateOrderStatus('${order.id}',this.value)">
+          <option value="new" ${order.status==='new'?'selected':''}>New</option>
+          <option value="ready" ${order.status==='ready'?'selected':''}>Print Ready</option>
+          <option value="shipped" ${order.status==='shipped'?'selected':''}>Shipped</option>
+        </select>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  if (state.orders.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--gray-400);font-size:13px">No orders yet. Orders placed by customers will appear here.</td></tr>';
+  }
+}
+
+function updateOrderStatus(id, status) {
+  const order = state.orders.find(o => o.id === id);
+  if (order) { order.status = status; saveToStorage(); renderOrdersTable(); }
+}
+
+function refreshOrders() {
+  loadFromStorage();
+  renderAdminStats();
+  renderOrdersTable();
+  showToast('Orders refreshed');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PDF EXPORT (PRINTER ONLY) — every page gets bleed + trim marks
+// ═══════════════════════════════════════════════════════════════════
+function pdfAddBleedTrimMarks(pdf, bMM, pageWMM, pageHMM) {
+  // bMM  = bleed size in mm (3mm)
+  // pageWMM / pageHMM = trim size (content area) in mm
+  const ml = 5;    // mark length mm
+  const mg = 1.5;  // gap between trim edge and mark start mm
+
+  // ── RED bleed border (marks where bleed begins) ──
+  pdf.setDrawColor(229, 62, 62);
+  pdf.setLineWidth(0.25);
+  pdf.rect(bMM, bMM, pageWMM, pageHMM); // rect at trim size, offset by bleed
+
+  // ── BLACK trim marks (4 corners × 2 lines each) ──
+  pdf.setDrawColor(0, 0, 0);
+  pdf.setLineWidth(0.3);
+  const corners = [
+    [bMM,           bMM,           -1, -1],  // TL
+    [bMM + pageWMM, bMM,            1, -1],  // TR
+    [bMM,           bMM + pageHMM, -1,  1],  // BL
+    [bMM + pageWMM, bMM + pageHMM,  1,  1],  // BR
+  ];
+  corners.forEach(([cx, cy, dx, dy]) => {
+    // horizontal tick (pointing outward)
+    pdf.line(cx + dx * mg, cy,  cx + dx * (mg + ml), cy);
+    // vertical tick (pointing outward)
+    pdf.line(cx, cy + dy * mg,  cx, cy + dy * (mg + ml));
+  });
+}
+
+function pdfDrawPageContent(pdf, elements, bMM, pageWMM, pageHMM, xOffsetIn, sz) {
+  // xOffsetIn: for spread right-page, elements have x >= sz.w, so we subtract sz.w
+  const inToMM = 25.4;
+  (elements || []).forEach(el => {
+    const x = bMM + (el.x - xOffsetIn) * inToMM;
+    const y = bMM + el.y * inToMM;
+    const w = el.w * inToMM;
+    const h = el.h * inToMM;
+
+    if (el.type === 'text' && el.text) {
+      const rgb = hexToRgb(el.color || '#000000');
+      pdf.setTextColor(rgb.r, rgb.g, rgb.b);
+      pdf.setFontSize(el.fontSize || 24);
+      const lines = el.text.split('\n');
+      const lineH = ((el.fontSize || 24) * 0.352778) * 1.4;
+      lines.forEach((line, li) => {
+        pdf.text(line, x, y + ((el.fontSize || 24) * 0.352778) + li * lineH);
+      });
+    } else if (el.type === 'image' && el.src) {
+      try {
+        // Detect format from data URL
+        const fmt = el.src.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+        pdf.addImage(el.src, fmt, x, y, w, h, undefined, 'FAST');
+      } catch(err) {
+        pdf.setFillColor(200, 200, 200);
+        pdf.rect(x, y, w, h, 'F');
+      }
+    }
+  });
+}
+
+function downloadOrderPDF(orderId) {
+  const order = state.orders.find(o => o.id === orderId);
+  if (!order) return;
+  if (!window.jspdf) {
+    showToast('PDF library loading — please try again in a moment');
+    return;
+  }
+  showToast('Generating print-ready PDF…');
+
+  setTimeout(() => {
+    try {
+      const { jsPDF } = window.jspdf;
+
+      // Use the current editor size (in case order was from a different session)
+      const sizeKey = state.currentSize;
+      const sz = BOOK_SIZES[sizeKey];
+      const inToMM = 25.4;
+      const bMM = BLEED_MM;                // 3mm
+      const trimWMM = sz.w * inToMM;       // trim width (content) in mm
+      const trimHMM = sz.h * inToMM;       // trim height in mm
+      const totalWMM = trimWMM + bMM * 2;  // full page with bleed
+      const totalHMM = trimHMM + bMM * 2;
+
+      // Parse stored project pages
+      let projectPages = [];
+      try {
+        projectPages = JSON.parse(order.projectData).pages || [];
+      } catch(e) {
+        projectPages = state.pages.map(p => ({
+          ...p,
+          elements: p.elements.map(e => ({...e, imgEl: undefined}))
+        }));
+      }
+
+      // Re-attach imgEl from assets for any elements that have src
+      projectPages.forEach(pg => {
+        (pg.elements || []).forEach(el => {
+          if (el.type === 'image' && el.src && !el.imgEl) {
+            const asset = state.assets.find(a => a.src === el.src);
+            if (asset) { /* imgEl not needed for jsPDF */ }
+          }
+        });
+      });
+
+      // Build flat list of PDF pages:
+      // - cover = 1 page
+      // - each spread = 2 pages (left page then right page)
+      const pdfPageList = [];
+      projectPages.forEach(pg => {
+        if (pg.type === 'cover') {
+          pdfPageList.push({ pg, side: 'cover', xOffset: 0 });
+        } else {
+          // Left page of spread (x: 0 to sz.w)
+          pdfPageList.push({ pg, side: 'left',  xOffset: 0     });
+          // Right page of spread (x: sz.w to sz.w*2)
+          pdfPageList.push({ pg, side: 'right', xOffset: sz.w  });
+        }
+      });
+
+      if (pdfPageList.length === 0) {
+        showToast('No pages found in this order');
+        return;
+      }
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: [totalWMM, totalHMM],
+        compress: true
+      });
+
+      pdfPageList.forEach((item, idx) => {
+        if (idx > 0) pdf.addPage([totalWMM, totalHMM]);
+
+        const { pg, side, xOffset } = item;
+
+        // ── Page background ──
+        const bg = hexToRgb(pg.bg || '#ffffff');
+        pdf.setFillColor(bg.r, bg.g, bg.b);
+        pdf.rect(0, 0, totalWMM, totalHMM, 'F');
+
+        // ── Filter elements for this side ──
+        let els = pg.elements || [];
+        if (side === 'left') {
+          // Only elements whose center is on the left half
+          els = els.filter(el => (el.x + el.w / 2) < sz.w);
+        } else if (side === 'right') {
+          // Only elements whose center is on the right half
+          els = els.filter(el => (el.x + el.w / 2) >= sz.w);
+        }
+        // (cover: use all elements)
+
+        // ── Draw content ──
+        pdfDrawPageContent(pdf, els, bMM, trimWMM, trimHMM, xOffset, sz);
+
+        // ── Bleed border + trim marks — ALWAYS on every page ──
+        pdfAddBleedTrimMarks(pdf, bMM, trimWMM, trimHMM);
+
+        // ── Page label (for printer reference, outside trim in bleed) ──
+        pdf.setTextColor(120, 120, 120);
+        pdf.setFontSize(6);
+        const pageLabel = side === 'cover' ? 'Cover' :
+          side === 'left'  ? `Spread ${Math.ceil(idx/2)} — Left`  :
+                             `Spread ${Math.ceil(idx/2)} — Right`;
+        pdf.text(pageLabel, bMM, bMM - 1);
+        pdf.text(`Order: ${orderId}`, totalWMM - bMM, bMM - 1, { align: 'right' });
+      });
+
+      const safeName = (order.name || 'customer').replace(/[^a-z0-9]/gi, '-');
+      pdf.save(`${orderId}-${safeName}-printready.pdf`);
+      showToast(`✓ PDF ready — ${pdfPageList.length} pages with bleed & trim marks`);
+
+    } catch(err) {
+      showToast('PDF generation failed — check console');
+      console.error('PDF error:', err);
+    }
+  }, 150);
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return {r,g,b};
+}
+
+function exportAllOrders() {
+  const rows = [['Order ID','Name','Email','Address','Country','Size','Pages','Qty','Total','Status','Date']];
+  state.orders.forEach(o => rows.push([o.id,o.name,o.email,o.address,o.country,o.size,o.pages,o.qty,o.total,o.status,o.date]));
+  const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'photobook-orders.csv';
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════════════════════════
+function saveProject() {
+  const data = {
+    bookTitle: state.bookTitle,
+    currentSize: state.currentSize,
+    pages: state.pages.map(p => ({
+      ...p,
+      elements: p.elements.map(e => ({...e, imgEl: undefined}))
+    })),
+    assets: state.assets,
+    orders: state.orders,
+  };
+  try {
+    sessionStorage.setItem('photobook_project', JSON.stringify(data));
+    showToast('Project saved ✓');
+  } catch(e) {
+    showToast('Save failed — project too large');
+  }
+}
+
+function saveToStorage() {
+  try {
+    const data = { orders: state.orders };
+    sessionStorage.setItem('photobook_orders', JSON.stringify(data));
+  } catch(e) {}
+}
+
+function loadFromStorage() {
+  try {
+    const raw = sessionStorage.getItem('photobook_orders');
+    if (raw) { const d = JSON.parse(raw); if(d.orders) state.orders = d.orders; }
+  } catch(e) {}
+}
+
+function loadSampleOrders() {
+  loadFromStorage();
+  if (state.orders.length === 0) {
+    state.orders = [
+      {id:'PB-A1B2C3', name:'Priya Sharma', email:'priya@example.com', address:'14 MG Road, Bengaluru, Karnataka, India', country:'India', size:'8×8"', pages:21, qty:1, total:'2999', status:'new', date:'09/06/2026', projectData:'{"pages":[]}'},
+      {id:'PB-D4E5F6', name:'Rohit Verma', email:'rohit@example.com', address:'88 Linking Road, Bandra, Mumbai, Maharashtra, India', country:'India', size:'12×12"', pages:21, qty:10, total:'26991', status:'ready', date:'08/06/2026', projectData:'{"pages":[]}'},
+      {id:'PB-G7H8I9', name:'Ananya Iyer', email:'ananya@example.com', address:'22 Anna Nagar, Chennai, Tamil Nadu, India', country:'India', size:'6×6"', pages:21, qty:50, total:'59970', status:'shipped', date:'05/06/2026', projectData:'{"pages":[]}'},
+    ];
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BOOK TITLE SYNC
+// ═══════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  const titleInput = document.getElementById('book-title-input');
+  if (titleInput) titleInput.addEventListener('input', () => { state.bookTitle = titleInput.value; });
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// TOUCH SUPPORT FOR CANVAS
+// ═══════════════════════════════════════════════════════════════════
+function bindTouchEvents() {
+  canvas.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    const synth = {clientX: t.clientX, clientY: t.clientY};
+    onMouseDown(synth);
+  }, {passive: false});
+
+  canvas.addEventListener('touchmove', (e) => {
+    if (e.touches.length !== 1) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    const synth = {clientX: t.clientX, clientY: t.clientY};
+    onMouseMove(synth);
+  }, {passive: false});
+
+  canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    onMouseUp(e);
+  }, {passive: false});
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MOBILE PAGES STRIP
+// ═══════════════════════════════════════════════════════════════════
+function renderMobPagesStrip() {
+  const strip = document.getElementById('mob-pages-strip');
+  if (!strip) return;
+  strip.innerHTML = '';
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+
+  state.pages.forEach((pg, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'mob-page-chip' + (i === state.currentPage ? ' active' : '');
+    chip.onclick = () => goToPage(i);
+
+    const sz2 = BOOK_SIZES[state.currentSize];
+    const isSpread = pg.type === 'spread';
+    const pw = isSpread ? sz2.w * 2 : sz2.w;
+    const ph = sz2.h;
+
+    const logW = isSpread ? 60 : 30;
+    const logH = 30;
+    const c2 = document.createElement('canvas');
+    c2.width  = Math.round(logW * dpr);
+    c2.height = Math.round(logH * dpr);
+    c2.style.cssText = `width:${logW}px;height:${logH}px`;
+
+    const mc = c2.getContext('2d');
+    mc.scale(dpr, dpr);
+    const scX = logW / pw, scY = logH / ph;
+
+    mc.fillStyle = pg.bg || '#fff';
+    mc.fillRect(0, 0, logW, logH);
+
+    const sorted = [...(pg.elements || [])].sort((a,b)=>(a.zIndex||0)-(b.zIndex||0));
+    sorted.forEach(el => {
+      const ex = el.x * scX, ey = el.y * scY;
+      const ew = el.w * scX, eh = el.h * scY;
+      mc.save();
+      mc.globalAlpha = (el.opacity !== undefined ? el.opacity : 100) / 100;
+
+      if (el.type === 'image' && el.imgEl) {
+        if (el.crop) {
+          const cr = el.crop;
+          mc.save();
+          mc.beginPath(); mc.rect(ex, ey, ew, eh); mc.clip();
+          const sw = el.imgEl.naturalWidth * cr.w;
+          const sh = el.imgEl.naturalHeight * cr.h;
+          const sx = el.imgEl.naturalWidth * cr.x;
+          const sy = el.imgEl.naturalHeight * cr.y;
+          const scale = Math.max(ew / sw, eh / sh);
+          const dw = sw * scale, dh = sh * scale;
+          mc.drawImage(el.imgEl, sx, sy, sw, sh, ex + (ew-dw)/2, ey + (eh-dh)/2, dw, dh);
+          mc.restore();
+        } else {
+          mc.save();
+          mc.beginPath(); mc.rect(ex, ey, ew, eh); mc.clip();
+          const iw = el.imgEl.naturalWidth, ih = el.imgEl.naturalHeight;
+          const scale = Math.max(ew / iw, eh / ih);
+          const dw = iw * scale, dh = ih * scale;
+          mc.drawImage(el.imgEl, ex + (ew-dw)/2, ey + (eh-dh)/2, dw, dh);
+          mc.restore();
+        }
+      } else if (el.type === 'image-placeholder') {
+        mc.fillStyle = 'rgba(0,0,0,0.30)';
+        mc.fillRect(ex, ey, ew, eh);
+      } else if (el.type === 'text' && el.text) {
+        const fs = Math.max(3, (el.fontSize || 16) * scX * 0.9);
+        mc.font = `${el.bold?'700':'400'} ${fs}px ${el.fontFamily||'Inter, sans-serif'}`;
+        mc.fillStyle = el.color || '#000';
+        mc.textAlign = el.align || 'left';
+        const tx = el.align==='center'?ex+ew/2:el.align==='right'?ex+ew:ex;
+        mc.fillText(el.text, tx, ey + fs);
+      }
+      mc.restore();
+    });
+
+    // Gutter line
+    if (isSpread) {
+      mc.save();
+      mc.strokeStyle = 'rgba(180,180,180,0.5)';
+      mc.lineWidth = 0.5;
+      mc.setLineDash([2, 2]);
+      mc.beginPath(); mc.moveTo(logW/2, 0); mc.lineTo(logW/2, logH); mc.stroke();
+      mc.setLineDash([]);
+      mc.restore();
+    }
+    mc.strokeStyle = '#e0e0e0';
+    mc.lineWidth = 0.5;
+    mc.strokeRect(0, 0, logW, logH);
+
+    const lbl = document.createElement('span');
+    lbl.textContent = i === 0 ? 'Cover' : `S${i}`;
+    chip.appendChild(c2);
+    chip.appendChild(lbl);
+    strip.appendChild(chip);
+  });
+
+  // Add spreads button
+  const addChip = document.createElement('div');
+  addChip.className = 'mob-page-chip';
+  addChip.style.cssText = 'border:1px dashed var(--gray-300);padding:0 10px;min-width:44px;justify-content:center;font-size:18px;color:var(--accent)';
+  addChip.textContent = '+';
+  addChip.onclick = () => { addSpread(); renderMobPagesStrip(); };
+  strip.appendChild(addChip);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MOBILE BOTTOM SHEET
+// ═══════════════════════════════════════════════════════════════════
+let currentSheet = null;
+
+function mobOpenSheet(type) {
+  const sheet = document.getElementById('mob-sheet');
+  const title = document.getElementById('mob-sheet-title');
+  const body = document.getElementById('mob-sheet-body');
+  document.querySelectorAll('.mob-nav-btn').forEach(b => b.classList.remove('active'));
+
+  if (currentSheet === type) {
+    mobCloseSheet();
+    return;
+  }
+  currentSheet = type;
+  document.getElementById('mob-btn-' + type)?.classList.add('active');
+
+  if (type === 'pages') {
+    title.textContent = 'Pages';
+    body.innerHTML = '';
+    // Mini pages grid
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 16px';
+    state.pages.forEach((pg, i) => {
+      const cell = document.createElement('div');
+      cell.style.cssText = 'text-align:center;cursor:pointer';
+      const inner = document.createElement('div');
+      inner.style.cssText = `border:2px solid ${i === state.currentPage ? 'var(--accent)' : 'var(--gray-200)'};border-radius:8px;overflow:hidden;background:#fff;${pg.type === 'spread' ? 'aspect-ratio:2/1' : 'aspect-ratio:1/1'}`;
+      const c = document.createElement('canvas');
+      const cw = pg.type === 'spread' ? 80 : 40;
+      c.width = cw; c.height = 40;
+      c.style.cssText = 'width:100%;height:auto;display:block';
+      const ctx2 = c.getContext('2d');
+      ctx2.fillStyle = pg.bg || '#fff';
+      ctx2.fillRect(0, 0, cw, 40);
+      const sz2 = BOOK_SIZES[state.currentSize];
+      const pw = pg.type === 'spread' ? sz2.w * 2 : sz2.w;
+      (pg.elements || []).forEach(el => {
+        if (el.type === 'image' && el.imgEl) {
+          ctx2.drawImage(el.imgEl, el.x*(cw/pw), el.y*(40/sz2.h), el.w*(cw/pw), el.h*(40/sz2.h));
+        }
+      });
+      inner.appendChild(c);
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:10px;color:var(--gray-400);margin-top:4px';
+      lbl.textContent = i === 0 ? 'Cover' : `Spread ${i}`;
+      cell.appendChild(inner);
+      cell.appendChild(lbl);
+      cell.onclick = () => { goToPage(i); mobCloseSheet(); };
+      grid.appendChild(cell);
+    });
+    body.appendChild(grid);
+    // Add spreads button
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-page-btn';
+    addBtn.style.cssText = 'display:block;margin:0 16px 8px;width:calc(100% - 32px)';
+    addBtn.textContent = '+ Add 2 spreads';
+    addBtn.onclick = () => { addSpread(); mobOpenSheet('pages'); };
+    body.appendChild(addBtn);
+
+  } else if (type === 'images') {
+    title.textContent = 'Images';
+    body.innerHTML = '';
+    // Upload button
+    const uploadWrap = document.createElement('div');
+    uploadWrap.style.cssText = 'padding:12px 16px';
+    uploadWrap.innerHTML = `
+      <div class="upload-zone" style="position:relative"
+        ondragover="handleUploadZoneDragOver(event)"
+        ondragleave="handleUploadZoneDragLeave(event)"
+        ondrop="handleUploadZoneDrop(event)">
+        <input type="file" accept="image/*" multiple onchange="handleImageUpload(event);mobOpenSheet('images')" style="position:absolute;inset:0;opacity:0;cursor:pointer">
+        <div class="upload-zone-icon">📷</div>
+        <div class="upload-zone-text">Tap or drag photos here<br>Select multiple at once</div>
+      </div>`;
+    body.appendChild(uploadWrap);
+    if (state.assets.length > 0) {
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'padding:4px 16px 8px;font-size:11px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.6px';
+      lbl.textContent = `Your images (${state.assets.length})`;
+      body.appendChild(lbl);
+      const grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 16px';
+      state.assets.forEach(asset => {
+        const item = document.createElement('div');
+        item.className = 'asset-item';
+        item.style.cssText = 'border-radius:8px;overflow:hidden;cursor:pointer;aspect-ratio:1/1;background:var(--gray-100);position:relative';
+        const img = document.createElement('img');
+        img.src = asset.src;
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover';
+        const overlay = document.createElement('div');
+        overlay.className = 'asset-item-add';
+        overlay.textContent = '+';
+        item.appendChild(img);
+        item.appendChild(overlay);
+        item.onclick = () => { addImageElement(asset.src, asset.name); mobCloseSheet(); showToast('Image added to page'); };
+        grid.appendChild(item);
+      });
+      body.appendChild(grid);
+    } else {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'text-align:center;padding:20px;font-size:13px;color:var(--gray-400)';
+      empty.textContent = 'No images yet. Upload some above.';
+      body.appendChild(empty);
+    }
+
+  } else if (type === 'props') {
+    title.textContent = 'Properties';
+    body.innerHTML = '';
+    const pg = state.pages[state.currentPage];
+    const el = state.selectedElementId ? pg.elements.find(e => e.id === state.selectedElementId) : null;
+
+    if (!el) {
+      // Page background
+      const bgSection = document.createElement('div');
+      bgSection.style.cssText = 'padding:16px';
+      bgSection.innerHTML = `
+        <div style="font-size:11px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px">Page Background</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:13px">Background color</span>
+          <div style="width:36px;height:36px;border-radius:8px;border:1px solid var(--gray-200);overflow:hidden">
+            <input type="color" id="mob-bg-color" value="${pg.bg||'#ffffff'}" onchange="updateBgColor();document.getElementById('bg-color').value=this.value" style="width:44px;height:44px;margin:-4px;border:none;cursor:pointer">
+          </div>
+        </div>`;
+      body.appendChild(bgSection);
+      const hint = document.createElement('div');
+      hint.style.cssText = 'padding:0 16px;font-size:12px;color:var(--gray-400)';
+      hint.textContent = 'Tap an image or text on the canvas to select it and edit its properties.';
+      body.appendChild(hint);
+      // Layers
+      if (pg.elements.length > 0) {
+        const layerLbl = document.createElement('div');
+        layerLbl.style.cssText = 'padding:16px 16px 8px;font-size:11px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.6px';
+        layerLbl.textContent = 'Layers';
+        body.appendChild(layerLbl);
+        const layerList = document.createElement('div');
+        layerList.style.cssText = 'padding:0 8px 16px';
+        [...pg.elements].reverse().forEach(el2 => {
+          const row = document.createElement('div');
+          row.className = 'layer-row';
+          row.innerHTML = `<span class="layer-icon">${el2.type==='image'?'🖼':'✏️'}</span><span class="layer-name">${el2.type==='text'?(el2.text||'Text').substring(0,20):(el2.name||'Image')}</span><span class="layer-del" onclick="deleteEl(${el2.id},event)">✕</span>`;
+          row.onclick = (e) => { if(!e.target.classList.contains('layer-del')){selectElement(el2.id); renderPage();} };
+          layerList.appendChild(row);
+        });
+        body.appendChild(layerList);
+      }
+      return;
+    }
+
+    // Element selected
+    const propsWrap = document.createElement('div');
+    propsWrap.style.cssText = 'padding:12px 16px';
+    if (el.type === 'text') {
+      propsWrap.innerHTML = `
+        <div style="font-size:11px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px">Text Properties</div>
+        <div class="mob-props-grid">
+          <div class="mob-prop-item" style="grid-column:1/-1">
+            <label class="mob-prop-label">Text content</label>
+            <textarea id="mob-text-content" rows="3" style="width:100%;padding:10px;border:1px solid var(--gray-200);border-radius:8px;font-size:15px;resize:none;outline:none" oninput="getSelected()&&(getSelected().text=this.value,document.getElementById('text-content').value=this.value,renderPage())">${el.text||''}</textarea>
+          </div>
+          <div class="mob-prop-item" style="grid-column:1/-1">
+            <label class="mob-prop-label">Font</label>
+            <select class="font-select" onchange="document.getElementById('font-select').value=this.value;updateFont()">
+              <option value="Inter, sans-serif">Inter</option>
+              <option value="'Playfair Display', serif">Playfair Display</option>
+              <option value="Montserrat, sans-serif">Montserrat</option>
+              <option value="Raleway, sans-serif">Raleway</option>
+              <option value="Lora, serif">Lora</option>
+              <option value="Poppins, sans-serif">Poppins</option>
+              <option value="'DM Sans', sans-serif">DM Sans</option>
+            </select>
+          </div>
+          <div class="mob-prop-item">
+            <label class="mob-prop-label">Font size</label>
+            <input type="number" class="mob-prop-input" value="${el.fontSize||24}" onchange="document.getElementById('font-size').value=this.value;updateFontSize()">
+          </div>
+          <div class="mob-prop-item">
+            <label class="mob-prop-label">Color</label>
+            <div style="height:40px;border-radius:8px;border:1px solid var(--gray-200);overflow:hidden">
+              <input type="color" value="${el.color||'#000000'}" onchange="document.getElementById('text-color').value=this.value;updateTextColor()" style="width:calc(100%+8px);height:calc(100%+8px);margin:-4px;border:none;cursor:pointer">
+            </div>
+          </div>
+          <div class="mob-prop-item">
+            <label class="mob-prop-label">Opacity %</label>
+            <input type="number" class="mob-prop-input" min="0" max="100" value="${el.opacity??100}" onchange="document.getElementById('prop-opacity').value=this.value;updatePropOpacity()">
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;padding-top:4px">
+          <button class="btn btn-ghost" style="flex:1;min-height:44px" onclick="centerOnPage()">Center</button>
+          <button class="btn btn-ghost" style="flex:1;min-height:44px;color:#e53e3e;border-color:#e53e3e" onclick="deleteSelected();mobCloseSheet()">Delete</button>
+        </div>`;
+    } else {
+      propsWrap.innerHTML = `
+        <div style="font-size:11px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px">Image Properties</div>
+        <div class="mob-props-grid">
+          <div class="mob-prop-item">
+            <label class="mob-prop-label">Width (in)</label>
+            <input type="number" class="mob-prop-input" step="0.1" value="${Math.round(el.w*100)/100}" onchange="document.getElementById('prop-w').value=this.value;updatePropW()">
+          </div>
+          <div class="mob-prop-item">
+            <label class="mob-prop-label">Height (in)</label>
+            <input type="number" class="mob-prop-input" step="0.1" value="${Math.round(el.h*100)/100}" onchange="document.getElementById('prop-h').value=this.value;updatePropH()">
+          </div>
+          <div class="mob-prop-item">
+            <label class="mob-prop-label">Rotation °</label>
+            <input type="number" class="mob-prop-input" value="${el.rotation||0}" onchange="document.getElementById('prop-rotation').value=this.value;updateRotation()">
+          </div>
+          <div class="mob-prop-item">
+            <label class="mob-prop-label">Opacity %</label>
+            <input type="number" class="mob-prop-input" min="0" max="100" value="${el.opacity??100}" onchange="document.getElementById('prop-opacity').value=this.value;updatePropOpacity()">
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;padding-top:4px">
+          <button class="btn btn-ghost" style="flex:1;min-height:44px" onclick="fitToPage()">Fit</button>
+          <button class="btn btn-ghost" style="flex:1;min-height:44px" onclick="centerOnPage()">Center</button>
+          <button class="btn btn-ghost" style="flex:1;min-height:44px;color:#e53e3e;border-color:#e53e3e" onclick="deleteSelected();mobCloseSheet()">Delete</button>
+        </div>`;
+    }
+    body.appendChild(propsWrap);
+  }
+
+  sheet.classList.add('open');
+}
+
+function mobCloseSheet() {
+  currentSheet = null;
+  document.getElementById('mob-sheet').classList.remove('open');
+  document.querySelectorAll('.mob-nav-btn').forEach(b => b.classList.remove('active'));
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SYNC mob strip after page navigation
+// ═══════════════════════════════════════════════════════════════════
+const _origGoToPage = goToPage;
+// Override goToPage to also sync mob strip
+function goToPage(idx) {
+  state.currentPage = idx;
+  state.selectedElementId = null;
+  document.getElementById('no-selection').style.display = 'block';
+  document.getElementById('element-props').style.display = 'none';
+  document.getElementById('text-props-section').style.display = 'none';
+  document.getElementById('image-props-section').style.display = 'none';
+  document.getElementById('bg-color').value = state.pages[idx].bg || '#ffffff';
+  computeCanvasDimensions();
+  renderPage();
+  renderLayersList();
+  renderPagesList();
+  renderMobPagesStrip();
+  updateStatusBar();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MOBILE TOOL SYNC
+// ═══════════════════════════════════════════════════════════════════
+const _origSetTool = setTool;
+function setTool(tool) {
+  state.activeTool = tool;
+  document.querySelectorAll('.tool-btn[id^="tool-"]').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mob-tool-btn[id^="mob-tool-"]').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('tool-' + tool);
+  if (btn) btn.classList.add('active');
+  const mobBtn = document.getElementById('mob-tool-' + tool);
+  if (mobBtn) mobBtn.classList.add('active');
+  canvas.style.cursor = tool === 'text' ? 'text' : tool === 'image' ? 'cell' : 'default';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RESPONSIVE LAYOUT INIT
+// ═══════════════════════════════════════════════════════════════════
+function applyResponsiveLayout() {
+  const isMob = window.innerWidth <= 768;
+  const sidebar = document.getElementById('sidebar');
+  const rightPanel = document.getElementById('right-panel');
+  const statusBar = document.getElementById('status-bar');
+  const toolbar = document.getElementById('toolbar');
+  const mobNav = document.getElementById('mob-nav');
+  const mobStrip = document.getElementById('mob-pages-strip');
+  const mobToolbar = document.getElementById('mob-toolbar');
+
+  if (isMob) {
+    sidebar.style.display = 'none';
+    rightPanel.style.display = 'none';
+    statusBar.style.display = 'none';
+    toolbar.style.display = 'none';
+    mobNav.style.display = 'flex';
+    mobStrip.style.display = 'flex';
+    mobToolbar.style.display = 'flex';
+    renderMobPagesStrip();
+  } else {
+    sidebar.style.display = 'flex';
+    rightPanel.style.display = window.innerWidth > 1100 ? 'flex' : 'none';
+    statusBar.style.display = 'flex';
+    toolbar.style.display = 'flex';
+    mobNav.style.display = 'none';
+    mobStrip.style.display = 'none';
+    mobToolbar.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CROP ENGINE
+// ═══════════════════════════════════════════════════════════════════
+let cropState = {
+  el: null,
+  imgW: 0, imgH: 0,          // displayed image dimensions in modal
+  box: {x:0,y:0,w:0,h:0},   // crop box in modal-px coords
+  dragging: null,             // null | 'box' | handle id
+  startMx:0, startMy:0,
+  startBox: null,
+  ratio: 0,
+  imgRect: null,
+};
+
+function openCropModal() {
+  const el = getSelected();
+  if (!el || el.type !== 'image' || !el.imgEl) {
+    showToast('Select an image first');
+    return;
+  }
+  cropState.el = el;
+  cropState.ratio = 0;
+
+  const modal = document.getElementById('crop-modal');
+  const img = document.getElementById('crop-img');
+  img.src = el.src;
+
+  img.onload = () => {
+    // Position crop box = current crop or full image
+    const r = img.getBoundingClientRect();
+    cropState.imgW = img.offsetWidth;
+    cropState.imgH = img.offsetHeight;
+    const c = el.crop || {x:0,y:0,w:1,h:1};
+    cropState.box = {
+      x: c.x * cropState.imgW,
+      y: c.y * cropState.imgH,
+      w: c.w * cropState.imgW,
+      h: c.h * cropState.imgH,
+    };
+    updateCropBoxUI();
+  };
+
+  modal.classList.add('open');
+  document.querySelectorAll('.crop-ratio').forEach(b => b.classList.toggle('active', b.dataset.r === '0'));
+  bindCropEvents();
+}
+
+function closeCropModal() {
+  document.getElementById('crop-modal').classList.remove('open');
+  unbindCropEvents();
+}
+
+function applyCrop() {
+  const el = cropState.el;
+  if (!el) return;
+  const b = cropState.box;
+  const iw = cropState.imgW;
+  const ih = cropState.imgH;
+  el.crop = {
+    x: Math.max(0, b.x / iw),
+    y: Math.max(0, b.y / ih),
+    w: Math.min(1 - b.x/iw, b.w / iw),
+    h: Math.min(1 - b.y/ih, b.h / ih),
+  };
+  closeCropModal();
+  renderPage();
+  showToast('Crop applied ✓');
+}
+
+function setCropRatio(r) {
+  cropState.ratio = r;
+  document.querySelectorAll('.crop-ratio').forEach(b => b.classList.toggle('active', parseFloat(b.dataset.r) === r));
+  if (r !== 0) {
+    const cx = cropState.box.x + cropState.box.w/2;
+    const cy = cropState.box.y + cropState.box.h/2;
+    let nw = cropState.box.w;
+    let nh = nw / r;
+    if (nh > cropState.imgH) { nh = cropState.imgH; nw = nh * r; }
+    cropState.box.w = nw;
+    cropState.box.h = nh;
+    cropState.box.x = Math.max(0, cx - nw/2);
+    cropState.box.y = Math.max(0, cy - nh/2);
+    clampCropBox();
+    updateCropBoxUI();
+  }
+}
+
+function updateCropBoxUI() {
+  const b = cropState.box;
+  const box = document.getElementById('crop-box');
+  box.style.left = b.x + 'px';
+  box.style.top  = b.y + 'px';
+  box.style.width  = b.w + 'px';
+  box.style.height = b.h + 'px';
+}
+
+function clampCropBox() {
+  const b = cropState.box;
+  const MIN = 30;
+  if (b.w < MIN) b.w = MIN;
+  if (b.h < MIN) b.h = MIN;
+  if (b.x < 0) b.x = 0;
+  if (b.y < 0) b.y = 0;
+  if (b.x + b.w > cropState.imgW) b.x = cropState.imgW - b.w;
+  if (b.y + b.h > cropState.imgH) b.y = cropState.imgH - b.h;
+  if (b.x < 0) { b.x = 0; b.w = cropState.imgW; }
+  if (b.y < 0) { b.y = 0; b.h = cropState.imgH; }
+}
+
+function getCropMousePos(e) {
+  const imgEl = document.getElementById('crop-img');
+  const r = imgEl.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: clientX - r.left, y: clientY - r.top };
+}
+
+function onCropMouseDown(e) {
+  if (e.target.classList.contains('crop-handle')) {
+    cropState.dragging = e.target.dataset.h;
+  } else if (e.target.id === 'crop-box' || e.target.closest('#crop-box')) {
+    cropState.dragging = 'box';
+  } else if (e.target.id === 'crop-wrap' || e.target.id === 'crop-img') {
+    // Start new box
+    const pos = getCropMousePos(e);
+    cropState.box = {x:pos.x, y:pos.y, w:1, h:1};
+    cropState.dragging = 'br';
+  }
+  if (cropState.dragging) {
+    const pos = getCropMousePos(e);
+    cropState.startMx = pos.x;
+    cropState.startMy = pos.y;
+    cropState.startBox = {...cropState.box};
+    e.preventDefault();
+  }
+}
+
+function onCropMouseMove(e) {
+  if (!cropState.dragging) return;
+  e.preventDefault();
+  const pos = getCropMousePos(e);
+  const dx = pos.x - cropState.startMx;
+  const dy = pos.y - cropState.startMy;
+  const sb = cropState.startBox;
+  const b  = cropState.box;
+  const d  = cropState.dragging;
+  const MIN = 30;
+
+  if (d === 'box') {
+    b.x = sb.x + dx; b.y = sb.y + dy;
+  } else {
+    if (d.includes('r') || d === 'br' || d === 'tr' || d === 'mr') { b.w = Math.max(MIN, sb.w + dx); }
+    if (d.includes('l') || d === 'bl' || d === 'tl' || d === 'ml') { b.x = sb.x + dx; b.w = Math.max(MIN, sb.w - dx); if(b.w===MIN)b.x=sb.x+sb.w-MIN; }
+    if (d === 'br' || d === 'bl' || d === 'bm') { b.h = Math.max(MIN, sb.h + dy); }
+    if (d === 'tr' || d === 'tl' || d === 'tm') { b.y = sb.y + dy; b.h = Math.max(MIN, sb.h - dy); if(b.h===MIN)b.y=sb.y+sb.h-MIN; }
+  }
+
+  // Enforce ratio if set
+  if (cropState.ratio !== 0 && d !== 'box') {
+    b.h = b.w / cropState.ratio;
+  }
+
+  clampCropBox();
+  updateCropBoxUI();
+}
+
+function onCropMouseUp(e) {
+  cropState.dragging = null;
+}
+
+let _cropHandlers = null;
+function bindCropEvents() {
+  const wrap = document.getElementById('crop-wrap');
+  _cropHandlers = {
+    md: onCropMouseDown, mm: onCropMouseMove, mu: onCropMouseUp
+  };
+  wrap.addEventListener('mousedown',  _cropHandlers.md);
+  wrap.addEventListener('touchstart', _cropHandlers.md, {passive:false});
+  window.addEventListener('mousemove', _cropHandlers.mm);
+  window.addEventListener('touchmove', _cropHandlers.mm, {passive:false});
+  window.addEventListener('mouseup',  _cropHandlers.mu);
+  window.addEventListener('touchend', _cropHandlers.mu);
+}
+function unbindCropEvents() {
+  const wrap = document.getElementById('crop-wrap');
+  if (_cropHandlers) {
+    wrap.removeEventListener('mousedown',  _cropHandlers.md);
+    wrap.removeEventListener('touchstart', _cropHandlers.md);
+    window.removeEventListener('mousemove', _cropHandlers.mm);
+    window.removeEventListener('touchmove', _cropHandlers.mm);
+    window.removeEventListener('mouseup',  _cropHandlers.mu);
+    window.removeEventListener('touchend', _cropHandlers.mu);
+  }
+  _cropHandlers = null;
+}
+
+window.addEventListener('resize', () => {
+  if (canvas) { computeCanvasDimensions(); renderPage(); }
+  applyResponsiveLayout();
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// COVER DEFAULT ELEMENTS — called after initEditor
+// ═══════════════════════════════════════════════════════════════════
+function initCoverDefaults() {
+  const pg = state.pages[0]; // cover page
+  const sz = BOOK_SIZES[state.currentSize];
+  const pw = sz.w;
+  const ph = sz.h;
+
+  // Image placeholder — occupies the top ~65% of the cover
+  pg.elements.push({
+    id: state.nextId++, type:'image-placeholder',
+    x: pw * 0.06, y: ph * 0.05,
+    w: pw * 0.88, h: ph * 0.62,
+    opacity:100, zIndex:5
+  });
+
+  // Title text box — large, below the image
+  pg.elements.push({
+    id: state.nextId++, type:'text',
+    x: pw * 0.06, y: ph * 0.70,
+    w: pw * 0.88, h: ph * 0.14,
+    text: state.bookTitle || 'My Photobook',
+    fontFamily:"'Playfair Display', serif", fontSize: 28,
+    color:'#0a0a0a', bold:false, italic:false,
+    align:'center', opacity:100, zIndex:11,
+    isCoverTitle: true
+  });
+
+  // Subtitle / date line
+  pg.elements.push({
+    id: state.nextId++, type:'text',
+    x: pw * 0.06, y: ph * 0.86,
+    w: pw * 0.88, h: ph * 0.08,
+    text:'Add a subtitle or date',
+    fontFamily:'Inter, sans-serif', fontSize:11,
+    color:'#cccccc', bold:false, italic:false,
+    align:'center', opacity:100, zIndex:11
+  });
+}
+
+// image-placeholder handled inside drawElement above
+
+// ═══════════════════════════════════════════════════════════════════
+// SIDEBAR IMAGE TABS
+// ═══════════════════════════════════════════════════════════════════
+function switchImgTab(tab, btn) {
+  document.querySelectorAll('.img-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('img-tab-upload').style.display = tab === 'upload' ? 'block' : 'none';
+  document.getElementById('img-tab-stock').style.display  = tab === 'stock'  ? 'block' : 'none';
+  if (tab === 'stock' && document.getElementById('stock-grid-wrap').querySelector('.stock-empty')) {
+    // Pre-load a nice set of cover-worthy defaults
+    searchStockDefault();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// STOCK IMAGE SEARCH — Unsplash, Pexels (public/free APIs)
+// Uses Unsplash Source (no key needed) + Picsum for demo fallback
+// ═══════════════════════════════════════════════════════════════════
+const STOCK_SOURCES = [
+  { name:'Unsplash', badge:'unsplash',
+    search: q => `https://source.unsplash.com/featured/400x300/?${encodeURIComponent(q)}&sig=${Date.now()}`,
+    thumbs: (q, n) => Array.from({length:n},(_,i)=>`https://source.unsplash.com/featured/400x300/?${encodeURIComponent(q)}&sig=${i+Date.now()}`)
+  }
+];
+
+// Because Unsplash Source returns individual images (redirect) and doesn't
+// offer a search API without a key, we use the Unsplash Source URL pattern
+// with multiple random seeds to get varied results.
+// For Pexels we use their public embed pattern.
+// Both Unsplash Source and Pexels CC0/free-use apply.
+
+function searchStockDefault() {
+  const defaultTerms = ['nature','travel','family','flowers','architecture'];
+  const q = defaultTerms[Math.floor(Math.random()*defaultTerms.length)];
+  doStockSearch(q);
+}
+
+function searchStock() {
+  const q = document.getElementById('stock-query').value.trim();
+  if (!q) return;
+  doStockSearch(q);
+}
+
+function doStockSearch(q) {
+  const wrap = document.getElementById('stock-grid-wrap');
+  wrap.innerHTML = '<div class="stock-loading">🔍 Finding beautiful photos…</div>';
+
+  // Build 12 Unsplash Source thumbnails with unique seeds
+  const results = [];
+  for (let i = 0; i < 12; i++) {
+    results.push({
+      thumb: `https://source.unsplash.com/featured/400x300/?${encodeURIComponent(q)}&seed=${i}-${Date.now()}`,
+      full:  `https://source.unsplash.com/featured/2400x1800/?${encodeURIComponent(q)}&seed=${i}-${Date.now()}`,
+      source: 'Unsplash',
+      badge: 'unsplash',
+      credit: 'Free to use · Unsplash licence'
+    });
+  }
+
+  renderStockGrid(results, q, wrap);
+}
+
+function renderStockGrid(results, query, wrap) {
+  wrap.innerHTML = '';
+
+  const attribution = document.createElement('div');
+  attribution.style.cssText = 'font-size:10px;color:var(--gray-400);padding:0 0 6px;line-height:1.5';
+  attribution.innerHTML = `Results for "<strong style="color:var(--gray-600)">${query}</strong>" · Free for print use · Unsplash licence`;
+  wrap.appendChild(attribution);
+
+  const grid = document.createElement('div');
+  grid.className = 'stock-grid';
+
+  results.forEach(img => {
+    const item = document.createElement('div');
+    item.className = 'stock-img-item';
+
+    const im = document.createElement('img');
+    im.src = img.thumb;
+    im.alt = query;
+    im.loading = 'lazy';
+    im.onerror = () => { item.style.display = 'none'; };
+
+    const overlay = document.createElement('div');
+    overlay.className = 'stock-img-add';
+    overlay.textContent = '+';
+
+    item.appendChild(im);
+    item.appendChild(overlay);
+
+    // Clicking adds the FULL-resolution version to the canvas
+    item.onclick = () => {
+      showToast('Loading full-resolution photo…');
+      // Fetch full-res as blob → data URL so it's embeddable
+      fetch(img.full)
+        .then(r => r.blob())
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onload = e => {
+            addImageElement(e.target.result, `${query}-unsplash.jpg`);
+            showToast('Photo added ✓  Free for print use');
+          };
+          reader.readAsDataURL(blob);
+        })
+        .catch(() => {
+          // Fallback: add thumb directly
+          addImageElement(img.thumb, `${query}-unsplash.jpg`);
+          showToast('Photo added ✓');
+        });
+    };
+
+    grid.appendChild(item);
+  });
+
+  wrap.appendChild(grid);
+
+  const footer = document.createElement('div');
+  footer.style.cssText = 'font-size:9px;color:var(--gray-400);text-align:center;padding:6px 0 4px;line-height:1.4';
+  footer.innerHTML = 'All photos are free for commercial and print use under the Unsplash licence. No attribution required.';
+  wrap.appendChild(footer);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BOOK MOCKUP RENDERER
+// ═══════════════════════════════════════════════════════════════════
+
+
+
+
+
+
+
+// Placeholder click handled inside onMouseDown directly (see below)
+
+// handleImageUpload placeholder logic merged into original below
+
+
+</script>
+</body>
+</html>

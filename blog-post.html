@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">Blog — Binder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" onload="this.rel='stylesheet'">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#27AE72;--accent-h:#1f9660;--accent-l:#e8f7f0;
+  --black:#0a0a0a;--white:#fff;
+  --g50:#f9f9f9;--g100:#f2f2f2;--g200:#e4e4e4;--g400:#999;--g500:#666;
+  --font:'Inter',system-ui,sans-serif;--font-serif:'Playfair Display',Georgia,serif;
+}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--white);color:var(--black);line-height:1.6}
+a{text-decoration:none;color:inherit}
+nav{position:sticky;top:0;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--g200);z-index:100;padding:0 5vw}
+.nav-inner{display:flex;align-items:center;height:62px;gap:28px}
+.nav-logo{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.nav-logo-mark{width:34px;height:34px;background:var(--black);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--white);font-weight:700;font-size:16px}
+.nav-logo-name{font-size:15px;font-weight:700}
+.nav-spacer{flex:1}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:all .15s}
+.btn-primary{background:var(--accent);color:var(--white)}
+.btn-primary:hover{background:var(--accent-h)}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--g400);padding:8px 0;transition:color .15s}
+.back-link:hover{color:var(--black)}
+/* POST LAYOUT */
+.post-wrap{max-width:720px;margin:0 auto;padding:48px 5vw 80px}
+.post-header{margin-bottom:40px}
+.post-cat{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--accent);margin-bottom:12px}
+.post-title{font-size:clamp(26px,4vw,42px);font-weight:700;line-height:1.18;letter-spacing:-.4px;font-family:var(--font-serif);margin-bottom:16px}
+.post-meta{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--g400);margin-bottom:32px}
+.post-meta-sep{width:3px;height:3px;background:var(--g200);border-radius:50%}
+/* Cover image */
+.post-cover{width:100%;border-radius:16px;overflow:hidden;margin-bottom:40px;background:var(--g100)}
+.post-cover img{width:100%;height:auto;display:block;max-height:500px;object-fit:cover}
+.post-cover-ph{width:100%;height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,var(--g100),var(--g200));color:var(--g400)}
+.post-cover-ph svg{width:44px;height:44px;opacity:.3}
+.post-cover-ph span{font-size:12px;font-weight:500}
+/* Article body */
+.post-body{font-size:17px;line-height:1.78;color:#222}
+.post-body p{margin-bottom:1.4em}
+.post-body h2{font-size:24px;font-weight:700;font-family:var(--font-serif);letter-spacing:-.2px;margin:2em 0 .7em;color:var(--black)}
+.post-body h3{font-size:19px;font-weight:600;margin:1.8em 0 .6em;color:var(--black)}
+.post-body blockquote{border-left:3px solid var(--accent);padding:14px 22px;background:var(--accent-l);border-radius:0 8px 8px 0;margin:2em 0;font-style:italic;font-family:var(--font-serif);font-size:18px;line-height:1.6;color:var(--black)}
+.post-body ul,.post-body ol{padding-left:1.6em;margin-bottom:1.4em}
+.post-body li{margin-bottom:.5em}
+.post-body a{color:var(--accent);border-bottom:1px solid var(--accent-l);transition:border-color .15s}
+.post-body a:hover{border-color:var(--accent)}
+.post-body strong{font-weight:600}
+.post-body em{font-style:italic}
+/* Inline image */
+.post-body .post-image{width:100%;border-radius:12px;overflow:hidden;margin:2em 0;background:var(--g100)}
+.post-body .post-image img{width:100%;height:auto;display:block}
+.post-body .post-image-ph{height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--g300);background:linear-gradient(135deg,var(--g100),var(--g200))}
+.post-body .post-image-ph svg{width:32px;height:32px;opacity:.35}
+.post-body .post-image-ph span{font-size:11px;font-weight:500;color:var(--g400);text-transform:uppercase;letter-spacing:.4px}
+.post-image-caption{font-size:12px;color:var(--g400);text-align:center;margin-top:-1em;margin-bottom:1.4em;font-style:italic}
+/* CTA box */
+.post-cta-box{background:var(--black);border-radius:16px;padding:32px 28px;text-align:center;margin:3em 0;color:var(--white)}
+.post-cta-box h4{font-size:20px;font-weight:700;margin-bottom:10px;font-family:var(--font-serif)}
+.post-cta-box p{font-size:14px;opacity:.6;margin-bottom:20px;line-height:1.6}
+/* Tags */
+.post-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:40px;padding-top:32px;border-top:1px solid var(--g200)}
+.tag{padding:5px 12px;background:var(--g100);border-radius:100px;font-size:12px;color:var(--g500);font-weight:500}
+/* Related */
+.related-section{border-top:1px solid var(--g100);padding-top:40px;margin-top:48px}
+.related-title{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--g400);margin-bottom:20px}
+.related-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.related-card{border-radius:12px;overflow:hidden;background:var(--g50);border:1px solid var(--g200);transition:box-shadow .15s;cursor:pointer}
+.related-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.07)}
+.related-card__img{height:120px;background:var(--g100);overflow:hidden;position:relative}
+.related-card__img img{width:100%;height:100%;object-fit:cover}
+.related-card__img .img-ph{height:120px}
+.related-card__body{padding:12px 14px}
+.related-card__cat{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--accent);margin-bottom:5px}
+.related-card__title{font-size:13px;font-weight:600;line-height:1.4;color:var(--black)}
+.img-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,var(--g100),var(--g200));color:var(--g300);height:100%}
+.img-ph svg{opacity:.35;width:28px;height:28px}
+.img-ph span{font-size:10px;font-weight:500;color:var(--g400);text-transform:uppercase;letter-spacing:.4px}
+footer{padding:24px 5vw;border-top:1px solid var(--g200);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.footer-copy{font-size:12px;color:var(--g400)}
+.footer-links{display:flex;gap:16px}
+.footer-links a{font-size:12px;color:var(--g400)}
+.footer-links a:hover{color:var(--accent)}
+@media(max-width:580px){
+  .related-grid{grid-template-columns:1fr}
+  .post-body{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">B</div>
+      <div class="nav-logo-name">Binder</div>
+    </a>
+    <div class="nav-spacer"></div>
+    <a href="blog.html" class="back-link">
+      <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M10 3L6 8l4 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      All posts
+    </a>
+    <a href="photobook-editor.html" class="btn btn-primary">Start designing →</a>
+  </div>
+</nav>
+
+<div class="post-wrap" id="post-content">
+  <div style="text-align:center;padding:80px 0;color:var(--g400)">
+    <div style="font-size:32px;margin-bottom:12px;opacity:.4">📖</div>
+    <div>Loading post…</div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-copy">© 2026 Binder · A-291/1, Okhla Phase I, Delhi — 110020</div>
+  <div style="display:flex;gap:8px">
+    <a href="https://instagram.com/binderbooks" target="_blank" style="color:var(--g400);transition:color .15s" onmouseover="this.style.color='#27AE72'" onmouseout="this.style.color='var(--g400)'" aria-label="Instagram">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5" fill="currentColor" stroke="none"/></svg>
+    </a>
+    <a href="https://facebook.com/binderbooks" target="_blank" style="color:var(--g400);transition:color .15s" onmouseover="this.style.color='#27AE72'" onmouseout="this.style.color='var(--g400)'" aria-label="Facebook">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+    </a>
+  </div>
+  <div class="footer-links">
+    <a href="blog.html">Blog</a>
+    <a href="index.html">Home</a>
+    <a href="photobook-editor.html">Design a book</a>
+  </div>
+</footer>
+
+<script>
+const DEFAULT_POSTS = [
+  {id:'post-1',title:'How to choose the right photobook size for your memories',excerpt:'From intimate pocket books to statement coffee-table albums — here\'s how to pick the size that works best for your story.',category:'guides',categoryLabel:'Guide',image:'',author:'Binder Team',date:'2026-06-01',featured:true,slug:'choosing-photobook-size',
+   content:`<p>Whether you're preserving a holiday, a wedding, or just a year of everyday moments — the size of your photobook shapes how your story feels in someone's hands.</p><h2>The 6×6" — intimate and personal</h2><p>Small enough to fit on any shelf, the 6×6" is perfect for a single event, a personal gift, or a short series. It feels precious rather than grand — the kind of book you pick up and flick through quietly.</p><div class="post-image"><div class="post-image-ph"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg><span>Add your image here</span></div></div><p class="post-image-caption">Replace this placeholder with a photo of your 6×6" book</p><h2>The 8×8" — the sweet spot</h2><p>Our most popular size for a reason. Big enough for impact, small enough to keep on a coffee table. Works beautifully for weddings, travel albums, and family annuals.</p><blockquote>"The 8×8" just feels right in your hands. Not too big, not too small — it's exactly the right canvas for a life well-documented."</blockquote><h2>The 12×12" — a statement piece</h2><p>When you want to go big. Full-bleed photos fill the page edge to edge. The 12×12" is a coffee-table book in the truest sense — it demands to be seen.</p><div class="post-image"><div class="post-image-ph"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg><span>Add your image here</span></div></div><p>Order one as a first edition — if you love it, order more for family at the volume discount. The 12×12" makes a particularly meaningful anniversary gift.</p><div class="post-cta-box"><h4>Ready to design your photobook?</h4><p>Start with our free online editor — no account needed until you're ready to print.</p><a href="photobook-editor.html" style="display:inline-flex;align-items:center;gap:6px;background:#27AE72;color:white;padding:12px 24px;border-radius:9px;font-size:14px;font-weight:600">Create your book →</a></div>`,
+   tags:['sizing','guide','photobook']
+  },
+  {id:'post-2',title:'10 layout ideas for your wedding photobook',excerpt:'Make your wedding album feel like a story, not a slideshow.',category:'tips',categoryLabel:'Design tips',image:'',author:'Binder Team',date:'2026-05-22',featured:false,slug:'wedding-photobook-layouts',
+   content:`<p>A wedding album is one of the most personal things you can create. Here are ten layout ideas that turn your photos into a narrative rather than a collection.</p><h2>1. Start with the getting ready moments</h2><p>The quiet morning before everything begins. Dresses hanging, nervous smiles, hands being held. These images set the tone for everything that follows.</p><h2>2. Full-bleed for your hero shots</h2><p>Let your best images breathe. One full-page photo — no text, no borders — makes an immediate emotional impact.</p><div class="post-image"><div class="post-image-ph"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg><span>Add your image here</span></div></div><h2>3. Use text sparingly</h2><p>A single line — the venue, the date, a quote from the ceremony — is more powerful than a paragraph. Let the photos speak.</p><div class="post-cta-box"><h4>Start designing your wedding album</h4><p>Use our free editor with 28 fonts and full layout control.</p><a href="photobook-editor.html" style="display:inline-flex;align-items:center;gap:6px;background:#27AE72;color:white;padding:12px 24px;border-radius:9px;font-size:14px;font-weight:600">Start designing →</a></div>`,
+   tags:['wedding','layouts','design']
+  },
+  {id:'post-3',title:'Behind the press: how your photobook is printed',excerpt:'A look inside our print facility in Okhla, Delhi.',category:'print',categoryLabel:'Print & craft',image:'',author:'Binder Team',date:'2026-05-10',featured:false,slug:'behind-the-press',
+   content:`<p>From the moment your design file arrives to the moment your book is packaged for delivery — here's exactly what happens.</p><h2>Step 1: Pre-press checks</h2><p>Every file is reviewed for resolution, colour profile, and bleed. If anything is below 300 DPI or the margins are wrong, we catch it before it goes to press.</p><h2>Step 2: CMYK conversion</h2><p>Your design is in sRGB on screen. Before printing, it's converted to CMYK — the four-ink process used by professional presses worldwide. This ensures the colours you see are what you get on paper.</p><div class="post-image"><div class="post-image-ph"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg><span>Add a press photo here</span></div></div><h2>Step 3: Print and quality check</h2><p>Printed on 200gsm premium matte paper. Each sheet is inspected before binding.</p>`,
+   tags:['printing','CMYK','process']
+  },
+];
+
+// ── CMS CONTENT RENDERER ──────────────────────────────────────
+(function() {
+  const C = window.BINDER_CONTENT;
+  if (!C || !C.blogPosts) return;
+  window.CMS_POSTS = C.blogPosts.map(p => ({
+    id: p.slug, title: p.title, excerpt: p.excerpt,
+    category: p.category, categoryLabel: p.categoryLabel,
+    image: p.cover || '', author: p.author, date: p.date,
+    featured: p.featured, slug: p.slug,
+    content: p.html || p.body || '', tags: p.tags || [],
+  }));
+})();
+
+function getPosts() {
+  if (window.CMS_POSTS && window.CMS_POSTS.length) return window.CMS_POSTS;
+  try { const s=sessionStorage.getItem('binder_posts'); return s?JSON.parse(s):DEFAULT_POSTS; } catch(e){return DEFAULT_POSTS;}
+}
+
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+}
+
+function getSlug() {
+  const p = new URLSearchParams(window.location.search);
+  return p.get('slug') || '';
+}
+
+function render() {
+  const slug = getSlug();
+  const posts = getPosts();
+  const post  = posts.find(p => p.slug === slug) || posts[0];
+  if (!post) {
+    document.getElementById('post-content').innerHTML = '<div style="text-align:center;padding:80px 0;color:#999"><div style="font-size:32px;margin-bottom:12px">😕</div><div>Post not found.</div><a href="blog.html" style="color:#27AE72;margin-top:12px;display:block">← Back to blog</a></div>';
+    return;
+  }
+
+  document.title = post.title + ' — Binder';
+  const related = posts.filter(p => p.id !== post.id).slice(0,2);
+
+  document.getElementById('post-content').innerHTML = `
+    <div style="margin-bottom:32px">
+      <a href="blog.html" class="back-link">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M10 3L6 8l4 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back to all posts
+      </a>
+    </div>
+    <div class="post-header">
+      <div class="post-cat">${post.categoryLabel}</div>
+      <h1 class="post-title">${post.title}</h1>
+      <div class="post-meta">
+        <span>${post.author}</span>
+        <span class="post-meta-sep"></span>
+        <span>${formatDate(post.date)}</span>
+      </div>
+    </div>
+    <div class="post-cover">
+      ${post.image
+        ? `<img src="${post.image}" alt="${post.title}">`
+        : `<div class="post-cover-ph"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg><span>Add cover image in admin CMS</span></div>`
+      }
+    </div>
+    <div class="post-body">${post.content || '<p>' + post.excerpt + '</p>'}</div>
+    ${post.tags?.length ? `<div class="post-tags">${post.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>` : ''}
+    ${related.length ? `
+    <div class="related-section">
+      <div class="related-title">More from the journal</div>
+      <div class="related-grid">
+        ${related.map(r=>`
+        <a href="blog-post.html?slug=${r.slug}" class="related-card">
+          <div class="related-card__img">
+            ${r.image?`<img src="${r.image}" alt="${r.title}">`:`<div class="img-ph"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></div>`}
+          </div>
+          <div class="related-card__body">
+            <div class="related-card__cat">${r.categoryLabel}</div>
+            <div class="related-card__title">${r.title}</div>
+          </div>
+        </a>`).join('')}
+      </div>
+    </div>` : ''}
+  `;
+}
+render();
+</script>
+</body>
+</html>

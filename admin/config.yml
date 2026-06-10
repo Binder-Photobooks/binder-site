@@ -1,0 +1,225 @@
+backend:
+  name: github
+  repo: GITHUB_USERNAME/binder-site
+  branch: main
+  base_url: https://api.netlify.com
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+# Allow editorial workflow (draft → review → publish)
+publish_mode: editorial_workflow
+
+collections:
+
+  # ── HOMEPAGE ─────────────────────────────────────────────────────
+  - name: "homepage"
+    label: "Homepage"
+    files:
+      - name: "hero"
+        label: "Hero Section"
+        file: "content/homepage/hero.json"
+        fields:
+          - { label: "Eyebrow text", name: "eyebrow", widget: "string", default: "✦ Premium photobooks · Delivered nationwide" }
+          - { label: "Title line 1", name: "title1", widget: "string", default: "Turn your photos" }
+          - { label: "Title line 2 (accent colour)", name: "title2", widget: "string", default: "into a beautiful book" }
+          - { label: "Subtitle", name: "subtitle", widget: "text", default: "Design your photobook in minutes." }
+          - { label: "Primary button text", name: "cta1", widget: "string", default: "Create your photobook" }
+          - { label: "Secondary button text", name: "cta2", widget: "string", default: "See how it works" }
+
+      - name: "banner"
+        label: "Photo Banner"
+        file: "content/homepage/banner.json"
+        fields:
+          - label: "Banner image"
+            name: "image"
+            widget: "image"
+            hint: "Recommended: 2400 × 900px landscape photo of your printed books"
+            required: false
+          - { label: "Banner headline", name: "headline", widget: "string", default: "Memories worth holding onto" }
+          - { label: "Banner subline", name: "subline", widget: "string", default: "Every spread printed with precision. Every photo preserved forever." }
+          - { label: "Banner button text", name: "cta", widget: "string", default: "Design yours →" }
+
+      - name: "features"
+        label: "Features Section"
+        file: "content/homepage/features.json"
+        fields:
+          - { label: "Section eyebrow", name: "eyebrow", widget: "string", default: "Why Binder" }
+          - { label: "Section title", name: "title", widget: "string", default: "Print quality you can feel" }
+          - { label: "Section subtitle", name: "subtitle", widget: "string", default: "Every book is made to the same exacting standard." }
+          - label: "Feature tiles"
+            name: "tiles"
+            widget: "list"
+            min: 4
+            max: 4
+            fields:
+              - { label: "Icon (emoji)", name: "icon", widget: "string" }
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Description", name: "desc", widget: "text" }
+
+      - name: "sizes"
+        label: "Book Sizes & Pricing"
+        file: "content/homepage/sizes.json"
+        fields:
+          - label: "6×6 inch book"
+            name: "s6"
+            widget: "object"
+            fields:
+              - { label: "Price (₹)", name: "price", widget: "string", default: "1,999" }
+              - { label: "Description", name: "desc", widget: "string", default: "Small · Square · 152×152mm" }
+              - label: "Book image"
+                name: "image"
+                widget: "image"
+                required: false
+                hint: "Photo of the 6×6 book"
+          - label: "8×8 inch book"
+            name: "s8"
+            widget: "object"
+            fields:
+              - { label: "Price (₹)", name: "price", widget: "string", default: "2,999" }
+              - { label: "Description", name: "desc", widget: "string", default: "Medium · Square · 203×203mm" }
+              - label: "Book image"
+                name: "image"
+                widget: "image"
+                required: false
+                hint: "Photo of the 8×8 book"
+          - label: "12×12 inch book"
+            name: "s12"
+            widget: "object"
+            fields:
+              - { label: "Price (₹)", name: "price", widget: "string", default: "4,499" }
+              - { label: "Description", name: "desc", widget: "string", default: "Large · Square · 305×305mm" }
+              - label: "Book image"
+                name: "image"
+                widget: "image"
+                required: false
+                hint: "Photo of the 12×12 book"
+
+      - name: "showcase"
+        label: "Showcase Strip"
+        file: "content/homepage/showcase.json"
+        fields:
+          - label: "Showcase photos"
+            name: "photos"
+            widget: "list"
+            min: 1
+            max: 8
+            fields:
+              - label: "Photo"
+                name: "image"
+                widget: "image"
+              - { label: "Caption (optional)", name: "caption", widget: "string", required: false }
+
+      - name: "testimonials"
+        label: "Testimonials"
+        file: "content/homepage/testimonials.json"
+        fields:
+          - label: "Testimonials"
+            name: "items"
+            widget: "list"
+            min: 1
+            max: 6
+            fields:
+              - { label: "Quote", name: "text", widget: "text" }
+              - { label: "Customer name", name: "author", widget: "string" }
+              - { label: "Location", name: "location", widget: "string" }
+
+  # ── BLOG POSTS ───────────────────────────────────────────────────
+  - name: "blog"
+    label: "Blog Posts"
+    folder: "content/blog"
+    create: true
+    slug: "{{slug}}"
+    identifier_field: "title"
+    summary: "{{title}} — {{date}}"
+    sortable_fields: ["date", "title", "category"]
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Publish date", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options:
+          - { label: "Design tips", value: "tips" }
+          - { label: "Stories", value: "stories" }
+          - { label: "Guides", value: "guides" }
+          - { label: "Print & craft", value: "print" }
+          - { label: "News", value: "news" }
+      - { label: "Author", name: "author", widget: "string", default: "Binder Team" }
+      - label: "Cover image"
+        name: "cover_image"
+        widget: "image"
+        required: false
+        hint: "Recommended: 1200 × 630px"
+      - { label: "Excerpt", name: "excerpt", widget: "text", hint: "Short summary shown on the blog listing page" }
+      - label: "Feature on homepage"
+        name: "featured"
+        widget: "boolean"
+        default: false
+      - label: "Post content"
+        name: "body"
+        widget: "markdown"
+        hint: "Write your post here. Use the toolbar to add headings, images, bold text, and links."
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        required: false
+      - label: "SEO title"
+        name: "meta_title"
+        widget: "string"
+        required: false
+        hint: "Defaults to post title if blank"
+      - label: "SEO description"
+        name: "meta_desc"
+        widget: "text"
+        required: false
+        hint: "Defaults to excerpt if blank. Keep under 155 characters."
+
+  # ── PRESS COVERAGE ───────────────────────────────────────────────
+  - name: "press"
+    label: "Press Coverage"
+    folder: "content/press"
+    create: true
+    slug: "{{slug}}"
+    identifier_field: "publication"
+    summary: "{{publication}} — {{date}}"
+    fields:
+      - { label: "Publication name", name: "publication", widget: "string" }
+      - { label: "Article title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - { label: "Excerpt", name: "excerpt", widget: "text", required: false }
+      - { label: "Article URL", name: "url", widget: "string", required: false }
+
+  # ── SITE SETTINGS ────────────────────────────────────────────────
+  - name: "settings"
+    label: "Site Settings"
+    files:
+      - name: "general"
+        label: "General"
+        file: "content/settings/general.json"
+        fields:
+          - { label: "Site name", name: "site_name", widget: "string", default: "Binder" }
+          - { label: "Tagline", name: "tagline", widget: "string" }
+          - { label: "Contact email", name: "email", widget: "string", default: "hello@binder.co.in" }
+          - { label: "Press email", name: "press_email", widget: "string", default: "press@binder.co.in" }
+          - { label: "Address", name: "address", widget: "string", default: "A-291/1, Okhla Phase I, Delhi — 110020" }
+          - { label: "Instagram URL", name: "instagram", widget: "string", default: "https://instagram.com/binderbooks" }
+          - { label: "Facebook URL", name: "facebook", widget: "string", default: "https://facebook.com/binderbooks" }
+          - label: "Logo / favicon"
+            name: "logo"
+            widget: "image"
+            required: false
+
+      - name: "seo"
+        label: "SEO & Meta"
+        file: "content/settings/seo.json"
+        fields:
+          - { label: "Homepage title", name: "home_title", widget: "string", default: "Binder — Custom Photobooks, Delivered Across India" }
+          - { label: "Homepage description", name: "home_desc", widget: "text" }
+          - label: "OG image (social share image)"
+            name: "og_image"
+            widget: "image"
+            required: false
+            hint: "Shown when your site is shared on WhatsApp, Instagram, etc. 1200×630px recommended."
+          - { label: "Blog page title", name: "blog_title", widget: "string", default: "Blog — Binder" }
+          - { label: "Press page title", name: "press_title", widget: "string", default: "Press & Media — Binder" }

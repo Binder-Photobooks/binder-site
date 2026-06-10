@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Press & Media — Binder</title>
+<meta name="description" content="Press resources, media kit, and contact details for Binder — India's premium photobook platform.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" onload="this.rel='stylesheet'">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#27AE72;--accent-h:#1f9660;--accent-l:#e8f7f0;
+  --black:#0a0a0a;--white:#fff;
+  --g50:#f9f9f9;--g100:#f2f2f2;--g200:#e4e4e4;--g300:#c8c8c8;--g400:#999;--g500:#666;
+  --font:'Inter',system-ui,sans-serif;--font-serif:'Playfair Display',Georgia,serif;
+  --max-w:1060px;--radius:10px;--radius-lg:16px;
+  --shadow:0 2px 8px rgba(0,0,0,.05),0 6px 20px rgba(0,0,0,.04);
+}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--white);color:var(--black);line-height:1.6}
+a{text-decoration:none;color:inherit}
+.wrap{max-width:var(--max-w);margin:0 auto;padding:0 5vw}
+nav{position:sticky;top:0;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--g200);z-index:100;padding:0 5vw}
+.nav-inner{display:flex;align-items:center;height:62px;gap:28px}
+.nav-logo{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.nav-logo-mark{width:34px;height:34px;background:var(--black);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--white);font-weight:700;font-size:16px}
+.nav-logo-name{font-size:15px;font-weight:700}
+.nav-links{display:flex;gap:24px;flex:1}
+.nav-links a{font-size:13px;color:var(--g400);font-weight:500;transition:color .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--black)}
+.nav-cta{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:var(--white)}
+.btn-primary:hover{background:var(--accent-h)}
+.btn-outline{background:transparent;border:1.5px solid var(--g200);color:var(--g500)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+/* PAGE HEADER */
+.page-header{padding:80px 5vw 60px;background:var(--black);color:var(--white)}
+.page-header-inner{max-width:var(--max-w);margin:0 auto}
+.page-eyebrow{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.page-title{font-size:clamp(32px,5vw,52px);font-weight:700;letter-spacing:-.5px;line-height:1.15;margin-bottom:16px;font-family:var(--font-serif)}
+.page-sub{font-size:16px;color:rgba(255,255,255,.55);max-width:500px;line-height:1.7}
+/* SECTIONS */
+.section{padding:72px 5vw}
+.section-alt{background:var(--g50);border-top:1px solid var(--g100)}
+.sh{margin-bottom:36px}
+.sh-title{font-size:22px;font-weight:700;letter-spacing:-.2px;margin-bottom:6px;font-family:var(--font-serif)}
+.sh-sub{font-size:14px;color:var(--g400);line-height:1.6}
+/* PRESS CONTACT */
+.press-contact-card{background:var(--white);border:1.5px solid var(--g200);border-radius:var(--radius-lg);padding:32px;max-width:520px;box-shadow:var(--shadow)}
+.press-contact-card h3{font-size:17px;font-weight:700;margin-bottom:6px}
+.press-contact-card p{font-size:14px;color:var(--g500);margin-bottom:20px;line-height:1.6}
+.press-contact-detail{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--g100);font-size:14px}
+.press-contact-detail:last-child{border:none}
+.press-contact-detail strong{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--g400);min-width:80px}
+.press-contact-detail a{color:var(--accent)}
+.press-contact-detail a:hover{text-decoration:underline}
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-top:32px}
+.stat-card{background:var(--white);border:1.5px solid var(--g200);border-radius:var(--radius-lg);padding:24px 20px}
+.stat-value{font-size:32px;font-weight:700;color:var(--accent);line-height:1;margin-bottom:6px}
+.stat-label{font-size:13px;color:var(--g500);line-height:1.4}
+/* MEDIA KIT */
+.kit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:20px}
+.kit-item{background:var(--white);border:1.5px solid var(--g200);border-radius:var(--radius-lg);padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
+.kit-preview{height:120px;background:var(--g100);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.kit-preview img{width:100%;height:100%;object-fit:cover}
+.kit-preview-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--g300)}
+.kit-preview-ph svg{width:28px;height:28px;opacity:.4}
+.kit-preview-ph span{font-size:10px;font-weight:500;color:var(--g400);text-transform:uppercase;letter-spacing:.4px}
+.kit-label{font-size:13px;font-weight:600}
+.kit-desc{font-size:12px;color:var(--g400);line-height:1.5;flex:1}
+.kit-btn{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;background:var(--accent);color:var(--white);text-align:center;cursor:pointer;transition:background .15s}
+.kit-btn:hover{background:var(--accent-h)}
+/* COVERAGE */
+.coverage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:24px}
+.coverage-card{background:var(--white);border:1.5px solid var(--g200);border-radius:var(--radius-lg);padding:22px;box-shadow:var(--shadow);transition:box-shadow .15s}
+.coverage-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.coverage-pub{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--g400);margin-bottom:8px}
+.coverage-title{font-size:15px;font-weight:600;margin-bottom:6px;line-height:1.4;font-family:var(--font-serif)}
+.coverage-excerpt{font-size:13px;color:var(--g500);line-height:1.6;margin-bottom:14px}
+.coverage-date{font-size:11px;color:var(--g400)}
+.coverage-link{font-size:13px;font-weight:600;color:var(--accent);display:inline-flex;align-items:center;gap:4px;transition:gap .12s}
+.coverage-link:hover{gap:7px}
+/* PLACEHOLDER COVERAGE */
+.coverage-ph{background:var(--g50);border:1.5px dashed var(--g300);border-radius:var(--radius-lg);padding:28px;text-align:center;color:var(--g400)}
+.coverage-ph p{font-size:13px;line-height:1.6;margin-top:8px}
+/* BRAND ASSETS — logos */
+.logo-showcase{display:flex;gap:16px;flex-wrap:wrap;margin-top:20px}
+.logo-box{border:1.5px solid var(--g200);border-radius:var(--radius-lg);overflow:hidden}
+.logo-box__bg{height:80px;display:flex;align-items:center;justify-content:center;padding:16px 28px}
+.logo-box__bg.white{background:var(--white)}
+.logo-box__bg.black{background:var(--black)}
+.logo-box__bg.green{background:var(--accent)}
+.logo-box__label{font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.5px;padding:8px 14px;border-top:1px solid var(--g100)}
+.logo-inline{display:flex;align-items:center;gap:8px}
+.logo-mark{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
+.logo-mark.on-dark{background:var(--white);color:var(--black)}
+.logo-mark.on-light{background:var(--black);color:var(--white)}
+.logo-mark.on-green{background:var(--white);color:var(--accent)}
+.logo-name-dark{font-size:16px;font-weight:700;color:var(--white)}
+.logo-name-light{font-size:16px;font-weight:700;color:var(--black)}
+/* FOOTER */
+footer{padding:32px 5vw;border-top:1px solid var(--g200);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:var(--white)}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{font-size:12px;color:var(--g400);transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+.footer-copy{font-size:12px;color:var(--g400)}
+@media(max-width:768px){.nav-links,.nav-cta{display:none}.page-header{padding:56px 5vw 40px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">B</div>
+      <div class="nav-logo-name">Binder</div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="blog.html">Blog</a>
+      <a href="press.html" class="active">Press</a>
+      <a href="my-orders.html">My Account</a>
+    </div>
+    <div class="nav-cta">
+      <a href="my-orders.html" class="btn btn-outline">Sign in</a>
+      <a href="photobook-editor.html" class="btn btn-primary">Start designing →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-eyebrow">Press & Media</div>
+    <h1 class="page-title">Resources for<br>journalists & media</h1>
+    <p class="page-sub">Everything you need to write about Binder — brand assets, key facts, and a direct line to our press team.</p>
+  </div>
+</div>
+
+<!-- PRESS CONTACT -->
+<section class="section">
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start">
+      <div>
+        <div class="sh">
+          <div class="sh-title">Press contact</div>
+          <div class="sh-sub">For media enquiries, interview requests, and review samples, reach out directly.</div>
+        </div>
+        <div class="press-contact-card">
+          <h3>Media & Communications</h3>
+          <p>We respond to all press enquiries within 24 hours. Please include your publication name, deadline, and what you're working on.</p>
+          <div class="press-contact-detail">
+            <strong>Email</strong>
+            <a href="mailto:press@binder.co.in">press@binder.co.in</a>
+          </div>
+          <div class="press-contact-detail">
+            <strong>General</strong>
+            <a href="mailto:hello@binder.co.in">hello@binder.co.in</a>
+          </div>
+          <div class="press-contact-detail">
+            <strong>Address</strong>
+            <span>A-291/1, Okhla Phase I, New Delhi — 110020</span>
+          </div>
+          <div class="press-contact-detail">
+            <strong>Instagram</strong>
+            <a href="https://instagram.com/binderbooks" target="_blank">@binderbooks</a>
+          </div>
+          <div class="press-contact-detail">
+            <strong>Facebook</strong>
+            <a href="https://facebook.com/binderbooks" target="_blank">Binder Books</a>
+          </div>
+          <div style="margin-top:20px">
+            <a href="mailto:press@binder.co.in" class="btn btn-primary" style="width:100%;justify-content:center">Get in touch</a>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="sh">
+          <div class="sh-title">About Binder</div>
+          <div class="sh-sub">Key facts and figures for journalists.</div>
+        </div>
+        <p style="font-size:15px;color:var(--g500);line-height:1.8;margin-bottom:20px">Binder is India's premium photobook platform. We enable anyone to design a professional-quality photobook in their browser and have it printed and delivered anywhere in India.</p>
+        <p style="font-size:15px;color:var(--g500);line-height:1.8;margin-bottom:20px">Our studio is based in Okhla Phase I, New Delhi. We print at 300 DPI in CMYK on 200gsm premium matte paper, with same-week turnaround and nationwide delivery.</p>
+        <p style="font-size:15px;color:var(--g500);line-height:1.8">The platform is available at <a href="index.html" style="color:var(--accent)">binder.co.in</a> and integrates with Shopify for a seamless ordering experience.</p>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">300</div>
+            <div class="stat-label">DPI print resolution on every book</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Book sizes from 6" to 12"</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">5–7</div>
+            <div class="stat-label">Day delivery across India</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">2026</div>
+            <div class="stat-label">Founded, New Delhi</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BRAND ASSETS -->
+<section class="section section-alt">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-title">Brand assets</div>
+      <div class="sh-sub">Logos and visual assets for use in publications. Please do not alter colours, proportions, or add effects.</div>
+    </div>
+
+    <!-- Logo variations -->
+    <div style="margin-bottom:32px">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--g400);margin-bottom:14px">Logo variations</div>
+      <div class="logo-showcase">
+        <div class="logo-box">
+          <div class="logo-box__bg white">
+            <div class="logo-inline">
+              <div class="logo-mark on-light">B</div>
+              <span class="logo-name-light">Binder</span>
+            </div>
+          </div>
+          <div class="logo-box__label">On white</div>
+        </div>
+        <div class="logo-box">
+          <div class="logo-box__bg black">
+            <div class="logo-inline">
+              <div class="logo-mark on-dark">B</div>
+              <span class="logo-name-dark">Binder</span>
+            </div>
+          </div>
+          <div class="logo-box__label">On black</div>
+        </div>
+        <div class="logo-box">
+          <div class="logo-box__bg green">
+            <div class="logo-inline">
+              <div class="logo-mark on-green">B</div>
+              <span class="logo-name-dark">Binder</span>
+            </div>
+          </div>
+          <div class="logo-box__label">On brand green</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colours -->
+    <div style="margin-bottom:32px">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--g400);margin-bottom:14px">Brand colours</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div style="border-radius:var(--radius);overflow:hidden;min-width:120px;border:1px solid var(--g200)">
+          <div style="height:56px;background:#27AE72"></div>
+          <div style="padding:10px 12px;background:var(--white)">
+            <div style="font-size:12px;font-weight:600">Binder Green</div>
+            <div style="font-size:11px;color:var(--g400);margin-top:2px">#27AE72</div>
+            <div style="font-size:11px;color:var(--g400)">CMYK 77 / 0 / 48 / 32</div>
+          </div>
+        </div>
+        <div style="border-radius:var(--radius);overflow:hidden;min-width:120px;border:1px solid var(--g200)">
+          <div style="height:56px;background:#0a0a0a"></div>
+          <div style="padding:10px 12px;background:var(--white)">
+            <div style="font-size:12px;font-weight:600">Binder Black</div>
+            <div style="font-size:11px;color:var(--g400);margin-top:2px">#0A0A0A</div>
+          </div>
+        </div>
+        <div style="border-radius:var(--radius);overflow:hidden;min-width:120px;border:1px solid var(--g200)">
+          <div style="height:56px;background:#e8f7f0"></div>
+          <div style="padding:10px 12px;background:var(--white)">
+            <div style="font-size:12px;font-weight:600">Binder Light</div>
+            <div style="font-size:11px;color:var(--g400);margin-top:2px">#E8F7F0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Downloadable kit items -->
+    <div>
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--g400);margin-bottom:14px">Media kit downloads</div>
+      <div class="kit-grid">
+        <div class="kit-item">
+          <div class="kit-preview">
+            <!-- <img src="press-kit/logo-pack.jpg" alt="Logo pack"> -->
+            <div class="kit-preview-ph">
+              <svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Logo pack</span>
+            </div>
+          </div>
+          <div class="kit-label">Logo pack</div>
+          <div class="kit-desc">SVG and PNG formats. All variations — light, dark, green. Add files to enable download.</div>
+          <div class="kit-btn" onclick="alert('Add your logo files to /press-kit/ and link them here.')">↓ Download</div>
+        </div>
+        <div class="kit-item">
+          <div class="kit-preview">
+            <div class="kit-preview-ph">
+              <svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+              <span>Product photos</span>
+            </div>
+          </div>
+          <div class="kit-label">Product photography</div>
+          <div class="kit-desc">High-resolution photos of our printed books. Replace placeholder with your product images.</div>
+          <div class="kit-btn" onclick="alert('Add your product photos and link the ZIP file here.')">↓ Download</div>
+        </div>
+        <div class="kit-item">
+          <div class="kit-preview">
+            <div class="kit-preview-ph">
+              <svg fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.2"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              <span>Brand guide</span>
+            </div>
+          </div>
+          <div class="kit-label">Brand guidelines</div>
+          <div class="kit-desc">Typefaces, colour usage, spacing rules, and do/don't examples for Binder's visual identity.</div>
+          <div class="kit-btn" onclick="alert('Add your brand guidelines PDF and link it here.')">↓ Download PDF</div>
+        </div>
+        <div class="kit-item">
+          <div class="kit-preview">
+            <div class="kit-preview-ph">
+              <svg fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.2"/><path d="M12 8v4M12 16v.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <span>Fact sheet</span>
+            </div>
+          </div>
+          <div class="kit-label">Fact sheet</div>
+          <div class="kit-desc">One-page summary of Binder — what we do, key figures, founding story, and team details.</div>
+          <div class="kit-btn" onclick="alert('Add your fact sheet PDF and link it here.')">↓ Download PDF</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRESS COVERAGE -->
+<section class="section">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-title">In the press</div>
+      <div class="sh-sub">Coverage and mentions of Binder across media. Manage coverage entries in the Admin CMS.</div>
+    </div>
+    <div class="coverage-grid" id="coverage-grid">
+      <!-- Populated from JS — manage in admin-cms.html -->
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="blog.html">Blog</a>
+    <a href="photobook-editor.html">Design a book</a>
+    <a href="my-orders.html">My orders</a>
+    <a href="admin-cms.html" style="opacity:.35">Admin</a>
+  </div>
+  <div class="footer-copy">© 2026 Binder · A-291/1, Okhla Phase I, Delhi — 110020</div>
+</footer>
+
+<script>
+// Press coverage data — manage this in admin-cms.html → Press section
+const COVERAGE = [
+  // Populate these from your Admin CMS. Structure:
+  // { pub:'Publication Name', title:'Article title', excerpt:'Brief excerpt...', date:'2026-05-15', url:'https://...', placeholder:true }
+  { pub:'', title:'', excerpt:'', date:'', url:'', placeholder:true },
+  { pub:'', title:'', excerpt:'', date:'', url:'', placeholder:true },
+  { pub:'', title:'', excerpt:'', date:'', url:'', placeholder:true },
+];
+
+// ── CMS CONTENT RENDERER ──────────────────────────────────────
+(function() {
+  const C = window.BINDER_CONTENT;
+  if (!C) return;
+  if (C.pressItems && C.pressItems.length) {
+    // Override COVERAGE with CMS data
+    window.CMS_COVERAGE = C.pressItems;
+  }
+  if (C.general) {
+    const g = C.general;
+    document.querySelectorAll('[data-cms="address"]').forEach(el => { if(g.address) el.textContent = g.address; });
+    document.querySelectorAll('[data-cms="press-email"]').forEach(el => { if(g.press_email) el.textContent = g.press_email; });
+    if (g.instagram) document.querySelectorAll('a[aria-label="Instagram"]').forEach(el => el.href = g.instagram);
+    if (g.facebook)  document.querySelectorAll('a[aria-label="Facebook"]').forEach(el => el.href = g.facebook);
+  }
+  if (C.seo && C.seo.press_title) document.title = C.seo.press_title;
+})();
+
+function renderCoverage() {
+  const grid = document.getElementById('coverage-grid');
+  const data = window.CMS_COVERAGE || COVERAGE;
+  const hasCoverage = data.some(c => !c.placeholder && (c.pub || c.publication));
+  if (!hasCoverage) {
+    grid.innerHTML = `
+      <div class="coverage-ph" style="grid-column:1/-1">
+        <div style="font-size:24px;margin-bottom:8px;opacity:.4">📰</div>
+        <strong style="font-size:14px;font-weight:600;color:var(--g500)">No coverage added yet</strong>
+        <p>Add press mentions via the <a href="admin/index.html" style="color:var(--accent)">CMS</a> → Press Coverage. They'll appear here automatically.</p>
+      </div>`;
+    return;
+  }
+  grid.innerHTML = data.filter(c => !c.placeholder && (c.pub || c.publication)).map(c => `
+    <div class="coverage-card">
+      <div class="coverage-pub">${c.pub || c.publication || ''}</div>
+      <div class="coverage-title">${c.title || ''}</div>
+      <div class="coverage-excerpt">${c.excerpt || ''}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+        <div class="coverage-date">${c.date || ''}</div>
+        ${c.url ? `<a href="${c.url}" target="_blank" rel="noopener" class="coverage-link">Read article <svg width="12" height="12" fill="none" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : ''}
+      </div>
+    </div>`).join('');
+        <p>Add press mentions and articles via the <a href="admin-cms.html" style="color:var(--accent)">Admin CMS</a> → Press section. They'll appear here automatically.</p>
+      </div>`;
+    return;
+  }
+  grid.innerHTML = COVERAGE.filter(c => !c.placeholder && c.pub).map(c => `
+    <div class="coverage-card">
+      <div class="coverage-pub">${c.pub}</div>
+      <div class="coverage-title">${c.title}</div>
+      <div class="coverage-excerpt">${c.excerpt}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+        <div class="coverage-date">${c.date}</div>
+        ${c.url ? `<a href="${c.url}" target="_blank" rel="noopener" class="coverage-link">Read article <svg width="12" height="12" fill="none" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : ''}
+      </div>
+    </div>`).join('');
+}
+renderCoverage();
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "s6":  { "price": "1,999", "desc": "Small · Square · 152×152mm", "image": "" },
+  "s8":  { "price": "2,999", "desc": "Medium · Square · 203×203mm", "image": "" },
+  "s12": { "price": "4,499", "desc": "Large · Square · 305×305mm", "image": "" }
+}
