@@ -205,15 +205,13 @@ section{padding:100px 0}
 @media(max-width:767px){.fb{padding:32px 24px}}
 
 /* SHOWCASE */
-.showcase{padding:80px 0;overflow:hidden;background:var(--white)}
-.sstrip{display:flex;gap:12px;overflow-x:auto;padding:8px 24px 20px;
-  -webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
-@media(min-width:768px){.sstrip{padding:8px 48px 20px}}
-.sstrip::-webkit-scrollbar{height:3px}
-.sstrip::-webkit-scrollbar-thumb{background:var(--bm);border-radius:2px}
-.sitem{flex-shrink:0;width:300px;height:220px;border-radius:var(--rl);overflow:hidden;
-  scroll-snap-align:start;background:var(--bgd);transition:transform .3s var(--ease);position:relative}
-@media(min-width:768px){.sitem{width:380px;height:260px}}
+.showcase{padding:80px 0;background:var(--white)}
+.sstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:8px 24px}
+@media(min-width:768px){.sstrip{padding:8px 48px}}
+@media(max-width:767px){.sstrip{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.sstrip{grid-template-columns:1fr}}
+.sitem{position:relative;width:100%;aspect-ratio:1/1;border-radius:var(--rl);overflow:hidden;
+  background:var(--bgd);transition:transform .3s var(--ease)}
 .sitem:hover{transform:scale(1.02)}
 .sitem img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .sph{width:100%;height:100%;background:var(--bgd);display:flex;align-items:center;
@@ -727,7 +725,6 @@ p,.hsub,.fd,.hwd,.sh p,.bsub,.ctasub,.ftag,.tctxt{font-weight:300!important}
     <div class="sitem" id="e-sc1" data-img><div class="sph"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>Showcase 2</div></div>
     <div class="sitem" id="e-sc2" data-img><div class="sph"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>Showcase 3</div></div>
     <div class="sitem" id="e-sc3" data-img><div class="sph"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>Showcase 4</div></div>
-    <div class="sitem" id="e-sc4" data-img><div class="sph"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>Showcase 5</div></div>
   </div>
 </div>
 
