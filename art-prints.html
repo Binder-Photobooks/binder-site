@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Art Prints — Binder</title>
+<meta name="description" content="Archival quality art prints on 270 GSM paper with 12-colour high-fidelity ink. Matte texture. Ships in 2 days. Colours last 400 years.">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#00B878;--ah:#009962;--al:#e8f7f0;--am:#d0f0e2;
+  --black:#0a0a0a;--white:#fff;
+  --g50:#f9f9f9;--g100:#f2f2f2;--g200:#e4e4e4;--g300:#c8c8c8;
+  --g400:#999;--g500:#666;--g600:#444;
+  --ink:#1a1a2e;
+  --font:'Lato',system-ui,sans-serif;
+  --font-serif:'Lato',system-ui,sans-serif;
+  --max-w:1120px;--radius:10px;--radius-lg:16px;--radius-xl:24px;
+  --shadow:0 2px 8px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.04);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.1);
+}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--white);color:var(--black);line-height:1.6;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%}
+button{font-family:var(--font);cursor:pointer}
+.wrap{max-width:var(--max-w);margin:0 auto;padding:0 5vw}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--g200);z-index:100;padding:0 5vw}
+.nav-inner{display:flex;align-items:center;height:62px;gap:28px}
+.nav-logo{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.nav-logo-mark{width:34px;height:34px;background:var(--black);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--white);font-weight:700;font-size:16px}
+.nav-logo-name{font-size:15px;font-weight:700}
+.nav-links{display:flex;gap:24px;flex:1}
+.nav-links a{font-size:13px;color:var(--g400);font-weight:400;transition:color .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--black)}
+.nav-cta{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:var(--font);transition:all .15s;white-space:nowrap;text-decoration:none}
+.btn-primary{background:var(--accent);color:var(--white)}
+.btn-primary:hover{background:var(--ah)}
+
+/* ── HERO ── */
+.ap-hero{min-height:88vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:60px;padding:80px 5vw 60px;max-width:var(--max-w);margin:0 auto}
+.ap-hero-content{}
+.ap-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--al);color:var(--ah);font-size:11px;font-weight:700;padding:5px 14px;border-radius:100px;letter-spacing:.6px;text-transform:uppercase;margin-bottom:22px}
+.ap-hero-title{font-size:clamp(36px,5vw,64px);font-weight:700;line-height:1.08;letter-spacing:-1.5px;margin-bottom:20px;color:var(--black)}
+.ap-hero-title em{font-style:normal;font-family:'Lato',system-ui,sans-serif;color:var(--accent)}
+.ap-hero-sub{font-size:17px;color:var(--g500);line-height:1.75;margin-bottom:32px;max-width:480px;font-weight:300}
+.ap-hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px}
+.btn-hero{padding:14px 32px;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;border:none;font-family:var(--font);transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-hero-primary{background:var(--accent);color:var(--white)}
+.btn-hero-primary:hover{background:var(--ah);transform:translateY(-1px);box-shadow:0 8px 24px rgba(39,174,114,.25)}
+.btn-hero-ghost{background:transparent;border:1.5px solid var(--g200);color:var(--g600)}
+.btn-hero-ghost:hover{border-color:var(--black);color:var(--black)}
+.ap-trust-row{display:flex;gap:20px;flex-wrap:wrap}
+.ap-trust-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--g500);font-weight:400}
+.ap-trust-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
+
+/* Print preview */
+.ap-hero-visual{position:relative;display:flex;justify-content:center;align-items:center}
+.ap-print-stack{position:relative;width:340px;height:420px}
+.ap-print-card{position:absolute;border-radius:4px;overflow:hidden;box-shadow:0 12px 48px rgba(0,0,0,.15);background:var(--g100)}
+.ap-print-card img{width:100%;height:100%;object-fit:cover;display:block}
+.ap-print-card.c1{width:240px;height:316px;top:20px;left:0;transform:rotate(-4deg);z-index:1}
+.ap-print-card.c2{width:240px;height:316px;top:40px;left:80px;transform:rotate(2deg);z-index:2}
+.ap-print-card.c3{width:200px;height:264px;top:10px;left:120px;transform:rotate(-1deg);z-index:3}
+.ap-gsm-badge{position:absolute;bottom:10px;right:0;background:var(--black);color:var(--white);padding:8px 14px;border-radius:var(--radius);font-size:11px;font-weight:700;letter-spacing:.4px;z-index:10}
+
+/* ── PRICING ── */
+.pricing-section{padding:80px 5vw;background:var(--g50)}
+.pricing-section .wrap{}
+.section-eyebrow{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;text-align:center}
+.section-title{font-size:clamp(28px,3.5vw,40px);font-weight:700;letter-spacing:-.3px;line-height:1.2;margin-bottom:12px;text-align:center}
+.section-sub{font-size:15px;color:var(--g400);text-align:center;max-width:500px;margin:0 auto 52px;line-height:1.7;font-weight:300}
+
+.pricing-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;max-width:900px;margin:0 auto 32px}
+.pricing-card{background:var(--white);border:1.5px solid var(--g200);border-radius:var(--radius-lg);padding:28px 22px;text-align:center;transition:all .2s;position:relative}
+.pricing-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--g300)}
+.pricing-card.featured{border:2px solid var(--accent);background:var(--al)}
+.pricing-card__badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--white);font-size:10px;font-weight:700;padding:3px 12px;border-radius:100px;white-space:nowrap;letter-spacing:.4px;text-transform:uppercase}
+.pricing-card__count{font-size:40px;font-weight:700;line-height:1;color:var(--black);margin-bottom:4px}
+.pricing-card__unit{font-size:12px;color:var(--g400);margin-bottom:18px}
+.pricing-card__price{font-size:28px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.pricing-card__per{font-size:12px;color:var(--g400);margin-bottom:20px}
+.pricing-card__btn{display:block;width:100%;padding:11px;background:var(--accent);color:var(--white);border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background .15s;text-decoration:none}
+.pricing-card__btn:hover{background:var(--ah)}
+.pricing-card.featured .pricing-card__btn{background:var(--black);color:var(--white)}
+.pricing-card.featured .pricing-card__btn:hover{background:var(--g600)}
+.pricing-note{text-align:center;font-size:13px;color:var(--g400);line-height:1.7}
+
+/* ── QUALITY SPECS ── */
+.quality-section{padding:100px 5vw;background:var(--black);color:var(--white)}
+.quality-inner{max-width:var(--max-w);margin:0 auto}
+.quality-eyebrow{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+.quality-title{font-size:clamp(30px,4vw,52px);font-weight:700;letter-spacing:-.5px;line-height:1.1;margin-bottom:60px;max-width:700px}
+.quality-title em{font-style:normal;font-family:'Lato',system-ui,sans-serif;color:var(--accent)}
+.quality-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-bottom:80px}
+.quality-block{}
+.quality-num{font-size:56px;font-weight:700;line-height:1;color:var(--accent);letter-spacing:-2px;margin-bottom:8px;font-variant-numeric:tabular-nums}
+.quality-num sup{font-size:24px;letter-spacing:0}
+.quality-label{font-size:13px;color:rgba(255,255,255,.4);font-weight:400;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.quality-desc{font-size:14px;color:rgba(255,255,255,.55);line-height:1.7;font-weight:300}
+
+.quality-specs{display:grid;grid-template-columns:repeat(2,1fr);gap:0;border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-lg);overflow:hidden}
+.quality-spec{padding:24px 28px;border-bottom:1px solid rgba(255,255,255,.08);border-right:1px solid rgba(255,255,255,.08)}
+.quality-spec:nth-child(even){border-right:none}
+.quality-spec:nth-last-child(-n+2){border-bottom:none}
+.quality-spec__icon{font-size:22px;margin-bottom:10px}
+.quality-spec__title{font-size:14px;font-weight:700;color:var(--white);margin-bottom:5px}
+.quality-spec__text{font-size:13px;color:rgba(255,255,255,.45);line-height:1.6}
+
+/* ── HOW IT WORKS ── */
+.how-section{padding:80px 5vw;background:var(--white)}
+.how-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:900px;margin:0 auto}
+.how-step{background:var(--g50);border-radius:var(--radius-lg);padding:28px 22px;position:relative}
+.how-step__num{width:30px;height:30px;background:var(--accent);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-bottom:14px}
+.how-step__title{font-size:14px;font-weight:700;margin-bottom:6px;letter-spacing:-.1px}
+.how-step__text{font-size:12px;color:var(--g500);line-height:1.65}
+.how-connector{position:absolute;top:43px;right:-12px;width:24px;height:2px;background:var(--am);z-index:1}
+.how-step:last-child .how-connector{display:none}
+
+/* ── PAPER SHOWCASE ── */
+.paper-section{padding:80px 5vw;background:var(--g50)}
+.paper-inner{max-width:var(--max-w);margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.paper-visual{position:relative}
+.paper-swatch{width:100%;aspect-ratio:4/3;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg);position:relative;background:linear-gradient(135deg,#f5f0eb,#ede8e3)}
+.paper-swatch img{width:100%;height:100%;object-fit:cover}
+.paper-texture-label{position:absolute;bottom:16px;left:16px;background:rgba(0,0,0,.7);color:white;font-size:11px;font-weight:700;padding:4px 12px;border-radius:100px;letter-spacing:.4px;backdrop-filter:blur(4px)}
+.paper-content{}
+.paper-content .section-eyebrow{text-align:left}
+.paper-content .section-title{text-align:left}
+.paper-list{list-style:none;margin-top:0}
+.paper-list li{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--g200);font-size:14px;color:var(--g600);line-height:1.6}
+.paper-list li:last-child{border:none}
+.paper-list li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;margin-top:2px}
+
+/* ── ORIENTATION DEMO ── */
+.orient-section{padding:80px 5vw;background:var(--white)}
+.orient-inner{max-width:var(--max-w);margin:0 auto}
+.orient-cards{display:flex;gap:32px;justify-content:center;align-items:flex-end;margin-top:40px;flex-wrap:wrap}
+.orient-card{background:white;border:1.5px solid var(--g200);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);text-align:center;padding-bottom:16px}
+.orient-card.portrait .orient-preview{width:180px;height:240px}
+.orient-card.landscape .orient-preview{width:240px;height:180px}
+.orient-preview{background:var(--g100);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.orient-preview img{width:100%;height:100%;object-fit:cover}
+.orient-label{font-size:13px;font-weight:700;color:var(--g600);margin-top:12px;padding:0 16px}
+.orient-size{font-size:11px;color:var(--g400);margin-top:3px}
+.orient-badge{display:inline-block;background:var(--al);color:var(--ah);font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;margin-top:6px;letter-spacing:.3px;text-transform:uppercase}
+
+/* ── CTA ── */
+.ap-cta{padding:100px 5vw;background:linear-gradient(135deg,#0a0a0a 0%,#1a2e1f 100%);text-align:center;position:relative;overflow:hidden}
+.ap-cta::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 60% 50%,rgba(0,184,120,.13) 0%,transparent 70%);pointer-events:none}
+.ap-cta-inner{position:relative;z-index:1;max-width:640px;margin:0 auto}
+.ap-cta h2{font-size:clamp(28px,4vw,48px);font-weight:700;color:var(--white);line-height:1.15;letter-spacing:-.5px;margin-bottom:16px}
+.ap-cta h2 em{font-style:normal;font-family:'Lato',system-ui,sans-serif;color:var(--accent)}
+.ap-cta p{font-size:16px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:36px}
+.ap-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* ── FAQ ── */
+.faq-section{padding:80px 5vw;background:var(--g50)}
+.faq-list{max-width:680px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--g200);padding:20px 0}
+.faq-q{font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--black)}
+.faq-q .faq-icon{font-size:18px;color:var(--g400);flex-shrink:0;transition:transform .2s}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+.faq-a{font-size:14px;color:var(--g500);line-height:1.75;max-height:0;overflow:hidden;transition:max-height .25s ease,padding .25s}
+.faq-item.open .faq-a{max-height:200px;padding-top:12px}
+
+/* ── FOOTER ── */
+footer{padding:32px 5vw;border-top:1px solid var(--g200);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{font-size:12px;color:var(--g400);transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+.footer-copy{font-size:12px;color:var(--g400)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .ap-hero{grid-template-columns:1fr;padding:50px 5vw 40px;gap:40px}
+  .ap-hero-visual{order:-1}
+  .quality-grid{grid-template-columns:1fr 1fr}
+  .how-steps{grid-template-columns:1fr 1fr}
+  .paper-inner{grid-template-columns:1fr}
+  .nav-links,.nav-cta{display:none}
+}
+@media(max-width:640px){
+  .quality-grid{grid-template-columns:1fr}
+  .quality-specs{grid-template-columns:1fr}
+  .quality-spec{border-right:none}
+  .quality-spec:nth-last-child(-n+2){border-bottom:1px solid rgba(255,255,255,.08)}
+  .quality-spec:last-child{border-bottom:none}
+  .how-steps{grid-template-columns:1fr}
+  .how-connector{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">B</div>
+      <div class="nav-logo-name">Binder</div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#sizes">Photobooks</a>
+      <a href="art-prints.html" class="active">Art Prints</a>
+      <a href="shop.html">Binder Store</a>
+      <a href="blog.html">Blog</a>
+      <a href="my-orders.html">My Account</a>
+    </div>
+    <div class="nav-cta">
+      <a href="art-print-editor.html" class="btn btn-primary">Design art prints →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="ap-hero">
+  <div class="ap-hero-content">
+    <div class="ap-eyebrow">✦ Archival quality · 400-year colour life</div>
+    <h1 class="ap-hero-title">Prints that<br>outlast <span>everything</span></h1>
+    <p class="ap-hero-sub">Museum-grade art prints on 270 GSM fine art paper. Printed with 12 high-fidelity inks. Matte texture. Vibrant colours. True-tone blacks. Shipped in 2 days.</p>
+    <div class="ap-hero-btns">
+      <a href="art-print-editor.html" class="btn-hero btn-hero-primary">
+        Create your prints →
+      </a>
+      <a href="#pricing" class="btn-hero btn-hero-ghost">See pricing</a>
+    </div>
+    <div class="ap-trust-row">
+      <div class="ap-trust-item"><div class="ap-trust-dot"></div>270 GSM fine art paper</div>
+      <div class="ap-trust-item"><div class="ap-trust-dot"></div>12-colour ink system</div>
+      <div class="ap-trust-item"><div class="ap-trust-dot"></div>Ships in 2 days</div>
+    </div>
+  </div>
+  <div class="ap-hero-visual">
+    <div class="ap-print-stack">
+      <div class="ap-print-card c1">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=480&h=640&q=90&fit=crop" alt="Landscape art print">
+      </div>
+      <div class="ap-print-card c2">
+        <img src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=480&h=640&q=90&fit=crop" alt="Nature art print">
+      </div>
+      <div class="ap-print-card c3">
+        <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=530&q=90&fit=crop" alt="Portrait art print">
+      </div>
+      <div class="ap-gsm-badge">270 GSM · Matte</div>
+    </div>
+  </div>
+</div>
+
+<!-- QUALITY NUMBERS -->
+<div class="quality-section">
+  <div class="quality-inner">
+    <div class="quality-eyebrow">Built to last</div>
+    <h2 class="quality-title">Print quality that belongs in a <span>museum</span></h2>
+    <div class="quality-grid">
+      <div class="quality-block">
+        <div class="quality-num">400<sup>yrs</sup></div>
+        <div class="quality-label">Colour longevity</div>
+        <div class="quality-desc">Pigment inks rated to 400+ years under normal display conditions — far exceeding the lifetime of any framing or display.</div>
+      </div>
+      <div class="quality-block">
+        <div class="quality-num">270</div>
+        <div class="quality-label">GSM paper weight</div>
+        <div class="quality-desc">Heavy-weight fine art paper with a premium matte texture. Substantial in hand, with zero curl or flex under normal conditions.</div>
+      </div>
+      <div class="quality-block">
+        <div class="quality-num">12</div>
+        <div class="quality-label">Ink colours</div>
+        <div class="quality-desc">A 12-channel high-fidelity ink system. Extended colour gamut for vivid saturation, and a dedicated photo black for true-tone monochrome.</div>
+      </div>
+    </div>
+
+    <div class="quality-specs">
+      <div class="quality-spec">
+        <div class="quality-spec__icon">🎨</div>
+        <div class="quality-spec__title">Vibrant, true colour</div>
+        <div class="quality-spec__text">Wide-gamut ink system captures colours your screen can barely display. Every sunset, every shade.</div>
+      </div>
+      <div class="quality-spec">
+        <div class="quality-spec__icon">⬛</div>
+        <div class="quality-spec__title">True-tone black & white</div>
+        <div class="quality-spec__text">Dedicated matte black and light black inks produce neutral, rich monochrome prints free of colour cast.</div>
+      </div>
+      <div class="quality-spec">
+        <div class="quality-spec__icon">🧾</div>
+        <div class="quality-spec__title">Matte fine art texture</div>
+        <div class="quality-spec__text">A subtle, smooth matte surface that holds detail beautifully and eliminates glare entirely. Gallery-ready from the box.</div>
+      </div>
+      <div class="quality-spec">
+        <div class="quality-spec__icon">📐</div>
+        <div class="quality-spec__title">Precision cut with bleed</div>
+        <div class="quality-spec__text">Every print includes 5mm of bleed and is cut with trim marks for a clean, professional edge — ready to frame.</div>
+      </div>
+      <div class="quality-spec">
+        <div class="quality-spec__icon">⚡</div>
+        <div class="quality-spec__title">Ships in 2 days</div>
+        <div class="quality-spec__text">Printed and dispatched within 48 hours of your order. Carefully rolled or flat-packed in protective board-backed mailers.</div>
+      </div>
+      <div class="quality-spec">
+        <div class="quality-spec__icon">🇮🇳</div>
+        <div class="quality-spec__title">Printed in Delhi</div>
+        <div class="quality-spec__text">Every print is produced at our studio in Okhla, Delhi. Pan-India delivery. No middlemen, no outsourcing.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAPER SHOWCASE -->
+<div class="paper-section">
+  <div class="paper-inner">
+    <div class="paper-visual">
+      <div class="paper-swatch">
+        <img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=800&h=600&q=90&fit=crop" alt="Fine art paper texture">
+        <div class="paper-texture-label">270 GSM · Matte fine art paper</div>
+      </div>
+    </div>
+    <div class="paper-content">
+      <div class="section-eyebrow" style="text-align:left;margin-bottom:10px">The paper</div>
+      <h2 class="section-title" style="text-align:left;margin-bottom:20px;font-size:clamp(24px,3vw,36px)">Not all paper is created equal</h2>
+      <ul class="paper-list">
+        <li>270 GSM weight — thick, substantial, museum-standard</li>
+        <li>Smooth matte surface — zero glare, gallery-ready</li>
+        <li>Acid-free and OBA-free — no yellowing over time</li>
+        <li>Compatible with archival pigment inks only</li>
+        <li>Colour gamut wider than sRGB or Adobe RGB</li>
+        <li>Holds fine detail and shadow depth simultaneously</li>
+        <li>Used by fine art photographers and galleries worldwide</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ORIENTATION DEMO -->
+<div class="orient-section">
+  <div class="orient-inner">
+    <div style="text-align:center;margin-bottom:0">
+      <div class="section-eyebrow">Choose your orientation</div>
+      <h2 class="section-title">Portrait or landscape — you decide</h2>
+      <p class="section-sub">Switch between orientations inside the editor with one click. The canvas adjusts instantly.</p>
+    </div>
+    <div class="orient-cards">
+      <div class="orient-card portrait">
+        <div class="orient-preview" style="width:180px;height:240px">
+          <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=360&h=480&q=85&fit=crop" alt="Portrait orientation">
+        </div>
+        <div class="orient-label">Portrait</div>
+        <div class="orient-size">4 × 6 inches</div>
+        <div class="orient-badge">101mm × 152mm</div>
+      </div>
+      <div style="display:flex;align-items:center;font-size:24px;color:var(--g300);padding-bottom:30px">⇄</div>
+      <div class="orient-card landscape">
+        <div class="orient-preview" style="width:240px;height:160px">
+          <img src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=480&h=320&q=85&fit=crop" alt="Landscape orientation">
+        </div>
+        <div class="orient-label">Landscape</div>
+        <div class="orient-size">6 × 4 inches</div>
+        <div class="orient-badge">152mm × 101mm</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div class="pricing-section" id="pricing">
+  <div class="wrap">
+    <div class="section-eyebrow">Pricing</div>
+    <h2 class="section-title">Simple, transparent pricing</h2>
+    <p class="section-sub">Every set of 4 prints is ₹800. Order more and the price per print stays the same — no hidden fees.</p>
+    <div class="pricing-cards">
+      <div class="pricing-card">
+        <div class="pricing-card__count">4</div>
+        <div class="pricing-card__unit">prints</div>
+        <div class="pricing-card__price">₹800</div>
+        <div class="pricing-card__per">₹200 per print</div>
+        <a href="art-print-editor.html?qty=4" class="pricing-card__btn">Design now</a>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-card__badge">Most popular</div>
+        <div class="pricing-card__count">8</div>
+        <div class="pricing-card__unit">prints</div>
+        <div class="pricing-card__price">₹1,600</div>
+        <div class="pricing-card__per">₹200 per print</div>
+        <a href="art-print-editor.html?qty=8" class="pricing-card__btn">Design now</a>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-card__count">12</div>
+        <div class="pricing-card__unit">prints</div>
+        <div class="pricing-card__price">₹2,400</div>
+        <div class="pricing-card__per">₹200 per print</div>
+        <a href="art-print-editor.html?qty=12" class="pricing-card__btn">Design now</a>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-card__count">16</div>
+        <div class="pricing-card__unit">prints</div>
+        <div class="pricing-card__price">₹3,200</div>
+        <div class="pricing-card__per">₹200 per print</div>
+        <a href="art-print-editor.html?qty=16" class="pricing-card__btn">Design now</a>
+      </div>
+    </div>
+    <p class="pricing-note">Prints come in sets of 4. Each set adds ₹800. Add as many sets as you need in the editor.<br>Free delivery on orders above ₹1,500 · Pan-India delivery · Ships in 2 days</p>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-section">
+  <div class="wrap">
+    <div class="section-eyebrow">How it works</div>
+    <h2 class="section-title">From your screen to your wall</h2>
+    <p class="section-sub" style="margin-bottom:44px">Four simple steps to museum-quality prints.</p>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-step__num">1</div>
+        <div class="how-step__title">Design in the editor</div>
+        <div class="how-step__text">Upload your photos, add text and layers. Switch orientation. Add pages in groups of 4.</div>
+        <div class="how-connector"></div>
+      </div>
+      <div class="how-step">
+        <div class="how-step__num">2</div>
+        <div class="how-step__title">We prepare your files</div>
+        <div class="how-step__text">Your design is exported with 5mm bleed, trim marks, and colour profiles ready for print.</div>
+        <div class="how-connector"></div>
+      </div>
+      <div class="how-step">
+        <div class="how-step__num">3</div>
+        <div class="how-step__title">Printed in Delhi</div>
+        <div class="how-step__text">12-colour archival printing on 270 GSM fine art paper. Quality-checked before packing.</div>
+        <div class="how-connector"></div>
+      </div>
+      <div class="how-step">
+        <div class="how-step__num">4</div>
+        <div class="how-step__title">Delivered in 2 days</div>
+        <div class="how-step__text">Packed flat in board-backed mailers to protect your prints. Delivered anywhere in India.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="ap-cta">
+  <div class="ap-cta-inner">
+    <h2>Ready to make something <span>lasting</span>?</h2>
+    <p>Open the editor, design your prints, and have museum-quality art on your wall within the week.</p>
+    <div class="ap-cta-btns">
+      <a href="art-print-editor.html" class="btn-hero btn-hero-primary" style="background:#00B878;color:white;border:none">
+        Start designing →
+      </a>
+      <a href="shop.html" class="btn-hero" style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);color:white">
+        Browse the store
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section">
+  <div class="wrap">
+    <div class="section-eyebrow">FAQ</div>
+    <h2 class="section-title" style="margin-bottom:40px">Common questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What paper do you print on? <span class="faq-icon">+</span></div>
+        <div class="faq-a">We use 270 GSM fine art matte paper — the same paper used by professional fine art photographers and galleries. It is acid-free, OBA-free, and rated for 400+ years of colour stability under normal display conditions.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How many colours are used in printing? <span class="faq-icon">+</span></div>
+        <div class="faq-a">We use a 12-channel pigment ink system. This includes standard CMYK, light cyan, light magenta, vivid light magenta, photo black, matte black, light black, light light black, and green/orange channels for extended gamut reproduction. The result is colours more vibrant than sRGB and blacks that are truly neutral.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Will my colours look the same as on screen? <span class="faq-icon">+</span></div>
+        <div class="faq-a">We use ICC colour profiles and soft proofing to match print output as closely as possible to your screen. For best results, we recommend calibrating your monitor and designing in sRGB. Our 12-colour ink system can reproduce a wider gamut than most screens can even display.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What sizes are available? <span class="faq-icon">+</span></div>
+        <div class="faq-a">All art prints are 4×6 inches (101×152mm) in portrait orientation, or 6×4 inches (152×101mm) in landscape. You can switch between orientations in the editor. Each print includes 5mm bleed for clean edge-to-edge printing.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How are the prints packed for shipping? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Prints are packed flat in rigid board-backed mailers that prevent bending in transit. For orders of 12+ prints we use reinforced flat boxes. Each print is interleaved with glassine paper to prevent surface contact.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Can I order fewer than 4 prints? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Our minimum order is 4 prints at ₹800. Prints come in sets of 4 — you can design each print differently within a set, or use the same design across all prints in a set.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="art-prints.html">Art Prints</a>
+    <a href="art-print-editor.html">Design prints</a>
+    <a href="shop.html">Binder Store</a>
+    <a href="blog.html">Blog</a>
+    <a href="press.html">Press</a>
+    <a href="my-orders.html">My orders</a>
+  </div>
+  <div class="footer-copy">© 2026 Binder · A-291/1, Okhla Phase I, Delhi — 110020</div>
+</footer>
+
+<script>
+function toggleFaq(el) {
+  const item = el.parentElement;
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+</script>
+</body>
+</html>

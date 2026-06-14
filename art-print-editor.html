@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Art Print Editor — Binder</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════
+   BINDER ART PRINT EDITOR
+   4×6 / 6×4 canvas · 270 GSM · 12-colour · Archival
+═══════════════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#111;--bg2:#1a1a1a;--bg3:#222;--bg4:#2a2a2a;--bg5:#333;
+  --border:#333;--border2:#444;
+  --text:#e8e8e8;--text2:#aaa;--text3:#666;
+  --accent:#00B878;--ah:#009962;--al:rgba(0,184,120,.13);
+  --red:#ef4444;--amber:#f59e0b;
+  --font:'Lato',system-ui,sans-serif;
+  --radius:6px;--radius-lg:10px;
+  --toolbar:50px;--sidebar:260px;--right:240px;
+  /* Print dimensions - 4x6 at 96dpi screen preview */
+  --print-w:384px; /* 4 inches × 96dpi */
+  --print-h:576px; /* 6 inches × 96dpi */
+}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow:hidden;user-select:none}
+button,input,select,textarea{font-family:var(--font)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:3px}
+
+/* ── TOPBAR ── */
+#topbar{height:var(--toolbar);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;z-index:100}
+.tb-logo{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.tb-mark{width:26px;height:26px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.tb-name{font-size:13px;font-weight:700;color:var(--text)}
+.tb-badge{font-size:10px;background:rgba(255,255,255,.08);color:var(--text3);padding:2px 7px;border-radius:100px}
+.tb-sep{width:1px;height:18px;background:var(--border);flex-shrink:0}
+.tb-spacer{flex:1}
+.tb-group{display:flex;gap:4px;align-items:center}
+.tb-btn{height:30px;padding:0 10px;border-radius:var(--radius);font-size:12px;font-weight:400;cursor:pointer;border:1px solid transparent;background:transparent;color:var(--text2);transition:all .12s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.tb-btn:hover{background:var(--bg3);border-color:var(--border);color:var(--text)}
+.tb-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tb-btn.primary:hover{background:var(--ah)}
+.tb-btn.active{background:var(--al);border-color:var(--accent);color:var(--accent)}
+.tb-select{height:30px;padding:0 8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:12px;cursor:pointer;outline:none}
+.tb-select:focus{border-color:var(--accent)}
+
+/* Orientation toggle */
+.orient-toggle{display:flex;background:var(--bg3);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden}
+.orient-btn{padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--text3);transition:all .15s;white-space:nowrap}
+.orient-btn.active{background:var(--accent);color:#fff}
+
+/* ── LAYOUT ── */
+#shell{display:flex;height:calc(100vh - var(--toolbar));overflow:hidden}
+
+/* ── LEFT SIDEBAR ── */
+#sidebar{width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sb-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.sb-tab{flex:1;padding:9px 4px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;transition:all .12s}
+.sb-tab.active{color:var(--accent);border-color:var(--accent)}
+.sb-panel{display:none;flex:1;overflow-y:auto;flex-direction:column}
+.sb-panel.active{display:flex}
+
+/* Tools panel */
+.tool-section{padding:10px 10px 0;border-bottom:1px solid var(--border)}
+.tool-section-title{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:6px 2px 8px}
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding-bottom:10px}
+.tool-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:var(--radius);cursor:pointer;border:1px solid transparent;background:transparent;color:var(--text2);font-size:10px;font-weight:400;transition:all .12s;text-align:center}
+.tool-item:hover{background:var(--bg3);border-color:var(--border);color:var(--text)}
+.tool-item.active{background:var(--al);border-color:var(--accent);color:var(--accent)}
+.tool-icon{font-size:18px}
+
+/* Upload zone */
+.upload-zone{margin:10px;border:2px dashed var(--border2);border-radius:var(--radius-lg);padding:20px 10px;text-align:center;cursor:pointer;transition:all .15s;position:relative}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:var(--al)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone-icon{font-size:24px;margin-bottom:6px;opacity:.5}
+.upload-zone-text{font-size:11px;color:var(--text3);line-height:1.5}
+.upload-zone-text strong{color:var(--accent)}
+
+/* Layers */
+.layers-list{flex:1;overflow-y:auto;padding:6px}
+.layer-item{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:5px;cursor:pointer;border:1px solid transparent;margin-bottom:2px;transition:all .12s}
+.layer-item:hover{background:var(--bg3);border-color:var(--border)}
+.layer-item.selected{background:var(--al);border-color:var(--accent)}
+.layer-thumb{width:28px;height:28px;border-radius:4px;background:var(--bg4);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;overflow:hidden}
+.layer-thumb img{width:100%;height:100%;object-fit:cover}
+.layer-name{font-size:11px;color:var(--text2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.layer-vis{font-size:12px;cursor:pointer;opacity:.5;flex-shrink:0}
+.layer-del{font-size:11px;cursor:pointer;color:var(--text3);flex-shrink:0;opacity:0;transition:opacity .12s}
+.layer-item:hover .layer-del{opacity:.7}
+.layer-del:hover{color:var(--red)!important;opacity:1!important}
+
+/* ── CANVAS AREA ── */
+#canvas-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);position:relative}
+
+/* Page strip (top) */
+#page-strip{height:90px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 12px;overflow-x:auto;flex-shrink:0}
+#page-strip::-webkit-scrollbar{height:3px}
+.page-thumb{flex-shrink:0;cursor:pointer;border-radius:4px;overflow:hidden;border:2px solid transparent;transition:all .15s;position:relative}
+.page-thumb.active{border-color:var(--accent)}
+.page-thumb canvas{display:block}
+.page-thumb-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);font-size:9px;color:rgba(255,255,255,.7);text-align:center;padding:2px}
+.page-add-btn{flex-shrink:0;width:52px;height:70px;border:2px dashed var(--border2);border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--text3);font-size:10px;transition:all .15s;background:transparent}
+.page-add-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--al)}
+.page-add-btn span{font-size:18px;line-height:1}
+
+/* Canvas viewport */
+#canvas-viewport{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:30px;background:var(--bg)}
+#canvas-wrap{position:relative}
+#main-canvas{display:block;cursor:crosshair;box-shadow:0 8px 48px rgba(0,0,0,.6)}
+
+/* ── RIGHT PANEL ── */
+#right-panel{width:var(--right);background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.rp-head{padding:10px 12px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.rp-body{flex:1;overflow-y:auto;padding:10px}
+.rp-empty{text-align:center;padding:24px 12px;color:var(--text3);font-size:11px;line-height:1.6}
+
+/* Property controls */
+.prop-row{margin-bottom:10px}
+.prop-label{font-size:10px;color:var(--text3);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:.4px}
+.prop-input{width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;outline:none}
+.prop-input:focus{border-color:var(--accent)}
+.prop-select{width:100%;padding:6px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;cursor:pointer;outline:none}
+.prop-select:focus{border-color:var(--accent)}
+.prop-row-2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.prop-color-row{display:flex;gap:6px;align-items:center}
+.prop-color{width:32px;height:28px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);cursor:pointer;flex-shrink:0}
+.prop-color input{width:200%;height:200%;margin:-50%;border:none;cursor:pointer;padding:0}
+.prop-sep{height:1px;background:var(--border);margin:12px 0}
+.prop-btn{width:100%;padding:7px;border-radius:var(--radius);font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text2);transition:all .12s;margin-bottom:5px}
+.prop-btn:hover{border-color:var(--accent);color:var(--accent)}
+.prop-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.prop-btn.primary:hover{background:var(--ah)}
+.prop-btn.danger{border-color:var(--red);color:var(--red)}
+.prop-btn.danger:hover{background:var(--red);color:#fff}
+
+/* Pricing bar (bottom) */
+#pricing-bar{height:44px;background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:14px;flex-shrink:0}
+.pb-info{font-size:12px;color:var(--text3)}
+.pb-price{font-size:15px;font-weight:700;color:var(--accent)}
+.pb-pages{font-size:11px;color:var(--text3)}
+
+/* Toast */
+#toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:9px 18px;border-radius:var(--radius-lg);font-size:12px;font-weight:400;z-index:9999;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+#toast.on{opacity:1}
+#toast.ok{background:var(--accent);border-color:var(--accent);color:#fff}
+#toast.err{background:var(--red);border-color:var(--red);color:#fff}
+
+/* Hidden inputs */
+#img-upload-input{display:none}
+#text-input-overlay{position:absolute;border:none;background:transparent;outline:none;resize:none;overflow:hidden;cursor:text;z-index:100;min-width:60px;min-height:24px}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="tb-logo">
+    <div class="tb-mark">B</div>
+    <div class="tb-name">Art Print Editor</div>
+    <span class="tb-badge">4×6 · 270 GSM</span>
+  </div>
+  <div class="tb-sep"></div>
+
+  <!-- Orientation -->
+  <div class="orient-toggle">
+    <button class="orient-btn active" id="orient-portrait" onclick="setOrientation('portrait')">4×6 Portrait</button>
+    <button class="orient-btn" id="orient-landscape" onclick="setOrientation('landscape')">6×4 Landscape</button>
+  </div>
+
+  <div class="tb-sep"></div>
+
+  <!-- Text formatting (shown when text tool active) -->
+  <div class="tb-group" id="text-tools">
+    <select class="tb-select" id="font-family" onchange="applyTextProp('fontFamily',this.value)" style="width:130px">
+      <option value=>Inter</option>
+      <option value="Playfair Display">Playfair Display</option>
+      <option value="Dancing Script">Dancing Script</option>
+      <option value="Montserrat">Montserrat</option>
+      <option value="Lato">Lato</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Arial">Arial</option>
+      <option value="Courier New">Courier New</option>
+    </select>
+    <select class="tb-select" id="font-size" onchange="applyTextProp('fontSize',parseInt(this.value))">
+      <option value="10">10</option><option value="12">12</option><option value="14">14</option>
+      <option value="16">16</option><option value="18" selected>18</option><option value="20">20</option>
+      <option value="24">24</option><option value="28">28</option><option value="32">32</option>
+      <option value="36">36</option><option value="42">42</option><option value="48">48</option>
+      <option value="60">60</option><option value="72">72</option>
+    </select>
+    <button class="tb-btn" id="btn-bold" onclick="toggleTextStyle('bold')" title="Bold"><strong>B</strong></button>
+    <button class="tb-btn" id="btn-italic" onclick="toggleTextStyle('italic')" title="Italic"><span>I</span></button>
+    <div class="prop-color" title="Text colour" style="width:28px;height:28px;flex-shrink:0">
+      <input type="color" id="text-color" value="#000000" onchange="applyTextProp('color',this.value)">
+    </div>
+    <select class="tb-select" id="text-align" onchange="applyTextProp('align',this.value)">
+      <option value="left">Left</option>
+      <option value="center">Center</option>
+      <option value="right">Right</option>
+    </select>
+  </div>
+
+  <div class="tb-spacer"></div>
+
+  <div class="tb-group">
+    <button class="tb-btn" onclick="undo()" title="Undo (⌘Z)">↩ Undo</button>
+    <button class="tb-btn" onclick="clearCanvas()" title="Clear page">🗑 Clear</button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" onclick="exportPDF()" title="Export print-ready PDF">📄 Export PDF</button>
+    <button class="tb-btn primary" onclick="orderPrints()">🛒 Order prints</button>
+  </div>
+</div>
+
+<!-- SHELL -->
+<div id="shell">
+
+  <!-- LEFT SIDEBAR -->
+  <div id="sidebar">
+    <div class="sb-tabs">
+      <div class="sb-tab active" onclick="setSbTab('tools',this)">Tools</div>
+      <div class="sb-tab" onclick="setSbTab('layers',this)">Layers</div>
+    </div>
+
+    <!-- TOOLS PANEL -->
+    <div class="sb-panel active" id="panel-tools">
+      <div class="tool-section">
+        <div class="tool-section-title">Tools</div>
+        <div class="tool-grid">
+          <button class="tool-item active" id="tool-select" onclick="setTool('select')"><div class="tool-icon">↖</div>Select</button>
+          <button class="tool-item" id="tool-text" onclick="setTool('text')"><div class="tool-icon">T</div>Text</button>
+          <button class="tool-item" id="tool-image" onclick="document.getElementById('img-upload-input').click()"><div class="tool-icon">🖼</div>Image</button>
+          <button class="tool-item" id="tool-rect" onclick="setTool('rect')"><div class="tool-icon">▭</div>Rectangle</button>
+          <button class="tool-item" id="tool-ellipse" onclick="setTool('ellipse')"><div class="tool-icon">○</div>Ellipse</button>
+          <button class="tool-item" id="tool-line" onclick="setTool('line')"><div class="tool-icon">╱</div>Line</button>
+        </div>
+      </div>
+
+      <!-- Image upload zone -->
+      <div class="tool-section">
+        <div class="tool-section-title">Upload photo</div>
+        <div class="upload-zone" id="upload-zone" ondragover="this.classList.add('drag');event.preventDefault()" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+          <input type="file" accept="image/*" multiple onchange="handleFileSelect(event)">
+          <div class="upload-zone-icon">📷</div>
+          <div class="upload-zone-text"><strong>Click or drag</strong><br>to upload photos</div>
+        </div>
+      </div>
+
+      <!-- Background colour -->
+      <div class="tool-section" style="padding-bottom:10px">
+        <div class="tool-section-title">Canvas background</div>
+        <div style="display:flex;gap:8px;align-items:center;padding:4px 2px">
+          <div class="prop-color" style="width:32px;height:28px">
+            <input type="color" id="bg-color" value="#ffffff" onchange="setBackground(this.value)">
+          </div>
+          <span style="font-size:11px;color:var(--text3)">Background colour</span>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;padding:4px 2px 6px">
+          <button onclick="setBackground('#ffffff')" style="width:24px;height:24px;border-radius:4px;background:#fff;border:1px solid #ccc;cursor:pointer" title="White"></button>
+          <button onclick="setBackground('#000000')" style="width:24px;height:24px;border-radius:4px;background:#000;border:1px solid #333;cursor:pointer" title="Black"></button>
+          <button onclick="setBackground('#f5f0eb')" style="width:24px;height:24px;border-radius:4px;background:#f5f0eb;border:1px solid #ddd;cursor:pointer" title="Warm white"></button>
+          <button onclick="setBackground('#1a1a2e')" style="width:24px;height:24px;border-radius:4px;background:#1a1a2e;border:1px solid #333;cursor:pointer" title="Dark navy"></button>
+          <button onclick="setBackground('#00B878')" style="width:24px;height:24px;border-radius:4px;background:#00B878;border:1px solid #009962;cursor:pointer" title="Green"></button>
+          <button onclick="setBackground('#ef4444')" style="width:24px;height:24px;border-radius:4px;background:#ef4444;border:1px solid #dc2626;cursor:pointer" title="Red"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAYERS PANEL -->
+    <div class="sb-panel" id="panel-layers">
+      <div style="padding:8px 10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+        <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Layers</span>
+        <span style="font-size:10px;color:var(--text3)" id="layer-count">0 layers</span>
+      </div>
+      <div class="layers-list" id="layers-list">
+        <div class="rp-empty">No layers yet.<br>Add text or images to see them here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANVAS AREA -->
+  <div id="canvas-area">
+    <!-- Page thumbnails strip -->
+    <div id="page-strip">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- Main canvas viewport -->
+    <div id="canvas-viewport">
+      <div id="canvas-wrap">
+        <canvas id="main-canvas"></canvas>
+        <textarea id="text-input-overlay" style="display:none"></textarea>
+      </div>
+    </div>
+
+    <!-- Pricing bar -->
+    <div id="pricing-bar">
+      <span class="pb-info">Art prints:</span>
+      <span class="pb-price" id="pb-price">₹800</span>
+      <span class="pb-pages" id="pb-pages">(4 prints · 1 set)</span>
+      <div style="flex:1"></div>
+      <span style="font-size:10px;color:var(--text3)">270 GSM · 12-colour · Ships in 2 days · 400-year colour life</span>
+    </div>
+  </div>
+
+  <!-- RIGHT PROPERTIES PANEL -->
+  <div id="right-panel">
+    <div class="rp-head">
+      <span id="rp-title">Properties</span>
+    </div>
+    <div class="rp-body" id="rp-body">
+      <div class="rp-empty">Select an element to edit its properties.</div>
+    </div>
+  </div>
+
+</div>
+
+<input type="file" id="img-upload-input" accept="image/*" multiple>
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// BINDER ART PRINT EDITOR
+// 4×6 inches · 300 DPI print · 5mm bleed · Trim marks
+// ═══════════════════════════════════════════════════════════════
+
+// ── CONSTANTS ──────────────────────────────────────────────────
+const DPI_SCREEN  = 96;
+const DPI_PRINT   = 300;
+const BLEED_IN    = 5 / 25.4;          // 5mm in inches
+const MARGIN_IN   = 0.5;               // 0.5 inch margin
+const PRICE_PER_SET = 800;
+const PRINTS_PER_SET = 4;
+
+// Print dimensions in inches
+const DIMS = {
+  portrait:  { w: 4, h: 6 },
+  landscape: { w: 6, h: 4 },
+};
+
+// ── STATE ───────────────────────────────────────────────────────
+let orientation = 'portrait';
+let pages       = [];           // array of page state objects
+let currentPage = 0;
+let currentTool = 'select';
+let selectedEl  = null;
+let undoStack   = [];
+let isDrawing   = false;
+let drawStart   = null;
+let isDragging  = false;
+let dragOffset  = { x: 0, y: 0 };
+let scale       = 1;
+
+// Canvas elements
+const canvas  = document.getElementById('main-canvas');
+const ctx     = canvas.getContext('2d');
+const imgInput = document.getElementById('img-upload-input');
+
+// ── INIT ────────────────────────────────────────────────────────
+function init() {
+  addPage();
+  addPage();
+  addPage();
+  addPage();
+  switchPage(0);
+  updatePricing();
+  render();
+  toast('Editor ready — upload a photo or add text to get started', true);
+}
+
+function getCanvasW() {
+  return Math.round(DIMS[orientation].w * DPI_SCREEN);
+}
+function getCanvasH() {
+  return Math.round(DIMS[orientation].h * DPI_SCREEN);
+}
+
+function resizeCanvas() {
+  canvas.width  = getCanvasW();
+  canvas.height = getCanvasH();
+  canvas.style.width  = getCanvasW() + 'px';
+  canvas.style.height = getCanvasH() + 'px';
+}
+
+// ── PAGES ───────────────────────────────────────────────────────
+function addPage() {
+  pages.push({
+    bg: '#ffffff',
+    elements: [],
+    orientation,
+  });
+  rebuildPageStrip();
+}
+
+function addPageSet() {
+  // Add 4 pages at a time
+  for (let i = 0; i < 4; i++) addPage();
+  updatePricing();
+  toast('+4 pages added (' + pages.length + ' total · ₹' + (Math.ceil(pages.length / 4) * PRICE_PER_SET).toLocaleString('en-IN') + ')', true);
+}
+
+function switchPage(idx) {
+  currentPage = idx;
+  selectedEl  = null;
+  render();
+  renderLayers();
+  renderProps();
+  updatePageStrip();
+}
+
+function rebuildPageStrip() {
+  const strip = document.getElementById('page-strip');
+  strip.innerHTML = '';
+  pages.forEach((p, i) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'page-thumb' + (i === currentPage ? ' active' : '');
+    const tw = orientation === 'portrait' ? 42 : 63;
+    const th = orientation === 'portrait' ? 63 : 42;
+    const tc = document.createElement('canvas');
+    tc.width = tw; tc.height = th;
+    thumb.appendChild(tc);
+    const label = document.createElement('div');
+    label.className = 'page-thumb-label';
+    label.textContent = 'P' + (i + 1);
+    thumb.appendChild(label);
+    thumb.onclick = () => switchPage(i);
+    strip.appendChild(thumb);
+    renderThumb(tc, p);
+  });
+  const addBtn = document.createElement('div');
+  addBtn.className = 'page-add-btn';
+  addBtn.innerHTML = '<span>+4</span><span>pages</span>';
+  addBtn.title = 'Add 4 more prints (+₹800)';
+  addBtn.onclick = addPageSet;
+  strip.appendChild(addBtn);
+}
+
+function updatePageStrip() {
+  document.querySelectorAll('.page-thumb').forEach((t, i) => {
+    t.classList.toggle('active', i === currentPage);
+  });
+}
+
+function renderThumb(tc, page) {
+  const tctx = tc.getContext('2d');
+  tctx.fillStyle = page.bg || '#fff';
+  tctx.fillRect(0, 0, tc.width, tc.height);
+  const sx = tc.width / getCanvasW();
+  const sy = tc.height / getCanvasH();
+  tctx.save();
+  tctx.scale(sx, sy);
+  page.elements.forEach(el => drawElement(tctx, el));
+  tctx.restore();
+}
+
+// ── RENDER ──────────────────────────────────────────────────────
+function render() {
+  if (!pages[currentPage]) return;
+  const page = pages[currentPage];
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Background
+  ctx.fillStyle = page.bg || '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Margin guides (0.5 inch)
+  const marginPx = MARGIN_IN * DPI_SCREEN;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,184,120,.2)';
+  ctx.setLineDash([4, 4]);
+  ctx.lineWidth = 0.5;
+  ctx.strokeRect(marginPx, marginPx, canvas.width - marginPx * 2, canvas.height - marginPx * 2);
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Elements
+  page.elements.forEach(el => drawElement(ctx, el));
+
+  // Selection handles
+  if (selectedEl) drawHandles(ctx, selectedEl);
+
+  // Update thumb
+  const thumbs = document.querySelectorAll('.page-thumb canvas');
+  if (thumbs[currentPage]) renderThumb(thumbs[currentPage], page);
+}
+
+function drawElement(c, el) {
+  if (!el.visible) return;
+  c.save();
+  c.globalAlpha = el.opacity !== undefined ? el.opacity : 1;
+
+  if (el.type === 'image' && el.imgEl) {
+    // Cover-fit
+    const scaleX = el.w / el.imgEl.naturalWidth;
+    const scaleY = el.h / el.imgEl.naturalHeight;
+    const s      = Math.max(scaleX, scaleY);
+    const dw     = el.imgEl.naturalWidth * s;
+    const dh     = el.imgEl.naturalHeight * s;
+    const dx     = el.x + (el.w - dw) / 2;
+    const dy     = el.y + (el.h - dh) / 2;
+    c.beginPath();
+    c.rect(el.x, el.y, el.w, el.h);
+    c.clip();
+    c.drawImage(el.imgEl, dx, dy, dw, dh);
+
+  } else if (el.type === 'text') {
+    c.font = (el.bold ? 'bold ' : '') + (el.italic ? 'italic ' : '') + el.fontSize + 'px ' + (el.fontFamily || );
+    c.fillStyle = el.color || '#000000';
+    c.textAlign = el.align || 'left';
+    const lines = (el.text || '').split('\n');
+    const lh    = el.fontSize * 1.35;
+    lines.forEach((line, i) => {
+      let x = el.x;
+      if (el.align === 'center') x = el.x + el.w / 2;
+      if (el.align === 'right')  x = el.x + el.w;
+      c.fillText(line, x, el.y + el.fontSize + i * lh);
+    });
+
+  } else if (el.type === 'rect') {
+    c.fillStyle   = el.fill   || 'transparent';
+    c.strokeStyle = el.stroke || '#000000';
+    c.lineWidth   = el.strokeW || 1;
+    if (el.fill && el.fill !== 'transparent') c.fillRect(el.x, el.y, el.w, el.h);
+    if (el.stroke) c.strokeRect(el.x, el.y, el.w, el.h);
+
+  } else if (el.type === 'ellipse') {
+    c.beginPath();
+    c.ellipse(el.x + el.w / 2, el.y + el.h / 2, el.w / 2, el.h / 2, 0, 0, Math.PI * 2);
+    c.fillStyle   = el.fill   || 'transparent';
+    c.strokeStyle = el.stroke || '#000000';
+    c.lineWidth   = el.strokeW || 1;
+    if (el.fill && el.fill !== 'transparent') c.fill();
+    c.stroke();
+
+  } else if (el.type === 'line') {
+    c.beginPath();
+    c.moveTo(el.x, el.y);
+    c.lineTo(el.x + el.w, el.y + el.h);
+    c.strokeStyle = el.stroke || '#000000';
+    c.lineWidth   = el.strokeW || 2;
+    c.stroke();
+  }
+  c.restore();
+}
+
+function drawHandles(c, el) {
+  c.save();
+  c.strokeStyle = '#00B878';
+  c.lineWidth   = 1.5;
+  c.setLineDash([3, 3]);
+  c.strokeRect(el.x - 2, el.y - 2, el.w + 4, el.h + 4);
+  c.setLineDash([]);
+  const hSize = 7;
+  const corners = [
+    [el.x - 2, el.y - 2], [el.x + el.w / 2, el.y - 2], [el.x + el.w + 2, el.y - 2],
+    [el.x - 2, el.y + el.h / 2],                         [el.x + el.w + 2, el.y + el.h / 2],
+    [el.x - 2, el.y + el.h + 2], [el.x + el.w / 2, el.y + el.h + 2], [el.x + el.w + 2, el.y + el.h + 2],
+  ];
+  corners.forEach(([hx, hy]) => {
+    c.fillStyle = '#00B878';
+    c.fillRect(hx - hSize / 2, hy - hSize / 2, hSize, hSize);
+  });
+  c.restore();
+}
+
+// ── TOOLS ───────────────────────────────────────────────────────
+function setTool(tool) {
+  currentTool = tool;
+  document.querySelectorAll('.tool-item').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('tool-' + tool);
+  if (btn) btn.classList.add('active');
+  canvas.style.cursor = tool === 'select' ? 'default' : 'crosshair';
+}
+
+// ── CANVAS EVENTS ───────────────────────────────────────────────
+canvas.addEventListener('mousedown', onDown);
+canvas.addEventListener('mousemove', onMove);
+canvas.addEventListener('mouseup',   onUp);
+canvas.addEventListener('dblclick',  onDblClick);
+
+function getPos(e) {
+  const r = canvas.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+
+function hitTest(pos) {
+  const page = pages[currentPage];
+  for (let i = page.elements.length - 1; i >= 0; i--) {
+    const el = page.elements[i];
+    if (!el.visible) continue;
+    if (pos.x >= el.x && pos.x <= el.x + el.w &&
+        pos.y >= el.y && pos.y <= el.y + el.h) return el;
+  }
+  return null;
+}
+
+function onDown(e) {
+  const pos = getPos(e);
+  if (currentTool === 'select') {
+    const hit = hitTest(pos);
+    if (hit) {
+      pushUndo();
+      selectedEl   = hit;
+      isDragging   = true;
+      dragOffset   = { x: pos.x - hit.x, y: pos.y - hit.y };
+      // Bring to front
+      const page = pages[currentPage];
+      page.elements = page.elements.filter(el => el !== hit);
+      page.elements.push(hit);
+    } else {
+      selectedEl = null;
+    }
+    renderProps();
+    renderLayers();
+    render();
+  } else if (currentTool !== 'text') {
+    pushUndo();
+    isDrawing = true;
+    drawStart = pos;
+  }
+}
+
+function onMove(e) {
+  if (!isDrawing && !isDragging) return;
+  const pos = getPos(e);
+  if (isDragging && selectedEl) {
+    selectedEl.x = pos.x - dragOffset.x;
+    selectedEl.y = pos.y - dragOffset.y;
+    render();
+  } else if (isDrawing) {
+    render();
+    const x = Math.min(pos.x, drawStart.x);
+    const y = Math.min(pos.y, drawStart.y);
+    const w = Math.abs(pos.x - drawStart.x);
+    const h = Math.abs(pos.y - drawStart.y);
+    ctx.save();
+    ctx.strokeStyle = '#00B878';
+    ctx.lineWidth   = 1.5;
+    ctx.setLineDash([4, 4]);
+    if (currentTool === 'ellipse') {
+      ctx.beginPath(); ctx.ellipse(x + w/2, y + h/2, w/2, h/2, 0, 0, Math.PI*2); ctx.stroke();
+    } else {
+      ctx.strokeRect(x, y, w, h);
+    }
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+}
+
+function onUp(e) {
+  const pos = getPos(e);
+  if (isDragging) {
+    isDragging = false;
+    renderProps();
+    renderLayers();
+    render();
+    return;
+  }
+  if (!isDrawing) return;
+  isDrawing = false;
+  const x = Math.min(pos.x, drawStart.x);
+  const y = Math.min(pos.y, drawStart.y);
+  const w = Math.max(Math.abs(pos.x - drawStart.x), 10);
+  const h = Math.max(Math.abs(pos.y - drawStart.y), 10);
+  const page = pages[currentPage];
+
+  if (currentTool === 'rect') {
+    page.elements.push({ type:'rect', x, y, w, h, fill:'rgba(0,184,120,.2)', stroke:'#00B878', strokeW:1.5, visible:true, opacity:1 });
+  } else if (currentTool === 'ellipse') {
+    page.elements.push({ type:'ellipse', x, y, w, h, fill:'rgba(0,184,120,.2)', stroke:'#00B878', strokeW:1.5, visible:true, opacity:1 });
+  } else if (currentTool === 'line') {
+    page.elements.push({ type:'line', x:drawStart.x, y:drawStart.y, w:pos.x-drawStart.x, h:pos.y-drawStart.y, stroke:'#000000', strokeW:2, visible:true, opacity:1 });
+  }
+  selectedEl = page.elements[page.elements.length - 1];
+  renderProps();
+  renderLayers();
+  render();
+  setTool('select');
+}
+
+function onDblClick(e) {
+  const pos = getPos(e);
+  if (currentTool === 'text' || (currentTool === 'select' && hitTest(pos)?.type === 'text')) {
+    // Double-click on text to edit
+    const hit = hitTest(pos);
+    if (hit && hit.type === 'text') {
+      openInlineTextEdit(hit);
+    } else if (currentTool === 'text') {
+      // Create new text element
+      pushUndo();
+      const newText = {
+        type:'text', x:pos.x, y:pos.y, w:200, h:60,
+        text:'Click to edit', fontSize:18, fontFamily:,
+        color:'#000000', bold:false, italic:false, align:'left',
+        visible:true, opacity:1, id:'txt-'+Date.now()
+      };
+      pages[currentPage].elements.push(newText);
+      selectedEl = newText;
+      renderLayers();
+      render();
+      openInlineTextEdit(newText);
+    }
+  }
+}
+
+// ── INLINE TEXT EDITOR ──────────────────────────────────────────
+let editingTextEl = null;
+function openInlineTextEdit(el) {
+  editingTextEl = el;
+  const overlay = document.getElementById('text-input-overlay');
+  overlay.style.display = 'block';
+  overlay.style.left    = el.x + 'px';
+  overlay.style.top     = el.y + 'px';
+  overlay.style.width   = Math.max(el.w, 120) + 'px';
+  overlay.style.height  = Math.max(el.h, 40) + 'px';
+  overlay.style.fontSize   = el.fontSize + 'px';
+  overlay.style.fontFamily = el.fontFamily || ;
+  overlay.style.fontWeight = el.bold ? 'bold' : 'normal';
+  overlay.style.fontStyle  = el.italic ? 'italic' : 'normal';
+  overlay.style.color      = el.color || '#000000';
+  overlay.style.textAlign  = el.align || 'left';
+  overlay.style.background = 'rgba(255,255,255,.1)';
+  overlay.style.border     = '1.5px solid #00B878';
+  overlay.style.borderRadius = '2px';
+  overlay.style.padding    = '2px 4px';
+  overlay.value = el.text || '';
+  overlay.focus();
+  overlay.select();
+}
+
+document.getElementById('text-input-overlay').addEventListener('blur', function() {
+  if (editingTextEl) {
+    editingTextEl.text = this.value;
+    // Auto-size width
+    const lines = this.value.split('\n');
+    const maxLen = Math.max(...lines.map(l => l.length));
+    editingTextEl.w = Math.max(80, maxLen * editingTextEl.fontSize * 0.6);
+    editingTextEl.h = lines.length * editingTextEl.fontSize * 1.35 + 8;
+  }
+  this.style.display = 'none';
+  editingTextEl = null;
+  render();
+});
+
+document.getElementById('text-input-overlay').addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') this.blur();
+});
+
+// ── IMAGE UPLOAD ────────────────────────────────────────────────
+imgInput.addEventListener('change', e => { handleFileSelect(e); });
+
+function handleFileSelect(e) {
+  Array.from(e.target.files).forEach(file => loadImageFile(file));
+  e.target.value = '';
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag');
+  Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')).forEach(loadImageFile);
+}
+
+function loadImageFile(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      pushUndo();
+      const cw = getCanvasW();
+      const ch = getCanvasH();
+      // Fit image to canvas maintaining aspect ratio
+      const scaleX = (cw * 0.8) / img.naturalWidth;
+      const scaleY = (ch * 0.8) / img.naturalHeight;
+      const s      = Math.min(scaleX, scaleY);
+      const w      = img.naturalWidth * s;
+      const h      = img.naturalHeight * s;
+      const x      = (cw - w) / 2;
+      const y      = (ch - h) / 2;
+      const el = { type:'image', x, y, w, h, imgEl:img, src:ev.target.result, visible:true, opacity:1, id:'img-'+Date.now() };
+      pages[currentPage].elements.push(el);
+      selectedEl = el;
+      render();
+      renderLayers();
+      renderProps();
+      toast('Image added ✓', true);
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── BACKGROUND ──────────────────────────────────────────────────
+function setBackground(color) {
+  pushUndo();
+  pages[currentPage].bg = color;
+  render();
+}
+
+// ── TEXT PROPS ──────────────────────────────────────────────────
+function applyTextProp(prop, val) {
+  if (selectedEl && selectedEl.type === 'text') {
+    selectedEl[prop] = val;
+    render();
+    renderProps();
+  }
+}
+
+function toggleTextStyle(style) {
+  if (selectedEl && selectedEl.type === 'text') {
+    selectedEl[style] = !selectedEl[style];
+    document.getElementById('btn-' + style).classList.toggle('active', selectedEl[style]);
+    render();
+  }
+}
+
+// ── PROPERTIES PANEL ────────────────────────────────────────────
+function renderProps() {
+  const body  = document.getElementById('rp-body');
+  const title = document.getElementById('rp-title');
+  if (!selectedEl) {
+    title.textContent = 'Properties';
+    body.innerHTML = '<div class="rp-empty">Select an element to edit its properties.</div>';
+    return;
+  }
+  title.textContent = selectedEl.type.charAt(0).toUpperCase() + selectedEl.type.slice(1);
+
+  let html = '';
+
+  // Position & size
+  html += `<div class="prop-row">
+    <label class="prop-label">Position & size</label>
+    <div class="prop-row-2">
+      <input class="prop-input" type="number" value="${Math.round(selectedEl.x)}" placeholder="X" oninput="selectedEl.x=+this.value;render()">
+      <input class="prop-input" type="number" value="${Math.round(selectedEl.y)}" placeholder="Y" oninput="selectedEl.y=+this.value;render()">
+    </div>
+    <div class="prop-row-2" style="margin-top:4px">
+      <input class="prop-input" type="number" value="${Math.round(selectedEl.w)}" placeholder="W" oninput="selectedEl.w=+this.value;render()">
+      <input class="prop-input" type="number" value="${Math.round(selectedEl.h)}" placeholder="H" oninput="selectedEl.h=+this.value;render()">
+    </div>
+  </div>`;
+
+  // Opacity
+  html += `<div class="prop-row">
+    <label class="prop-label">Opacity: <span id="opacity-val">${Math.round((selectedEl.opacity??1)*100)}%</span></label>
+    <input type="range" min="0" max="1" step=".01" value="${selectedEl.opacity??1}"
+      style="width:100%;accent-color:var(--accent)"
+      oninput="selectedEl.opacity=+this.value;document.getElementById('opacity-val').textContent=Math.round(this.value*100)+'%';render()">
+  </div>`;
+
+  html += `<div class="prop-sep"></div>`;
+
+  if (selectedEl.type === 'text') {
+    html += `<div class="prop-row">
+      <label class="prop-label">Text content</label>
+      <textarea class="prop-input" rows="4" style="resize:vertical" oninput="selectedEl.text=this.value;render()">${selectedEl.text||''}</textarea>
+    </div>
+    <div class="prop-row">
+      <label class="prop-label">Font family</label>
+      <select class="prop-select" onchange="selectedEl.fontFamily=this.value;render()">
+        ${[,'Playfair Display','Dancing Script','Montserrat','Lato','Georgia','Arial','Courier New']
+          .map(f=>`<option value="${f}" ${selectedEl.fontFamily===f?'selected':''}>${f}</option>`).join('')}
+      </select>
+    </div>
+    <div class="prop-row">
+      <label class="prop-label">Font size (px)</label>
+      <input class="prop-input" type="number" value="${selectedEl.fontSize||18}" oninput="selectedEl.fontSize=+this.value;render()">
+    </div>
+    <div class="prop-row">
+      <label class="prop-label">Colour</label>
+      <div class="prop-color-row">
+        <div class="prop-color"><input type="color" value="${selectedEl.color||'#000000'}" onchange="selectedEl.color=this.value;render()"></div>
+        <input class="prop-input" type="text" value="${selectedEl.color||'#000000'}" oninput="selectedEl.color=this.value;render()" style="flex:1">
+      </div>
+    </div>
+    <div class="prop-row">
+      <label class="prop-label">Alignment</label>
+      <select class="prop-select" onchange="selectedEl.align=this.value;render()">
+        ${['left','center','right'].map(a=>`<option value="${a}" ${selectedEl.align===a?'selected':''}>${a}</option>`).join('')}
+      </select>
+    </div>`;
+  }
+
+  if (selectedEl.type === 'rect' || selectedEl.type === 'ellipse') {
+    html += `<div class="prop-row">
+      <label class="prop-label">Fill colour</label>
+      <div class="prop-color-row">
+        <div class="prop-color"><input type="color" value="${selectedEl.fill&&selectedEl.fill!=='transparent'?selectedEl.fill:'#00B878'}" onchange="selectedEl.fill=this.value;render()"></div>
+        <input class="prop-input" type="text" value="${selectedEl.fill||'transparent'}" oninput="selectedEl.fill=this.value;render()" style="flex:1">
+      </div>
+    </div>
+    <div class="prop-row">
+      <label class="prop-label">Stroke colour</label>
+      <div class="prop-color-row">
+        <div class="prop-color"><input type="color" value="${selectedEl.stroke||'#000000'}" onchange="selectedEl.stroke=this.value;render()"></div>
+        <input class="prop-input" type="text" value="${selectedEl.stroke||'#000000'}" oninput="selectedEl.stroke=this.value;render()" style="flex:1">
+      </div>
+    </div>
+    <div class="prop-row">
+      <label class="prop-label">Stroke width</label>
+      <input class="prop-input" type="number" value="${selectedEl.strokeW||1}" oninput="selectedEl.strokeW=+this.value;render()">
+    </div>`;
+  }
+
+  if (selectedEl.type === 'image') {
+    html += `<div class="prop-row">
+      <button class="prop-btn" onclick="document.getElementById('img-upload-input').click()">🔄 Replace image</button>
+    </div>`;
+  }
+
+  html += `<div class="prop-sep"></div>`;
+
+  // Layer ordering
+  html += `<div class="prop-row">
+    <label class="prop-label">Layer order</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+      <button class="prop-btn" onclick="bringForward()">↑ Forward</button>
+      <button class="prop-btn" onclick="sendBackward()">↓ Backward</button>
+      <button class="prop-btn" onclick="bringToFront()">⤒ To front</button>
+      <button class="prop-btn" onclick="sendToBack()">⤓ To back</button>
+    </div>
+  </div>
+  <div class="prop-sep"></div>
+  <button class="prop-btn danger" onclick="deleteSelected()">🗑 Delete element</button>`;
+
+  body.innerHTML = html;
+}
+
+// ── LAYER OPERATIONS ────────────────────────────────────────────
+function bringForward()  { reorder(1); }
+function sendBackward()  { reorder(-1); }
+function bringToFront()  { reorder(Infinity); }
+function sendToBack()    { reorder(-Infinity); }
+
+function reorder(dir) {
+  if (!selectedEl) return;
+  const els = pages[currentPage].elements;
+  const idx = els.indexOf(selectedEl);
+  if (idx === -1) return;
+  const newIdx = Math.max(0, Math.min(els.length - 1, idx + (dir === Infinity ? els.length : dir === -Infinity ? -els.length : dir)));
+  els.splice(idx, 1);
+  els.splice(newIdx, 0, selectedEl);
+  render();
+  renderLayers();
+}
+
+function deleteSelected() {
+  if (!selectedEl) return;
+  pushUndo();
+  pages[currentPage].elements = pages[currentPage].elements.filter(e => e !== selectedEl);
+  selectedEl = null;
+  render();
+  renderLayers();
+  renderProps();
+  toast('Element deleted');
+}
+
+// ── LAYERS PANEL ────────────────────────────────────────────────
+function renderLayers() {
+  const list = document.getElementById('layers-list');
+  const page = pages[currentPage];
+  document.getElementById('layer-count').textContent = page.elements.length + ' layers';
+
+  if (page.elements.length === 0) {
+    list.innerHTML = '<div class="rp-empty">No layers yet.<br>Add text or images to see them here.</div>';
+    return;
+  }
+
+  list.innerHTML = [...page.elements].reverse().map((el, ri) => {
+    const i = page.elements.length - 1 - ri;
+    const icon = el.type === 'image' ? '🖼' : el.type === 'text' ? 'T' : el.type === 'rect' ? '▭' : el.type === 'ellipse' ? '○' : '╱';
+    const name = el.type === 'text' ? (el.text || 'Text').substring(0, 18) : el.type === 'image' ? 'Image ' + (i+1) : el.type.charAt(0).toUpperCase() + el.type.slice(1) + ' ' + (i+1);
+    return `<div class="layer-item ${el === selectedEl ? 'selected' : ''}" onclick="selectLayer(${i})">
+      <div class="layer-thumb">${el.type === 'image' && el.imgEl ? `<img src="${el.src}" alt="">` : icon}</div>
+      <div class="layer-name">${name}</div>
+      <div class="layer-vis" onclick="event.stopPropagation();toggleVisible(${i})">${el.visible ? '👁' : '🚫'}</div>
+      <div class="layer-del" onclick="event.stopPropagation();deleteLayer(${i})">✕</div>
+    </div>`;
+  }).join('');
+}
+
+function selectLayer(i) {
+  selectedEl = pages[currentPage].elements[i];
+  render();
+  renderProps();
+  renderLayers();
+}
+
+function toggleVisible(i) {
+  pages[currentPage].elements[i].visible = !pages[currentPage].elements[i].visible;
+  render();
+  renderLayers();
+}
+
+function deleteLayer(i) {
+  pushUndo();
+  const el = pages[currentPage].elements[i];
+  if (el === selectedEl) selectedEl = null;
+  pages[currentPage].elements.splice(i, 1);
+  render();
+  renderLayers();
+  renderProps();
+}
+
+// ── UNDO ────────────────────────────────────────────────────────
+function pushUndo() {
+  undoStack.push(JSON.stringify(pages.map(p => ({
+    bg: p.bg,
+    orientation: p.orientation,
+    elements: p.elements.map(el => {
+      const copy = Object.assign({}, el);
+      delete copy.imgEl; // can't serialize Image objects
+      return copy;
+    })
+  }))));
+  if (undoStack.length > 30) undoStack.shift();
+}
+
+function undo() {
+  if (undoStack.length === 0) { toast('Nothing to undo', false); return; }
+  const prev = JSON.parse(undoStack.pop());
+  // Restore pages (re-create Image objects for image elements)
+  pages = prev.map(p => ({
+    ...p,
+    elements: p.elements.map(el => {
+      if (el.type === 'image' && el.src) {
+        const img = new Image();
+        img.src = el.src;
+        return { ...el, imgEl: img };
+      }
+      return el;
+    })
+  }));
+  selectedEl = null;
+  render();
+  renderLayers();
+  renderProps();
+  rebuildPageStrip();
+  toast('Undo ✓');
+}
+
+// ── SIDEBAR TABS ────────────────────────────────────────────────
+function setSbTab(tab, btn) {
+  document.querySelectorAll('.sb-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.sb-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+// ── ORIENTATION ─────────────────────────────────────────────────
+function setOrientation(o) {
+  orientation = o;
+  document.getElementById('orient-portrait').classList.toggle('active',  o === 'portrait');
+  document.getElementById('orient-landscape').classList.toggle('active', o === 'landscape');
+  resizeCanvas();
+  pages.forEach(p => p.orientation = o);
+  render();
+  rebuildPageStrip();
+  toast('Orientation: ' + (o === 'portrait' ? '4×6"' : '6×4"'));
+}
+
+// ── PRICING ─────────────────────────────────────────────────────
+function updatePricing() {
+  const sets  = Math.ceil(pages.length / PRINTS_PER_SET);
+  const total = sets * PRICE_PER_SET;
+  document.getElementById('pb-price').textContent  = '₹' + total.toLocaleString('en-IN');
+  document.getElementById('pb-pages').textContent  = `(${pages.length} prints · ${sets} set${sets!==1?'s':''})`;
+}
+
+// ── CLEAR PAGE ──────────────────────────────────────────────────
+function clearCanvas() {
+  if (!confirm('Clear all elements on this page?')) return;
+  pushUndo();
+  pages[currentPage].elements = [];
+  pages[currentPage].bg = '#ffffff';
+  selectedEl = null;
+  render();
+  renderLayers();
+  renderProps();
+  toast('Page cleared');
+}
+
+// ── EXPORT PDF WITH BLEED + TRIM MARKS ──────────────────────────
+async function exportPDF() {
+  toast('Generating print-ready PDF…');
+  const { jsPDF } = window.jspdf;
+
+  // Print dimensions in mm
+  const printW_mm = DIMS[orientation].w * 25.4;  // e.g. 101.6mm for 4"
+  const printH_mm = DIMS[orientation].h * 25.4;  // e.g. 152.4mm for 6"
+  const bleed_mm  = 5;
+  const trim_mm   = 5; // trim mark length
+  const gap_mm    = 2; // gap between trim mark and bleed edge
+
+  // Page size includes bleed on all sides + space for trim marks
+  const pageW = printW_mm + bleed_mm * 2 + trim_mm + gap_mm;
+  const pageH = printH_mm + bleed_mm * 2 + trim_mm + gap_mm;
+
+  const pdf = new jsPDF({
+    unit: 'mm',
+    format: [pageW, pageH],
+    orientation: 'portrait'
+  });
+
+  // Render each page
+  for (let pi = 0; pi < pages.length; pi++) {
+    if (pi > 0) pdf.addPage([pageW, pageH]);
+    const page = pages[pi];
+
+    // Render the canvas for this page at high res
+    const printCanvas = document.createElement('canvas');
+    const dpiScale    = DPI_PRINT / DPI_SCREEN;
+    const cw = getCanvasW();
+    const ch = getCanvasH();
+    const bleedPx = BLEED_IN * DPI_SCREEN * dpiScale;
+
+    printCanvas.width  = Math.round((cw + bleedPx * 2) * dpiScale);
+    printCanvas.height = Math.round((ch + bleedPx * 2) * dpiScale);
+    const pc = printCanvas.getContext('2d');
+
+    // Scale for high DPI
+    pc.scale(dpiScale, dpiScale);
+
+    // Fill bleed area with background colour
+    pc.fillStyle = page.bg || '#ffffff';
+    pc.fillRect(-bleedPx / dpiScale, -bleedPx / dpiScale,
+      printCanvas.width / dpiScale + bleedPx / dpiScale * 2,
+      printCanvas.height / dpiScale + bleedPx / dpiScale * 2);
+
+    // Draw page content offset by bleed
+    pc.save();
+    pc.translate(bleedPx / dpiScale, bleedPx / dpiScale);
+    page.elements.forEach(el => drawElement(pc, el));
+    pc.restore();
+
+    const imgData = printCanvas.toDataURL('image/jpeg', 0.95);
+
+    // Draw image in PDF (bleed area)
+    const imgX = (trim_mm + gap_mm) / 2;
+    const imgY = (trim_mm + gap_mm) / 2;
+    pdf.addImage(imgData, 'JPEG', imgX, imgY, printW_mm + bleed_mm * 2, printH_mm + bleed_mm * 2);
+
+    // ── Draw trim marks ──────────────────────────────────────────
+    pdf.setLineWidth(0.25);
+    pdf.setDrawColor(0, 0, 0);
+
+    const bl = imgX + bleed_mm;  // bleed left
+    const bt = imgY + bleed_mm;  // bleed top
+    const br = bl + printW_mm;   // bleed right  
+    const bb = bt + printH_mm;   // bleed bottom
+
+    // Corner trim marks (4 corners × 2 lines each)
+    // Top-left
+    pdf.line(bl - bleed_mm - gap_mm, bt, bl - bleed_mm - gap_mm - trim_mm, bt);
+    pdf.line(bl, bt - bleed_mm - gap_mm, bl, bt - bleed_mm - gap_mm - trim_mm);
+    // Top-right
+    pdf.line(br + bleed_mm + gap_mm, bt, br + bleed_mm + gap_mm + trim_mm, bt);
+    pdf.line(br, bt - bleed_mm - gap_mm, br, bt - bleed_mm - gap_mm - trim_mm);
+    // Bottom-left
+    pdf.line(bl - bleed_mm - gap_mm, bb, bl - bleed_mm - gap_mm - trim_mm, bb);
+    pdf.line(bl, bb + bleed_mm + gap_mm, bl, bb + bleed_mm + gap_mm + trim_mm);
+    // Bottom-right
+    pdf.line(br + bleed_mm + gap_mm, bb, br + bleed_mm + gap_mm + trim_mm, bb);
+    pdf.line(br, bb + bleed_mm + gap_mm, br, bb + bleed_mm + gap_mm + trim_mm);
+
+    // Bleed box (dashed, for reference)
+    pdf.setLineDashPattern([1, 1], 0);
+    pdf.setDrawColor(150, 150, 150);
+    pdf.rect(imgX, imgY, printW_mm + bleed_mm * 2, printH_mm + bleed_mm * 2);
+    pdf.setLineDashPattern([], 0);
+    pdf.setDrawColor(0, 0, 0);
+
+    // Labels
+    pdf.setFontSize(5);
+    pdf.setTextColor(120, 120, 120);
+    pdf.text('Binder · Art Print · ' + DIMS[orientation].w + '×' + DIMS[orientation].h + '" · 270 GSM · Print ' + (pi+1) + '/' + pages.length, imgX, pageH - 1.5);
+    pdf.text('Bleed: 5mm · Trim marks: crop at solid corners · DO NOT PRINT TRIM MARKS', imgX, pageH - 0.5);
+  }
+
+  pdf.save('binder-art-prints.pdf');
+  toast('PDF downloaded ✓ — ' + pages.length + ' pages with trim marks', true);
+}
+
+// ── ORDER ────────────────────────────────────────────────────────
+function orderPrints() {
+  const sets  = Math.ceil(pages.length / PRINTS_PER_SET);
+  const total = sets * PRICE_PER_SET;
+  alert(
+    'Art Print Order Summary\n\n' +
+    '  Prints: ' + pages.length + '\n' +
+    '  Sets: ' + sets + '\n' +
+    '  Total: ₹' + total.toLocaleString('en-IN') + '\n\n' +
+    'To complete your order:\n' +
+    '1. Click "Export PDF" to download your print-ready file\n' +
+    '2. Email it to hello@binder.co.in with "Art Print Order" in the subject\n' +
+    '3. We\'ll confirm and arrange payment within 2 hours\n\n' +
+    'Ships in 2 days · 270 GSM · 12-colour archival · 400-year colour life'
+  );
+}
+
+// ── TOAST ────────────────────────────────────────────────────────
+let _tt;
+function toast(msg, ok) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'on' + (ok ? ' ok' : '');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => { el.className = ''; }, 3000);
+}
+
+// ── KEYBOARD SHORTCUTS ───────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'Delete' || e.key === 'Backspace') { deleteSelected(); e.preventDefault(); }
+  if ((e.metaKey || e.ctrlKey) && e.key === 'z') { undo(); e.preventDefault(); }
+  if (e.key === 'Escape') { selectedEl = null; render(); renderProps(); renderLayers(); }
+  if (e.key === 'v') setTool('select');
+  if (e.key === 't') setTool('text');
+  if (e.key === 'r') setTool('rect');
+  // Arrow keys to nudge selected element
+  if (selectedEl) {
+    const d = e.shiftKey ? 10 : 1;
+    if (e.key === 'ArrowLeft')  { selectedEl.x -= d; render(); e.preventDefault(); }
+    if (e.key === 'ArrowRight') { selectedEl.x += d; render(); e.preventDefault(); }
+    if (e.key === 'ArrowUp')    { selectedEl.y -= d; render(); e.preventDefault(); }
+    if (e.key === 'ArrowDown')  { selectedEl.y += d; render(); e.preventDefault(); }
+  }
+});
+
+// ── START ────────────────────────────────────────────────────────
+resizeCanvas();
+init();
+
+// Handle initial qty from URL
+const urlQty = parseInt(new URLSearchParams(location.search).get('qty') || '4');
+if (urlQty > 4) {
+  // Add extra pages
+  const extra = urlQty - 4;
+  for (let i = 0; i < extra; i++) addPage();
+  updatePricing();
+}
+</script>
+</body>
+</html>

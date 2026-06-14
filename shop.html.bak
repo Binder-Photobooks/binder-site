@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binder Shop — Custom Photobooks</title>
+<meta name="description" content="Order your custom photobook from Binder. Premium quality, delivered across India.">
+
+<noscript></noscript>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#00B878;--ah:#009962;--al:#e8f7f0;--am:#d0f0e2;
+  --black:#0a0a0a;--white:#fff;
+  --g50:#f9f9f9;--g100:#f2f2f2;--g200:#e4e4e4;--g300:#c8c8c8;
+  --g400:#999;--g500:#666;--g600:#444;
+  --font:'Lato',system-ui,sans-serif;
+  --font-serif:'Lato',system-ui,sans-serif;
+  --max-w:1120px;--radius:10px;--radius-lg:16px;
+  --shadow:0 2px 8px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.04);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.1);
+  --red:#ef4444;--red-l:#fef2f2;
+}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--white);color:var(--black);line-height:1.6}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%}
+button{font-family:var(--font);cursor:pointer}
+input,select,textarea{font-family:var(--font)}
+.wrap{max-width:var(--max-w);margin:0 auto;padding:0 5vw}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--g200);z-index:100;padding:0 5vw}
+.nav-inner{display:flex;align-items:center;height:62px;gap:28px}
+.nav-logo{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.nav-logo-mark{width:34px;height:34px;background:var(--black);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--white);font-weight:700;font-size:16px}
+.nav-logo-name{font-size:15px;font-weight:700}
+.nav-links{display:flex;gap:24px;flex:1}
+.nav-links a{font-size:13px;color:var(--g400);font-weight:400;transition:color .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--black)}
+.nav-cta{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:var(--font);transition:all .15s;white-space:nowrap;text-decoration:none}
+.btn-primary{background:var(--accent);color:var(--white)}
+.btn-primary:hover{background:var(--ah)}
+.btn-outline{background:transparent;border:1.5px solid var(--g200);color:var(--g500)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.cart-btn{position:relative}
+.cart-count{position:absolute;top:-6px;right:-6px;background:var(--red);color:var(--white);font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;display:none}
+.cart-count.show{display:flex}
+
+/* ── HERO ── */
+.shop-hero{position:relative;overflow:hidden;min-height:420px;display:flex;align-items:center}
+.shop-hero-img{position:absolute;inset:0;background:linear-gradient(135deg,#1a1a1a,#2d4a35);width:100%;height:100%;object-fit:cover;object-position:center}
+.shop-hero-img-ph{position:absolute;inset:0;background:linear-gradient(135deg,#111 0%,#1a3325 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:rgba(255,255,255,.2)}
+.shop-hero-img-ph svg{width:52px;height:52px;opacity:.3}
+.shop-hero-img-ph p{font-size:13px;color:rgba(255,255,255,.25);text-align:center}
+.shop-hero-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.7) 0%,rgba(0,0,0,.3) 60%,rgba(0,0,0,.1) 100%)}
+.shop-hero-content{position:relative;z-index:1;padding:80px 5vw;max-width:600px}
+.shop-hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:rgba(0,184,120,.2);border:1px solid rgba(39,174,114,.4);color:#7de3b0;font-size:11px;font-weight:700;padding:5px 14px;border-radius:100px;letter-spacing:.6px;text-transform:uppercase;margin-bottom:20px}
+.shop-hero-title{font-size:clamp(28px,4vw,52px);font-weight:700;line-height:1.15;letter-spacing:-.5px;color:var(--white);margin-bottom:14px}
+.shop-hero-title em{font-style:normal;color:#00B878;font-family:'Lato',system-ui,sans-serif;color:rgba(255,255,255,.65);line-height:1.7;margin-bottom:28px;max-width:480px}
+.shop-hero-btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn-hero{padding:13px 28px;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:var(--font);transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.btn-hero-primary{background:var(--accent);color:var(--white)}
+.btn-hero-primary:hover{background:var(--ah)}
+.btn-hero-outline{background:transparent;border:1.5px solid rgba(255,255,255,.35);color:var(--white)}
+.btn-hero-outline:hover{border-color:var(--white)}
+
+/* ── FILTER BAR ── */
+.filter-bar{padding:20px 5vw;background:var(--g50);border-bottom:1px solid var(--g200);position:sticky;top:62px;z-index:90}
+.filter-inner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:var(--max-w);margin:0 auto}
+.filter-btn{padding:6px 16px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--g200);background:transparent;color:var(--g500);font-family:var(--font);transition:all .15s;white-space:nowrap}
+.filter-btn:hover,.filter-btn.active{background:var(--accent);color:var(--white);border-color:var(--accent)}
+.filter-sep{flex:1}
+.sort-select{padding:7px 12px;border:1.5px solid var(--g200);border-radius:var(--radius);font-size:12px;font-family:var(--font);outline:none;cursor:pointer;background:var(--white);color:var(--g600)}
+.sort-select:focus{border-color:var(--accent)}
+
+/* ── PRODUCTS GRID ── */
+.products-section{padding:52px 5vw 80px}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:28px;max-width:var(--max-w);margin:0 auto}
+
+/* ── PRODUCT CARD ── */
+.product-card{background:var(--white);border:1.5px solid var(--g200);border-radius:var(--radius-lg);overflow:hidden;transition:all .2s;cursor:pointer}
+.product-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--g300)}
+.product-card__img{width:100%;height:200px;background:var(--g100);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
+.product-card__img img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
+.product-card__img-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100%;height:100%;background:linear-gradient(145deg,var(--g100),var(--g200))}
+.product-card__img-ph svg{opacity:.3;width:36px;height:36px;color:var(--g400)}
+.product-card__img-ph span{font-size:10px;color:var(--g400);font-weight:400;text-transform:uppercase;letter-spacing:.4px}
+.product-card__badge{position:absolute;top:10px;left:10px;background:var(--accent);color:var(--white);font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;letter-spacing:.3px;text-transform:uppercase}
+.product-card__badge.sale{background:#ef4444}
+.product-card__body{padding:16px}
+.product-card__desc{font-size:12px;color:var(--g400);line-height:1.55;margin-top:4px;margin-bottom:12px}
+.product-card__name{font-size:15px;font-weight:700;color:var(--black);margin-bottom:3px;letter-spacing:-.1px}
+.product-card__size{font-size:11px;color:var(--g400);margin-bottom:10px}
+.product-card__footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}
+.product-card__price{font-size:18px;font-weight:700;color:var(--accent)}
+.product-card__price-orig{font-size:12px;color:var(--g300);text-decoration:line-through;margin-left:4px}
+.product-card__add{padding:8px 16px;background:var(--accent);color:var(--white);border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s;font-family:var(--font)}
+.product-card__add:hover{background:var(--ah)}
+
+/* ── CART SIDEBAR ── */
+#cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;display:none;backdrop-filter:blur(2px)}
+#cart-overlay.open{display:block}
+#cart-panel{position:fixed;top:0;right:-440px;width:440px;max-width:95vw;height:100vh;background:var(--white);z-index:401;display:flex;flex-direction:column;transition:right .25s cubic-bezier(.4,0,.2,1);box-shadow:-4px 0 32px rgba(0,0,0,.12)}
+#cart-panel.open{right:0}
+.cart-head{padding:18px 20px;border-bottom:1px solid var(--g200);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.cart-head h2{font-size:16px;font-weight:700}
+.cart-close{width:30px;height:30px;border:none;background:var(--g100);border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--g500);transition:all .12s}
+.cart-close:hover{background:var(--g200);color:var(--black)}
+.cart-body{flex:1;overflow-y:auto;padding:16px}
+.cart-empty{text-align:center;padding:60px 20px;color:var(--g400)}
+.cart-empty-icon{font-size:40px;margin-bottom:12px;opacity:.4}
+.cart-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--g100);align-items:flex-start}
+.cart-item:last-child{border:none}
+.cart-item__img{width:64px;height:64px;border-radius:8px;overflow:hidden;background:var(--g100);flex-shrink:0}
+.cart-item__img img{width:100%;height:100%;object-fit:cover}
+.cart-item__info{flex:1;min-width:0}
+.cart-item__name{font-size:13px;font-weight:700}
+.cart-item__size{font-size:11px;color:var(--g400);margin-top:2px}
+.cart-item__price{font-size:14px;font-weight:700;color:var(--accent);margin-top:6px}
+.cart-item__qty{display:flex;align-items:center;gap:8px;margin-top:8px}
+.qty-btn{width:26px;height:26px;border:1.5px solid var(--g200);border-radius:6px;background:transparent;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--g600);transition:all .12s}
+.qty-btn:hover{border-color:var(--accent);color:var(--accent)}
+.qty-val{font-size:13px;font-weight:700;min-width:20px;text-align:center}
+.cart-item__remove{background:none;border:none;cursor:pointer;color:var(--g300);font-size:16px;transition:color .12s;padding:4px;align-self:flex-start;flex-shrink:0}
+.cart-item__remove:hover{color:var(--red)}
+.cart-foot{padding:16px 20px;border-top:1px solid var(--g200);flex-shrink:0}
+.cart-totals{margin-bottom:14px}
+.cart-total-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:var(--g500)}
+.cart-total-row.grand{font-size:16px;font-weight:700;color:var(--black);margin-top:10px;padding-top:10px;border-top:1px solid var(--g200)}
+.cart-checkout{width:100%;padding:14px;background:var(--accent);color:var(--white);border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background .15s;margin-bottom:8px}
+.cart-checkout:hover{background:var(--ah)}
+.cart-continue{width:100%;padding:10px;background:transparent;border:1.5px solid var(--g200);color:var(--g500);border-radius:var(--radius);font-size:13px;font-weight:400;cursor:pointer;font-family:var(--font);transition:all .15s}
+.cart-continue:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── CHECKOUT MODAL ── */
+#checkout-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+#checkout-overlay.open{display:flex}
+#checkout-modal{background:var(--white);border-radius:var(--radius-lg);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.2)}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--g200);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:1}
+.modal-head h2{font-size:17px;font-weight:700}
+.modal-body{padding:24px}
+.form-section{margin-bottom:24px}
+.form-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--g400);margin-bottom:14px}
+.form-row{margin-bottom:14px}
+.form-row.half{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f-label{font-size:12px;font-weight:400;color:var(--g600);margin-bottom:5px;display:block}
+.f-input{width:100%;padding:11px 14px;border:1.5px solid var(--g200);border-radius:9px;font-size:14px;outline:none;transition:border-color .15s;font-family:var(--font)}
+.f-input:focus{border-color:var(--accent)}
+.f-select{width:100%;padding:11px 14px;border:1.5px solid var(--g200);border-radius:9px;font-size:14px;outline:none;cursor:pointer;font-family:var(--font);background:var(--white)}
+.f-select:focus{border-color:var(--accent)}
+.order-summary{background:var(--g50);border-radius:var(--radius);padding:16px;margin-bottom:20px}
+.order-summary-title{font-size:12px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.order-summary-item{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px}
+.order-summary-total{display:flex;justify-content:space-between;font-size:15px;font-weight:700;margin-top:10px;padding-top:10px;border-top:1px solid var(--g200)}
+.place-order-btn{width:100%;padding:14px;background:var(--accent);color:var(--white);border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background .15s}
+.place-order-btn:hover{background:var(--ah)}
+
+/* ── SUCCESS ── */
+#success-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
+#success-overlay.open{display:flex}
+#success-modal{background:var(--white);border-radius:var(--radius-lg);width:100%;max-width:420px;padding:40px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.2)}
+.success-icon{width:64px;height:64px;background:var(--al);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
+#success-modal h2{font-size:22px;font-weight:700;margin-bottom:10px}
+#success-modal p{font-size:14px;color:var(--g500);line-height:1.6;margin-bottom:24px}
+
+/* ── TOAST ── */
+#shop-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--black);color:var(--white);padding:11px 20px;border-radius:10px;font-size:13px;font-weight:400;z-index:9999;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;box-shadow:var(--shadow-lg)}
+#shop-toast.on{opacity:1}
+#shop-toast.ok{background:var(--accent)}
+
+/* ── FOOTER ── */
+footer{padding:32px 5vw;border-top:1px solid var(--g200);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:var(--white)}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{font-size:12px;color:var(--g400);transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+.footer-copy{font-size:12px;color:var(--g400)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .nav-links,.nav-cta{display:none}
+  .products-grid{grid-template-columns:1fr 1fr}
+  .form-row.half{grid-template-columns:1fr}
+}
+@media(max-width:480px){.products-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">B</div>
+      <div class="nav-logo-name">Binder</div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#sizes">Sizes & Pricing</a>
+      <a href="art-prints.html">Art Prints</a>
+      <a href="shop.html" class="active">Binder Shop</a>
+      <a href="blog.html">Blog</a>
+      <a href="my-orders.html">My Account</a>
+    </div>
+    <div class="nav-cta">
+      <button class="btn btn-outline cart-btn" onclick="toggleCart()" id="cart-toggle-btn">
+        🛒 Cart
+        <span class="cart-count" id="cart-count">0</span>
+      </button>
+      <a href="photobook-editor.html" class="btn btn-primary">Start designing →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="shop-hero">
+  <!-- Replace with your hero image: <img src="your-image.jpg" class="shop-hero-img" alt="Binder Shop"> -->
+  <div class="shop-hero-img-ph" id="shop-hero-img">
+    <svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+    <p>Add your hero image here — recommended 1440×560px</p>
+  </div>
+  <div class="shop-hero-overlay"></div>
+  <div class="shop-hero-content">
+    <div class="shop-hero-eyebrow">✦ Free delivery on orders over ₹5,000</div>
+    <h1 class="shop-hero-title">The <span>Binder</span> Shop</h1>
+    <p class="shop-hero-sub">Premium photobooks, printed to order. Every book crafted at 300 DPI in CMYK with hardcover binding. Delivered across India in 5–7 days.</p>
+    <div class="shop-hero-btns">
+      <a href="#products" class="btn-hero btn-hero-primary">Shop all books</a>
+      <a href="photobook-editor.html" class="btn-hero btn-hero-outline">Design your own →</a>
+    </div>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <button class="filter-btn active" onclick="filterProducts('all',this)">All</button>
+    <button class="filter-btn" onclick="filterProducts('small',this)">6×6" Small</button>
+    <button class="filter-btn" onclick="filterProducts('medium',this)">8×8" Medium</button>
+    <button class="filter-btn" onclick="filterProducts('large',this)">12×12" Large</button>
+    <button class="filter-btn" onclick="filterProducts('bundle',this)">Bundles</button>
+    <div class="filter-sep"></div>
+    <select class="sort-select" onchange="sortProducts(this.value)">
+      <option value="featured">Featured</option>
+      <option value="price-asc">Price: Low to High</option>
+      <option value="price-desc">Price: High to Low</option>
+    </select>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="products-section" id="products">
+  <div class="products-grid" id="products-grid"></div>
+</div>
+
+<!-- CART SIDEBAR -->
+<div id="cart-overlay" onclick="toggleCart()"></div>
+<div id="cart-panel">
+  <div class="cart-head">
+    <h2>Your cart <span id="cart-item-count" style="font-size:13px;color:var(--g400);font-weight:400"></span></h2>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-body" id="cart-body">
+    <div class="cart-empty">
+      <div class="cart-empty-icon">🛒</div>
+      <div>Your cart is empty.<br><span style="font-size:12px;color:var(--g400)">Add some books to get started.</span></div>
+    </div>
+  </div>
+  <div class="cart-foot" id="cart-foot" style="display:none">
+    <div class="cart-totals">
+      <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal">₹0</span></div>
+      <div class="cart-total-row"><span>Shipping</span><span id="cart-shipping">Calculated at checkout</span></div>
+      <div class="cart-total-row grand"><span>Total</span><span id="cart-total">₹0</span></div>
+    </div>
+    <button class="cart-checkout" onclick="openCheckout()">Proceed to checkout →</button>
+    <button class="cart-continue" onclick="toggleCart()">Continue shopping</button>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div id="checkout-overlay">
+  <div id="checkout-modal">
+    <div class="modal-head">
+      <h2>Complete your order</h2>
+      <button class="cart-close" onclick="closeCheckout()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Order summary -->
+      <div class="order-summary">
+        <div class="order-summary-title">Order summary</div>
+        <div id="checkout-items"></div>
+        <div class="order-summary-total">
+          <span>Total</span>
+          <span id="checkout-total">₹0</span>
+        </div>
+      </div>
+      <!-- Customer details -->
+      <div class="form-section">
+        <div class="form-section-title">Your details</div>
+        <div class="form-row half">
+          <div><label class="f-label">First name</label><input class="f-input" type="text" id="f-fname" placeholder="Priya"></div>
+          <div><label class="f-label">Last name</label><input class="f-input" type="text" id="f-lname" placeholder="Sharma"></div>
+        </div>
+        <div class="form-row"><label class="f-label">Email</label><input class="f-input" type="email" id="f-email" placeholder="priya@example.com"></div>
+        <div class="form-row"><label class="f-label">Phone</label><input class="f-input" type="tel" id="f-phone" placeholder="+91 98765 43210"></div>
+      </div>
+      <!-- Shipping -->
+      <div class="form-section">
+        <div class="form-section-title">Shipping address</div>
+        <div class="form-row"><label class="f-label">Address line 1</label><input class="f-input" type="text" id="f-addr1" placeholder="Street address, apartment, suite…"></div>
+        <div class="form-row"><label class="f-label">Address line 2 (optional)</label><input class="f-input" type="text" id="f-addr2" placeholder="Building, landmark…"></div>
+        <div class="form-row half">
+          <div><label class="f-label">City</label><input class="f-input" type="text" id="f-city" placeholder="New Delhi"></div>
+          <div><label class="f-label">PIN code</label><input class="f-input" type="text" id="f-pin" placeholder="110020"></div>
+        </div>
+        <div class="form-row"><label class="f-label">State</label>
+          <select class="f-select" id="f-state">
+            <option value="">Select state</option>
+            <option>Andhra Pradesh</option><option>Assam</option><option>Bihar</option>
+            <option>Chhattisgarh</option><option>Delhi</option><option>Goa</option>
+            <option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option>
+            <option>Jharkhand</option><option>Karnataka</option><option>Kerala</option>
+            <option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option>
+            <option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option>
+            <option>Odisha</option><option>Punjab</option><option>Rajasthan</option>
+            <option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option>
+            <option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option>
+            <option>West Bengal</option>
+          </select>
+        </div>
+      </div>
+      <!-- Payment note -->
+      <div style="background:var(--al);border-radius:var(--radius);padding:14px;margin-bottom:20px;font-size:13px;color:var(--ah);line-height:1.6">
+        <strong>Payment on delivery available.</strong> Our team will contact you within 24 hours to confirm your order and arrange payment via UPI, bank transfer, or card.
+      </div>
+      <button class="place-order-btn" onclick="placeOrder()">Place order →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div id="success-overlay">
+  <div id="success-modal">
+    <div class="success-icon">✓</div>
+    <h2>Order placed!</h2>
+    <p>Thank you for your order. Our team will contact you at <strong id="success-email"></strong> within 24 hours to confirm and arrange payment.</p>
+    <p style="margin-top:8px;font-size:13px;color:var(--g400)">Your order ID: <strong id="success-order-id" style="color:var(--black)"></strong></p>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:24px;padding:13px" onclick="closeSuccess()">Continue shopping</button>
+  </div>
+</div>
+
+<div id="shop-toast"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="photobook-editor.html">Design a book</a>
+    <a href="blog.html">Blog</a>
+    <a href="press.html">Press</a>
+    <a href="my-orders.html">My orders</a>
+    <a href="admin-cms.html" style="opacity:.3">Admin</a>
+  </div>
+  <div class="footer-copy">© 2026 Binder · A-291/1, Okhla Phase I, Delhi — 110020</div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// BINDER SHOP — Products, Cart, Checkout
+// ═══════════════════════════════════════════════════════════════
+
+// ── PRODUCT CATALOGUE ──────────────────────────────────────────
+// Edit products via Admin CMS → Shop section
+// or by editing the PRODUCTS array below directly
+// Hero image pre-loaded
+document.addEventListener('DOMContentLoaded', function() {
+  var heroEl = document.getElementById('shop-hero-img');
+  if (heroEl) {
+    heroEl.innerHTML = '<img src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1440&h=560&q=85&fit=crop" style="width:100%;height:100%;object-fit:cover;object-position:center" alt="Binder Shop hero">';
+  }
+});
+
+var PRODUCTS = [
+  {
+    id: 'p1', name: '6×6" Classic Photobook',
+    size: 'small', category: 'small',
+    image: 'https://images.unsplash.com/photo-1603792907191-89e55f70099a?w=400&h=400&q=85&fit=crop'
+    desc: 'Compact square photobook. Perfect for single events, gifts, and personal collections. 20 pages included.',
+    price: 1999, origPrice: null, badge: null, featured: true,
+    details: '152×152mm · Hardcover · 200gsm paper · 20 pages'
+  },
+  {
+    id: 'p2', name: '8×8" Premium Photobook',
+    size: 'medium', category: 'medium',
+    image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=400&q=85&fit=crop',
+    desc: 'Our most popular size. Ideal for weddings, travel albums, and family annuals. Rich colour reproduction.',
+    price: 2999, origPrice: null, badge: 'Most popular', featured: true,
+    details: '203×203mm · Hardcover · 200gsm paper · 20 pages'
+  },
+  {
+    id: 'p3', name: '12×12" Statement Photobook',
+    size: 'large', category: 'large',
+    image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=400&q=85&fit=crop',
+    desc: 'A true coffee-table book. Full-bleed photos fill every spread. Makes an unforgettable anniversary or wedding gift.',
+    price: 4499, origPrice: null, badge: null, featured: true,
+    details: '305×305mm · Hardcover · 200gsm paper · 20 pages'
+  },
+  {
+    id: 'p4', name: '6×6" — 10 Book Bundle',
+    size: 'small', category: 'bundle',
+    image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=400&q=85&fit=crop',
+    desc: 'Order 10 identical 6×6" books. Perfect for gifting at weddings, events, or as thank-you presents.',
+    price: 15992, origPrice: 19990, badge: '20% off', featured: false,
+    details: '10 × 6×6" books · Hardcover · Identical copies'
+  },
+  {
+    id: 'p5', name: '8×8" — 10 Book Bundle',
+    size: 'medium', category: 'bundle',
+    image: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=400&h=400&q=85&fit=crop',
+    desc: 'Ten 8×8" premium photobooks at a significant discount. Great for corporate gifting and events.',
+    price: 23992, origPrice: 29990, badge: '20% off', featured: false,
+    details: '10 × 8×8" books · Hardcover · Identical copies'
+  },
+  {
+    id: 'p6', name: '12×12" — 10 Book Bundle',
+    size: 'large', category: 'bundle',
+    image: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=400&h=400&q=85&fit=crop',
+    desc: 'Ten large-format coffee-table books. Our most prestigious bulk option for weddings and events.',
+    price: 35992, origPrice: 44990, badge: '20% off', featured: false,
+    details: '10 × 12×12" books · Hardcover · Identical copies'
+  },
+];
+
+var cart = [];
+var currentFilter = 'all';
+var currentSort   = 'featured';
+
+// ── RENDER PRODUCTS ────────────────────────────────────────────
+function renderProducts() {
+  var grid = document.getElementById('products-grid');
+  var filtered = PRODUCTS.filter(function(p) {
+    return currentFilter === 'all' || p.category === currentFilter;
+  });
+
+  if (currentSort === 'price-asc')  filtered.sort(function(a,b){return a.price-b.price;});
+  if (currentSort === 'price-desc') filtered.sort(function(a,b){return b.price-a.price;});
+  if (currentSort === 'featured')   filtered.sort(function(a,b){return b.featured-a.featured;});
+
+  grid.innerHTML = filtered.map(function(p) {
+    return '<div class="product-card" onclick="quickAdd(\''+p.id+'\')">' +
+      '<div class="product-card__img">' +
+        (p.image
+          ? '<img src="'+p.image+'" alt="'+p.name+'">'
+          : '<div class="product-card__img-ph">' +
+              '<svg fill="none" viewBox="0 0 24 24" width="36" height="36"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>' +
+              '<span>'+p.name+'</span>' +
+            '</div>'
+        ) +
+        (p.badge ? '<div class="product-card__badge'+(p.badge.includes('off')?' sale':'')+'">'+p.badge+'</div>' : '') +
+      '</div>' +
+      '<div class="product-card__body">' +
+        '<div class="product-card__name">'+p.name+'</div>' +
+        '<div class="product-card__size">'+p.details+'</div>' +
+        '<div class="product-card__desc">'+p.desc+'</div>' +
+        '<div class="product-card__footer">' +
+          '<div>' +
+            '<span class="product-card__price">₹'+p.price.toLocaleString('en-IN')+'</span>' +
+            (p.origPrice ? '<span class="product-card__price-orig">₹'+p.origPrice.toLocaleString('en-IN')+'</span>' : '') +
+          '</div>' +
+          '<button class="product-card__add" onclick="event.stopPropagation();addToCart(\''+p.id+'\')" aria-label="Add to cart">Add to cart</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function filterProducts(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  renderProducts();
+}
+
+function sortProducts(val) {
+  currentSort = val;
+  renderProducts();
+}
+
+// ── CART ───────────────────────────────────────────────────────
+function addToCart(productId) {
+  var product = PRODUCTS.find(function(p){return p.id===productId;});
+  if (!product) return;
+  var existing = cart.find(function(i){return i.id===productId;});
+  if (existing) { existing.qty++; }
+  else { cart.push({id:product.id, name:product.name, price:product.price, image:product.image, details:product.details, qty:1}); }
+  updateCartUI();
+  toast('Added to cart ✓', true);
+}
+
+function quickAdd(productId) {
+  // clicking card adds to cart
+}
+
+function removeFromCart(productId) {
+  cart = cart.filter(function(i){return i.id!==productId;});
+  updateCartUI();
+}
+
+function changeQty(productId, delta) {
+  var item = cart.find(function(i){return i.id===productId;});
+  if (!item) return;
+  item.qty = Math.max(1, item.qty + delta);
+  updateCartUI();
+}
+
+function updateCartUI() {
+  var total = cart.reduce(function(s,i){return s+i.price*i.qty;}, 0);
+  var count = cart.reduce(function(s,i){return s+i.qty;}, 0);
+
+  // Count badge
+  var cc = document.getElementById('cart-count');
+  cc.textContent = count;
+  cc.classList.toggle('show', count > 0);
+
+  // Item count label
+  var ic = document.getElementById('cart-item-count');
+  ic.textContent = count > 0 ? '('+count+' item'+(count!==1?'s':'')+ ')' : '';
+
+  // Cart body
+  var body = document.getElementById('cart-body');
+  var foot = document.getElementById('cart-foot');
+
+  if (cart.length === 0) {
+    body.innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">🛒</div><div>Your cart is empty.<br><span style="font-size:12px;color:var(--g400)">Add some books to get started.</span></div></div>';
+    foot.style.display = 'none';
+  } else {
+    body.innerHTML = cart.map(function(item) {
+      return '<div class="cart-item">' +
+        '<div class="cart-item__img">' +
+          (item.image ? '<img src="'+item.image+'" alt="'+item.name+'">' : '<div style="width:100%;height:100%;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:20px">📖</div>') +
+        '</div>' +
+        '<div class="cart-item__info">' +
+          '<div class="cart-item__name">'+item.name+'</div>' +
+          '<div class="cart-item__size">'+item.details+'</div>' +
+          '<div class="cart-item__price">₹'+item.price.toLocaleString('en-IN')+'</div>' +
+          '<div class="cart-item__qty">' +
+            '<button class="qty-btn" onclick="changeQty(\''+item.id+'\',-1)">−</button>' +
+            '<span class="qty-val">'+item.qty+'</span>' +
+            '<button class="qty-btn" onclick="changeQty(\''+item.id+'\',1)">+</button>' +
+          '</div>' +
+        '</div>' +
+        '<button class="cart-item__remove" onclick="removeFromCart(\''+item.id+'\')" aria-label="Remove">✕</button>' +
+      '</div>';
+    }).join('');
+    foot.style.display = 'block';
+    document.getElementById('cart-subtotal').textContent = '₹'+total.toLocaleString('en-IN');
+    document.getElementById('cart-total').textContent     = '₹'+total.toLocaleString('en-IN');
+    document.getElementById('cart-shipping').textContent  = total >= 5000 ? 'Free' : '₹199';
+  }
+}
+
+function toggleCart() {
+  document.getElementById('cart-overlay').classList.toggle('open');
+  document.getElementById('cart-panel').classList.toggle('open');
+}
+
+// ── CHECKOUT ───────────────────────────────────────────────────
+function openCheckout() {
+  toggleCart();
+  var total = cart.reduce(function(s,i){return s+i.price*i.qty;},0);
+  document.getElementById('checkout-items').innerHTML = cart.map(function(item){
+    return '<div class="order-summary-item"><span>'+item.name+' ×'+item.qty+'</span><span>₹'+(item.price*item.qty).toLocaleString('en-IN')+'</span></div>';
+  }).join('');
+  document.getElementById('checkout-total').textContent = '₹'+total.toLocaleString('en-IN');
+  document.getElementById('checkout-overlay').classList.add('open');
+}
+
+function closeCheckout() {
+  document.getElementById('checkout-overlay').classList.remove('open');
+}
+
+function placeOrder() {
+  var fname = document.getElementById('f-fname').value.trim();
+  var email = document.getElementById('f-email').value.trim();
+  var addr1 = document.getElementById('f-addr1').value.trim();
+  var city  = document.getElementById('f-city').value.trim();
+  var pin   = document.getElementById('f-pin').value.trim();
+  var state = document.getElementById('f-state').value;
+
+  if (!fname||!email||!addr1||!city||!pin||!state) {
+    toast('Please fill in all required fields', false); return;
+  }
+  if (!email.includes('@')) {
+    toast('Please enter a valid email', false); return;
+  }
+
+  var orderId = 'BND-' + Date.now().toString(36).toUpperCase();
+  closeCheckout();
+  document.getElementById('success-email').textContent   = email;
+  document.getElementById('success-order-id').textContent = orderId;
+  document.getElementById('success-overlay').classList.add('open');
+  cart = [];
+  updateCartUI();
+}
+
+function closeSuccess() {
+  document.getElementById('success-overlay').classList.remove('open');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+var _tt;
+function toast(msg, ok) {
+  var el = document.getElementById('shop-toast');
+  el.textContent = msg;
+  el.className = 'on' + (ok ? ' ok' : '');
+  clearTimeout(_tt);
+  _tt = setTimeout(function(){ el.className=''; }, 2500);
+}
+
+// Close on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.getElementById('cart-overlay').classList.remove('open');
+    document.getElementById('cart-panel').classList.remove('open');
+    closeCheckout();
+    closeSuccess();
+  }
+});
+
+// Init
+renderProducts();
+updateCartUI();
+</script>
+</body>
+</html>

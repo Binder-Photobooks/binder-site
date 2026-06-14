@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Orders — Binder</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --white:#ffffff;--black:#0a0a0a;
+  --gray-50:#f9f9f9;--gray-100:#f0f0f0;--gray-200:#e0e0e0;--gray-300:#c8c8c8;--gray-400:#a0a0a0;--gray-500:#707070;--gray-600:#4a4a4a;
+  --accent:#00B878;--accent-hover:#009962;--accent-light:#e8f7f0;--accent-mid:#d0f0e2;
+  --warn-bg:#fffbeb;--warn-border:#fde68a;--warn-text:#92400e;
+  --danger-bg:#fef2f2;--danger-border:#fecaca;--danger-text:#991b1b;
+  --ok-bg:#f0fdf4;--ok-border:#bbf7d0;--ok-text:#15803d;
+  --font:'Lato',system-ui,sans-serif;
+  --radius-md:10px;--radius-lg:14px;--radius-xl:20px;
+  --shadow-card:0 1px 4px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.04);
+}
+html{height:100%;scroll-behavior:smooth}
+body{font-family:var(--font-ui);background:var(--gray-50);color:var(--black);min-height:100%;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* ── HEADER ── */
+#site-header{background:var(--white);border-bottom:1px solid var(--gray-200);position:sticky;top:0;z-index:100}
+.header-inner{max-width:1080px;margin:0 auto;padding:0 20px;height:56px;display:flex;align-items:center;gap:12px}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.logo-mark{width:28px;height:28px;background:var(--black);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;letter-spacing:-0.5px;flex-shrink:0}
+.logo-text{font-size:14px;font-weight:400;color:var(--black)}
+.logo-text span{color:var(--gray-400);font-weight:300}
+.header-spacer{flex:1}
+.header-nav-link{font-size:13px;color:var(--gray-500);text-decoration:none;padding:6px 10px;border-radius:7px;transition:all 0.15s}
+.header-nav-link:hover{color:var(--black);background:var(--gray-100)}
+.header-btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:400;cursor:pointer;border:none;font-family:var(--font-ui);transition:all 0.15s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-outline{background:transparent;border:1px solid var(--gray-200);color:var(--gray-600)}
+.btn-outline:hover{border-color:var(--gray-400);color:var(--black)}
+.btn-accent{background:var(--accent);color:white}
+.btn-accent:hover{background:var(--accent-hover)}
+
+/* ── PAGE ── */
+.page-wrap{max-width:860px;margin:0 auto;padding:40px 20px 80px}
+@media(max-width:600px){.page-wrap{padding:24px 16px 60px}}
+
+/* ── SECTION HEADER ── */
+.section-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:28px;flex-wrap:wrap}
+.section-title{font-size:24px;font-weight:700;letter-spacing:-0.3px}
+.section-sub{font-size:14px;color:var(--gray-500);margin-top:4px}
+
+/* ── AUTH GATE ── */
+#login-view{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px 16px;background:linear-gradient(160deg,var(--gray-50) 0%,#f0f7f3 100%)}
+.login-card{background:var(--white);border-radius:var(--radius-xl);padding:32px 28px;width:100%;max-width:420px;box-shadow:0 4px 24px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.04);border:1px solid var(--gray-200)}
+.form-group{margin-bottom:14px;text-align:left}
+.form-label{font-size:12px;font-weight:400;color:var(--gray-600);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between}
+.form-input{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:15px;font-family:var(--font-ui);outline:none;transition:border-color 0.15s;background:var(--white);-webkit-appearance:none}
+.form-input:focus{border-color:var(--accent)}
+.form-input.error{border-color:#ef4444}
+.btn-full{width:100%;padding:13px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:var(--font-ui);background:var(--accent);color:white;transition:all 0.15s;min-height:48px;letter-spacing:.1px}
+.btn-full:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 14px rgba(39,174,114,.25)}
+/* Auth tabs */
+.auth-tabs{display:flex;background:var(--gray-100);border-radius:10px;padding:3px;margin-bottom:24px;gap:2px}
+.auth-tab{flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:400;cursor:pointer;border:none;background:transparent;color:var(--gray-500);font-family:var(--font-ui);transition:all 0.15s}
+.auth-tab.active{background:var(--white);color:var(--accent);font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+/* Auth messages */
+.auth-msg{padding:11px 14px;border-radius:9px;font-size:13px;margin-bottom:16px;line-height:1.5;display:flex;align-items:flex-start;gap:8px}
+.auth-msg--error{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+.auth-msg--success{background:var(--ok-bg);border:1px solid var(--ok-border);color:var(--ok-text)}
+/* Input wrapper for password toggle */
+.input-wrap{position:relative}
+.input-wrap .form-input{padding-right:42px}
+.toggle-pw{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray-400);padding:4px;display:flex;align-items:center;transition:color 0.12s}
+.toggle-pw:hover{color:var(--gray-600)}
+/* Password strength */
+.pw-strength{margin-top:6px}
+.pw-strength-bar{height:4px;background:var(--gray-200);border-radius:2px;overflow:hidden;margin-bottom:5px}
+#pw-strength-fill{height:100%;border-radius:2px;transition:width 0.3s,background 0.3s;width:0%}
+#pw-strength-label{font-size:11px;font-weight:400}
+/* Forgot / back */
+.forgot-link{background:none;border:none;cursor:pointer;font-size:12px;color:var(--accent);font-family:var(--font-ui);font-weight:400;padding:0}
+.forgot-link:hover{text-decoration:underline}
+.back-btn{display:flex;align-items:center;gap:4px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--gray-500);font-family:var(--font-ui);margin-bottom:20px;padding:0;transition:color 0.12s}
+.back-btn:hover{color:var(--black)}
+.text-link{background:none;border:none;cursor:pointer;color:var(--accent);font-size:13px;font-family:var(--font-ui);font-weight:400;padding:0}
+.text-link:hover{text-decoration:underline}
+/* Name row */
+.name-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:400px){.name-row{grid-template-columns:1fr}}
+
+/* ── MAIN PORTAL ── */
+#portal-view{display:none}
+
+/* ── USER INFO BAR ── */
+.user-bar{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:28px;flex-wrap:wrap}
+/* ── DASHBOARD HEADER ── */
+.dash-header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px;flex-wrap:wrap;background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:16px 20px}
+.dash-header__left{display:flex;align-items:center;gap:14px}
+.dash-header__actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:auto}
+.dash-welcome{font-size:15px;font-weight:700}
+/* ── DASHBOARD STATS ── */
+.dash-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.dash-stat-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:14px 16px;box-shadow:var(--shadow-card)}
+.dash-stat-icon{font-size:18px;margin-bottom:6px}
+.dash-stat-value{font-size:22px;font-weight:700;line-height:1;color:var(--accent)}
+.dash-stat-label{font-size:11px;color:var(--gray-400);margin-top:3px;font-weight:400}
+/* ── ACCOUNT PANEL ── */
+.account-panel{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);margin-bottom:20px;overflow:hidden}
+.account-panel__head{padding:14px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:var(--gray-50);transition:background 0.12s}
+.account-panel__head:hover{background:var(--gray-100)}
+.account-panel__body{padding:18px;border-top:1px solid var(--gray-100)}
+.user-avatar{width:40px;height:40px;background:var(--accent-mid);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:var(--accent-hover);flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:14px;font-weight:400}
+.user-email{font-size:12px;color:var(--gray-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.notif-pref{display:flex;align-items:center;gap:8px;margin-left:auto}
+.notif-label{font-size:12px;color:var(--gray-500)}
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--gray-300);border-radius:10px;cursor:pointer;transition:background 0.2s}
+.toggle input:checked + .toggle-track{background:var(--accent)}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:16px;height:16px;background:white;border-radius:50%;transition:transform 0.2s;pointer-events:none}
+.toggle input:checked ~ .toggle-thumb{transform:translateX(16px)}
+
+/* ── NOTIFICATIONS BANNER ── */
+.notif-banner{border-radius:var(--radius-md);padding:14px 16px;margin-bottom:20px;font-size:13px;display:flex;align-items:flex-start;gap:10px;line-height:1.6}
+.notif-banner.warn{background:var(--warn-bg);border:1px solid var(--warn-border);color:var(--warn-text)}
+.notif-banner.info{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+.notif-banner.ok{background:var(--ok-bg);border:1px solid var(--ok-border);color:var(--ok-text)}
+.notif-icon{font-size:16px;flex-shrink:0;margin-top:0}
+.notif-banner strong{font-weight:700}
+
+/* ── ORDER CARD ── */
+.orders-list{display:flex;flex-direction:column;gap:16px}
+.order-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-card);transition:box-shadow 0.15s}
+.order-card:hover{box-shadow:0 2px 8px rgba(0,0,0,0.08),0 8px 24px rgba(0,0,0,0.06)}
+.order-card.expiring-soon{border-color:var(--warn-border)}
+.order-card.expiring-urgent{border-color:var(--danger-border)}
+.order-head{padding:18px 20px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;cursor:pointer;user-select:none}
+.order-head-left{flex:1;min-width:0}
+.order-id{font-size:11px;font-weight:400;color:var(--gray-400);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px}
+.order-title{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.order-meta{font-size:12px;color:var(--gray-500);margin-top:3px;display:flex;flex-wrap:wrap;gap:10px}
+.order-meta-item{display:flex;align-items:center;gap:4px}
+.order-head-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.status-pill{padding:3px 10px;border-radius:100px;font-size:11px;font-weight:400;white-space:nowrap}
+.status-pill.new{background:#dbeafe;color:#1e40af}
+.status-pill.ready{background:var(--accent-light);color:var(--accent-hover)}
+.status-pill.printing{background:#fef3c7;color:#92400e}
+.status-pill.shipped{background:#f3e8ff;color:#6b21a8}
+.status-pill.delivered{background:var(--ok-bg);color:var(--ok-text)}
+.expiry-chip{padding:2px 8px;border-radius:100px;font-size:10px;font-weight:400}
+.expiry-chip.safe{background:var(--gray-100);color:var(--gray-500)}
+.expiry-chip.soon{background:var(--warn-bg);color:var(--warn-text)}
+.expiry-chip.urgent{background:var(--danger-bg);color:var(--danger-text)}
+.chevron{color:var(--gray-400);font-size:14px;transition:transform 0.2s;margin-top:2px}
+.chevron.open{transform:rotate(180deg)}
+
+/* ── ORDER BODY (expanded) ── */
+.order-body{display:none;border-top:1px solid var(--gray-100);padding:20px}
+.order-body.open{display:block}
+.order-sections{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:560px){.order-sections{grid-template-columns:1fr}}
+.detail-block{background:var(--gray-50);border-radius:var(--radius-md);padding:14px 16px}
+.detail-block-title{font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px}
+.detail-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:6px;gap:8px}
+.detail-row:last-child{margin-bottom:0}
+.detail-label{color:var(--gray-500);flex-shrink:0}
+.detail-value{font-weight:400;text-align:right}
+
+/* ── PREVIEW SECTION ── */
+.preview-section{margin-top:16px}
+.preview-title{font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px}
+.preview-frames{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.preview-frames::-webkit-scrollbar{height:3px}
+.preview-frames::-webkit-scrollbar-thumb{background:var(--gray-200);border-radius:4px}
+.preview-frame{flex-shrink:0;background:var(--white);border:1px solid var(--gray-200);border-radius:8px;width:90px;height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:default;user-select:none;position:relative;overflow:hidden}
+.preview-frame:first-child{background:linear-gradient(135deg,#1a1a1a,#3a3a3a);border-color:#1a1a1a}
+.preview-frame-label{font-size:9px;color:var(--gray-400);position:absolute;bottom:4px;left:0;right:0;text-align:center}
+.preview-frame-icon{font-size:22px}
+.preview-no-download{background:var(--gray-50);border:1px dashed var(--gray-300);border-radius:8px;padding:12px;font-size:12px;color:var(--gray-500);text-align:center;margin-top:10px;line-height:1.5}
+.preview-no-download strong{color:var(--gray-600)}
+
+/* ── TIMELINE ── */
+.timeline{margin-top:16px}
+.timeline-title{font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:12px}
+.timeline-track{position:relative;padding-left:20px}
+.timeline-track::before{content:'';position:absolute;left:5px;top:6px;bottom:6px;width:1px;background:var(--gray-200)}
+.timeline-item{position:relative;margin-bottom:12px;display:flex;align-items:flex-start;gap:10px}
+.timeline-item:last-child{margin-bottom:0}
+.timeline-dot{width:11px;height:11px;border-radius:50%;border:2px solid var(--white);box-shadow:0 0 0 1px var(--gray-300);flex-shrink:0;margin-top:2px;position:relative;left:-16px;margin-right:-6px}
+.timeline-dot.done{background:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.timeline-dot.current{background:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
+.timeline-dot.pending{background:var(--white)}
+.timeline-text{font-size:12px;line-height:1.5}
+.timeline-text strong{font-size:13px;font-weight:400;display:block}
+.timeline-text span{color:var(--gray-400)}
+
+/* ── EXPIRY NOTICE IN CARD ── */
+.expiry-notice{margin-top:16px;padding:12px 14px;border-radius:var(--radius-md);font-size:12px;line-height:1.6;display:flex;gap:10px;align-items:flex-start}
+.expiry-notice.safe{background:var(--gray-50);border:1px solid var(--gray-200);color:var(--gray-500)}
+.expiry-notice.soon{background:var(--warn-bg);border:1px solid var(--warn-border);color:var(--warn-text)}
+.expiry-notice.urgent{background:var(--danger-bg);border:1px solid var(--danger-border);color:var(--danger-text)}
+
+/* ── EMAIL SIMULATION PANEL ── */
+#email-panel{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;align-items:center;justify-content:center;padding:20px}
+#email-panel.open{display:flex}
+.email-window{background:var(--white);border-radius:var(--radius-xl);width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+.email-chrome{background:var(--gray-100);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:12px 16px;display:flex;align-items:center;gap:8px}
+.email-dot{width:10px;height:10px;border-radius:50%}
+.email-chrome-title{font-size:12px;color:var(--gray-500);flex:1;text-align:center}
+.email-body{padding:28px 28px 32px}
+@media(max-width:500px){.email-body{padding:20px 18px 24px}}
+.email-from{font-size:12px;color:var(--gray-400);margin-bottom:4px}
+.email-from strong{color:var(--gray-600)}
+.email-to{font-size:12px;color:var(--gray-400);margin-bottom:20px}
+.email-to strong{color:var(--gray-600)}
+.email-divider{border:none;border-top:1px solid var(--gray-200);margin:16px 0}
+.email-logo-row{display:flex;align-items:center;gap:8px;margin-bottom:20px}
+.email-logo-mark{width:32px;height:32px;background:var(--black);border-radius:7px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:16px}
+.email-logo-name{font-size:15px;font-weight:700}
+.email-content h3{font-size:17px;font-weight:700;margin-bottom:12px;line-height:1.4}
+.email-content p{font-size:14px;color:var(--gray-600);line-height:1.7;margin-bottom:12px}
+.email-content p:last-of-type{margin-bottom:0}
+.email-highlight-box{background:var(--gray-50);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 14px;margin:16px 0;font-size:13px;color:var(--gray-600)}
+.email-highlight-box strong{color:var(--black);font-size:14px;display:block;margin-bottom:3px}
+.email-cta{display:block;margin:20px 0 0;padding:13px 20px;background:var(--accent);color:white;text-align:center;border-radius:10px;font-size:14px;font-weight:400;text-decoration:none;cursor:pointer;border:none;font-family:var(--font-ui);width:100%;transition:background 0.15s}
+.email-cta:hover{background:var(--accent-hover)}
+.email-footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--gray-200);font-size:11px;color:var(--gray-400);line-height:1.6;text-align:center}
+.email-close-btn{margin-top:12px;padding:8px 20px;background:var(--gray-100);border:none;border-radius:8px;font-size:13px;cursor:pointer;font-family:var(--font-ui);color:var(--gray-600);transition:background 0.15s;width:100%}
+.email-close-btn:hover{background:var(--gray-200)}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:60px 20px;color:var(--gray-400)}
+.empty-state-icon{font-size:48px;margin-bottom:16px;opacity:0.6}
+.empty-state h3{font-size:18px;font-weight:400;color:var(--gray-600);margin-bottom:8px}
+.empty-state p{font-size:14px;max-width:320px;margin:0 auto;line-height:1.6}
+
+/* ── TABS ── */
+.tab-bar{display:flex;gap:2px;background:var(--gray-100);padding:3px;border-radius:10px;margin-bottom:24px;width:fit-content}
+.tab{padding:6px 16px;border-radius:8px;font-size:13px;font-weight:400;cursor:pointer;color:var(--gray-500);border:none;background:transparent;font-family:var(--font-ui);transition:all 0.15s}
+.tab.active{background:var(--white);color:var(--black);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+
+/* ── DELETION COUNTDOWN BAR ── */
+.countdown-bar-wrap{margin-top:14px}
+.countdown-bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--gray-400);margin-bottom:4px}
+.countdown-bar-track{height:4px;background:var(--gray-200);border-radius:2px;overflow:hidden}
+.countdown-bar-fill{height:100%;border-radius:2px;transition:width 0.3s}
+.countdown-bar-fill.safe{background:var(--accent)}
+.countdown-bar-fill.soon{background:#f59e0b}
+.countdown-bar-fill.urgent{background:#ef4444}
+
+/* ── NOTIFICATION EMAIL BUTTON ── */
+.send-email-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:400;cursor:pointer;border:1px solid var(--gray-200);background:transparent;color:var(--gray-600);font-family:var(--font-ui);transition:all 0.15s;display:flex;align-items:center;gap:5px}
+.send-email-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:480px){
+  .section-title{font-size:20px}
+  .order-sections{grid-template-columns:1fr}
+  .email-window{border-radius:var(--radius-lg) var(--radius-lg) 0 0;position:fixed;bottom:0;left:0;right:0;max-height:92vh}
+  #email-panel{align-items:flex-end;padding:0}
+}
+</style>
+</head>
+<body>
+
+<!-- SITE HEADER -->
+<header id="site-header">
+  <div class="header-inner">
+    <a href="photobook-editor.html" class="logo">
+      <div class="logo-mark">B</div>
+      <div class="logo-text">Binder <span>Studio</span></div>
+    </a>
+    <div class="header-spacer"></div>
+    <a href="photobook-editor.html" class="header-nav-link">← Back to editor</a>
+    <a href="blog.html" class="header-nav-link" style="display:none" id="header-blog-link">Blog</a>
+    <a href="photobook-editor.html" class="header-btn btn-accent" id="header-design-btn" style="display:none">+ New book</a>
+    <button class="header-btn btn-outline" id="header-login-btn" onclick="showLogin()">Sign in</button>
+    <button class="header-btn btn-outline" id="header-logout-btn" onclick="logout()" style="display:none">Sign out</button>
+  </div>
+</header>
+
+<!-- AUTH GATE -->
+<div id="login-view">
+  <div class="login-card">
+
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="width:52px;height:52px;background:var(--black);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;color:white;font-weight:700;font-size:24px">B</div>
+      <div style="font-size:18px;font-weight:700">Binder</div>
+      <div style="font-size:13px;color:var(--gray-400);margin-top:3px">Your photobook account</div>
+    </div>
+
+    <!-- Tab switcher -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Sign in</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Create account</button>
+    </div>
+
+    <!-- Error / success banner -->
+    <div id="auth-error" class="auth-msg auth-msg--error" style="display:none"></div>
+    <div id="auth-success" class="auth-msg auth-msg--success" style="display:none"></div>
+
+    <!-- ── LOGIN FORM ── -->
+    <div id="form-login">
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input class="form-input" type="email" id="login-email" placeholder="your@email.com"
+          onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">
+          Password
+          <button type="button" class="forgot-link" onclick="showForgotPassword()">Forgot password?</button>
+        </label>
+        <div class="input-wrap">
+          <input class="form-input" type="password" id="login-password" placeholder="••••••••"
+            onkeydown="if(event.key==='Enter')doLogin()">
+          <button type="button" class="toggle-pw" onclick="togglePwVisibility('login-password',this)" aria-label="Show password">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:8px;margin-bottom:20px">
+        <input type="checkbox" id="remember-me" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer">
+        <label for="remember-me" style="font-size:13px;color:var(--gray-500);cursor:pointer">Keep me signed in</label>
+      </div>
+      <button class="btn-full" onclick="doLogin()">Sign in to my account</button>
+      <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray-400)">
+        Don't have an account? <button type="button" class="text-link" onclick="switchAuthTab('signup')">Create one →</button>
+      </p>
+      </div>
+
+    <!-- ── SIGNUP FORM ── -->
+    <div id="form-signup" style="display:none">
+      <div class="name-row">
+        <div class="form-group">
+          <label class="form-label">First name</label>
+          <input class="form-input" type="text" id="signup-firstname" placeholder="Priya"
+            onkeydown="if(event.key==='Enter')document.getElementById('signup-lastname').focus()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last name</label>
+          <input class="form-input" type="text" id="signup-lastname" placeholder="Sharma"
+            onkeydown="if(event.key==='Enter')document.getElementById('signup-email').focus()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input class="form-input" type="email" id="signup-email" placeholder="your@email.com"
+          onkeydown="if(event.key==='Enter')document.getElementById('signup-phone').focus()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone number <span style="color:var(--gray-400);font-weight:400">(optional)</span></label>
+        <input class="form-input" type="tel" id="signup-phone" placeholder="+91 98765 43210"
+          onkeydown="if(event.key==='Enter')document.getElementById('signup-password').focus()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <input class="form-input" type="password" id="signup-password" placeholder="At least 8 characters"
+            onkeydown="if(event.key==='Enter')document.getElementById('signup-password2').focus()"
+            oninput="checkPasswordStrength(this.value)">
+          <button type="button" class="toggle-pw" onclick="togglePwVisibility('signup-password',this)" aria-label="Show password">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg>
+          </button>
+        </div>
+        <div class="pw-strength" id="pw-strength" style="display:none">
+          <div class="pw-strength-bar"><div id="pw-strength-fill"></div></div>
+          <div id="pw-strength-label"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm password</label>
+        <div class="input-wrap">
+          <input class="form-input" type="password" id="signup-password2" placeholder="Repeat password"
+            onkeydown="if(event.key==='Enter')doSignup()">
+          <button type="button" class="toggle-pw" onclick="togglePwVisibility('signup-password2',this)" aria-label="Show password">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="form-group" style="display:flex;align-items:flex-start;gap:10px;margin-bottom:20px">
+        <input type="checkbox" id="signup-terms" style="width:16px;height:16px;margin-top:2px;accent-color:var(--accent);flex-shrink:0;cursor:pointer">
+        <label for="signup-terms" style="font-size:13px;color:var(--gray-500);cursor:pointer;line-height:1.5">
+          I agree to Binder's <a href="#" style="color:var(--accent)">Terms of Service</a> and <a href="#" style="color:var(--accent)">Privacy Policy</a>
+        </label>
+      </div>
+      <button class="btn-full" onclick="doSignup()">Create my account</button>
+      <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray-400)">
+        Already have an account? <button type="button" class="text-link" onclick="switchAuthTab('login')">Sign in →</button>
+      </p>
+    </div>
+
+    <!-- ── FORGOT PASSWORD ── -->
+    <div id="form-forgot" style="display:none">
+      <button type="button" class="back-btn" onclick="switchAuthTab('login')">← Back to sign in</button>
+      <div style="margin-bottom:20px">
+        <div style="font-size:16px;font-weight:700;margin-bottom:6px">Reset your password</div>
+        <div style="font-size:13px;color:var(--gray-500);line-height:1.6">Enter the email address on your account and we'll send you a reset link.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input class="form-input" type="email" id="forgot-email" placeholder="your@email.com"
+          onkeydown="if(event.key==='Enter')doForgotPassword()">
+      </div>
+      <button class="btn-full" onclick="doForgotPassword()">Send reset link</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- PORTAL -->
+<div id="portal-view">
+  <div class="page-wrap">
+
+    <!-- ── DASHBOARD HEADER ── -->
+    <div class="dash-header">
+      <div class="dash-header__left">
+        <div class="user-avatar" id="user-avatar">P</div>
+        <div>
+          <div class="dash-welcome" id="dash-welcome">Welcome back, Priya</div>
+          <div class="user-email" id="user-email"></div>
+        </div>
+      </div>
+      <div class="dash-header__actions">
+        <div class="notif-pref">
+          <span class="notif-label">Email alerts</span>
+          <label class="toggle">
+            <input type="checkbox" id="notif-toggle" checked onchange="toggleNotifications()">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <a href="photobook-editor.html" class="header-btn btn-accent" style="font-size:13px">+ New photobook</a>
+      </div>
+    </div>
+
+    <!-- ── STATS SUMMARY ── -->
+    <div class="dash-stats" id="dash-stats"></div>
+
+    <!-- ── GLOBAL ALERT BANNER ── -->
+    <div id="global-banner" style="display:none"></div>
+
+    <!-- ── ACCOUNT SETTINGS (collapsible) ── -->
+    <div class="account-panel" id="account-panel" style="display:none">
+      <div class="account-panel__head" onclick="toggleAccountPanel()">
+        <span style="font-size:14px;font-weight:700">Account settings</span>
+        <span id="account-chevron" style="color:var(--gray-400)">▾</span>
+      </div>
+      <div class="account-panel__body" id="account-panel-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="form-group">
+            <label class="form-label">Full name</label>
+            <input class="form-input" type="text" id="acct-name" placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input class="form-input" type="tel" id="acct-phone" placeholder="+91 98765 43210">
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">Shipping address</label>
+            <input class="form-input" type="text" id="acct-address" placeholder="Street, City, State, PIN">
+          </div>
+        </div>
+        <div style="margin-top:4px;padding-top:14px;border-top:1px solid var(--gray-100)">
+          <div style="font-size:12px;font-weight:400;color:var(--gray-600);margin-bottom:8px">Change password</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="input-wrap">
+              <input class="form-input" type="password" id="acct-pw-new" placeholder="New password">
+              <button type="button" class="toggle-pw" onclick="togglePwVisibility('acct-pw-new',this)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg></button>
+            </div>
+            <div class="input-wrap">
+              <input class="form-input" type="password" id="acct-pw-confirm" placeholder="Confirm password">
+              <button type="button" class="toggle-pw" onclick="togglePwVisibility('acct-pw-confirm',this)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button class="header-btn btn-accent" style="font-size:13px" onclick="saveAccountSettings()">Save changes</button>
+          <button class="header-btn btn-outline" style="font-size:13px" onclick="toggleAccountPanel()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION HEADER ── -->
+    <div class="section-header" style="margin-top:8px">
+      <div>
+        <h1 class="section-title">My photobooks</h1>
+        <p class="section-sub" id="orders-subtitle">Loading your orders…</p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="header-btn btn-outline" style="font-size:12px" onclick="toggleAccountPanel()">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 14c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Account
+        </button>
+        <button class="send-email-btn" onclick="previewEmailAll()">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4l6 5 6-5M2 4h12v8H2V4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          Preview email reminder
+        </button>
+      </div>
+    </div>
+
+    <!-- ── TABS ── -->
+    <div class="tab-bar">
+      <button class="tab active" onclick="filterOrders('all',this)">All</button>
+      <button class="tab" onclick="filterOrders('active',this)">Active</button>
+      <button class="tab" onclick="filterOrders('expiring',this)">Expiring soon</button>
+      <button class="tab" onclick="filterOrders('delivered',this)">Delivered</button>
+    </div>
+
+    <!-- ── ORDERS LIST ── -->
+    <div class="orders-list" id="orders-list">
+      <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <h3>Loading…</h3>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- EMAIL PREVIEW PANEL -->
+<div id="email-panel">
+  <div class="email-window" id="email-window">
+    <div class="email-chrome">
+      <div class="email-dot" style="background:#ff5f57"></div>
+      <div class="email-dot" style="background:#ffbd2e"></div>
+      <div class="email-dot" style="background:#28c840"></div>
+      <div class="email-chrome-title" id="email-subject-line">Email preview</div>
+    </div>
+    <div class="email-body" id="email-body-content"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA — same structure as photobook-editor.html
+// ═══════════════════════════════════════════════════════════
+const RETENTION_DAYS = 90;
+const WARN_DAYS_1    = 30; // first warning email
+const WARN_DAYS_2    = 14; // second warning
+const WARN_DAYS_3    = 7;  // urgent warning
+const WARN_DAYS_4    = 3;  // final notice
+
+// Sample orders — in production these come from your backend API
+// Dates are artificially set to test all warning states
+const ALL_ORDERS = [
+  {
+    id: 'PB-A1B2C3',
+    title: 'Our Goa Holiday',
+    name: 'Priya Sharma',
+    email: '',
+    address: '14 MG Road, Bengaluru, Karnataka',
+    country: 'India',
+    size: '8×8"',
+    pages: 21,
+    qty: 1,
+    total: '2,999',
+    status: 'delivered',
+    createdAt: daysAgo(62),   // 62 days old — 28 days left → FIRST WARNING territory
+    statusHistory: [
+      {label:'Order received',     date: daysAgo(62), done:true},
+      {label:'Payment confirmed',  date: daysAgo(61), done:true},
+      {label:'Sent to print',      date: daysAgo(58), done:true},
+      {label:'Quality checked',    date: daysAgo(55), done:true},
+      {label:'Dispatched',         date: daysAgo(53), done:true},
+      {label:'Delivered',          date: daysAgo(50), done:true},
+    ]
+  },
+  {
+    id: 'PB-D4E5F6',
+    title: 'Wedding Album 2025',
+    name: 'Rohit Verma',
+    
+    address: '88 Linking Road, Bandra, Mumbai',
+    country: 'India',
+    size: '12×12"',
+    pages: 21,
+    qty: 10,
+    total: '26,991',
+    status: 'shipped',
+    createdAt: daysAgo(83),   // 83 days old — 7 days left → URGENT
+    statusHistory: [
+      {label:'Order received',     date: daysAgo(83), done:true},
+      {label:'Payment confirmed',  date: daysAgo(82), done:true},
+      {label:'Sent to print',      date: daysAgo(79), done:true},
+      {label:'Quality checked',    date: daysAgo(76), done:true},
+      {label:'Dispatched',         date: daysAgo(74), done:true},
+      {label:'Delivered',          date: null,        done:false},
+    ]
+  },
+  {
+    id: 'PB-G7H8I9',
+    title: 'Baby\'s First Year',
+    name: 'Ananya Iyer',
+    
+    address: '22 Anna Nagar, Chennai, Tamil Nadu',
+    country: 'India',
+    size: '6×6"',
+    pages: 21,
+    qty: 50,
+    total: '59,970',
+    status: 'printing',
+    createdAt: daysAgo(40),   // 40 days old — 50 days left → safe
+    statusHistory: [
+      {label:'Order received',     date: daysAgo(40), done:true},
+      {label:'Payment confirmed',  date: daysAgo(39), done:true},
+      {label:'Sent to print',      date: daysAgo(36), done:true},
+      {label:'Quality checked',    date: null,        done:false},
+      {label:'Dispatched',         date: null,        done:false},
+      {label:'Delivered',          date: null,        done:false},
+    ]
+  },
+  {
+    id: 'PB-J1K2L3',
+    title: 'Family Reunion 2024',
+    name: 'Priya Sharma',
+    email: '',
+    address: '14 MG Road, Bengaluru, Karnataka',
+    country: 'India',
+    size: '12×12"',
+    pages: 21,
+    qty: 5,
+    total: '14,995',
+    status: 'delivered',
+    createdAt: daysAgo(87),   // 87 days old — 3 days left → FINAL NOTICE
+    statusHistory: [
+      {label:'Order received',     date: daysAgo(87), done:true},
+      {label:'Payment confirmed',  date: daysAgo(86), done:true},
+      {label:'Sent to print',      date: daysAgo(83), done:true},
+      {label:'Quality checked',    date: daysAgo(80), done:true},
+      {label:'Dispatched',         date: daysAgo(78), done:true},
+      {label:'Delivered',          date: daysAgo(74), done:true},
+    ]
+  },
+];
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function daysAgo(n) {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d.toISOString();
+}
+
+function daysUntilDeletion(createdAt) {
+  const created = new Date(createdAt);
+  const deleteDate = new Date(created);
+  deleteDate.setDate(deleteDate.getDate() + RETENTION_DAYS);
+  const now = new Date();
+  return Math.ceil((deleteDate - now) / (1000 * 60 * 60 * 24));
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
+}
+
+function expiryLevel(daysLeft) {
+  if (daysLeft <= WARN_DAYS_4) return 'urgent';
+  if (daysLeft <= WARN_DAYS_2) return 'soon';
+  return 'safe';
+}
+
+function expiryLabel(daysLeft) {
+  if (daysLeft <= 0)             return 'Deleted';
+  if (daysLeft === 1)            return 'Deletes tomorrow';
+  if (daysLeft <= WARN_DAYS_4)   return `${daysLeft} days left`;
+  if (daysLeft <= WARN_DAYS_2)   return `${daysLeft} days left`;
+  if (daysLeft <= WARN_DAYS_1)   return `${daysLeft} days left`;
+  return `${daysLeft} days left`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// In production this is your backend API / Shopify Customer API
+// ═══════════════════════════════════════════════════════════
+const DEMO_ACCOUNTS = [
+  ];
+
+function getAccountsDB() {
+  try {
+    const stored = sessionStorage.getItem('bs_accounts');
+    return stored ? JSON.parse(stored) : [...DEMO_ACCOUNTS];
+  } catch(e) { return [...DEMO_ACCOUNTS]; }
+}
+function saveAccountsDB(accounts) {
+  try { sessionStorage.setItem('bs_accounts', JSON.stringify(accounts)); } catch(e) {}
+}
+
+function getSessionUser() {
+  try {
+    const s = sessionStorage.getItem('bs_session');
+    return s ? JSON.parse(s) : null;
+  } catch(e) { return null; }
+}
+function saveSession(user) {
+  try { sessionStorage.setItem('bs_session', JSON.stringify(user)); } catch(e) {}
+}
+function clearSession() {
+  try { sessionStorage.removeItem('bs_session'); } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════════
+// AUTH STATE
+// ═══════════════════════════════════════════════════════════
+let currentUser = null;
+let notificationsEnabled = true;
+let currentFilter = 'all';
+
+// ── LOGIN ──
+function doLogin() {
+  const email    = document.getElementById('login-email').value.trim().toLowerCase();
+  const password = document.getElementById('login-password').value;
+  const remember = document.getElementById('remember-me').checked;
+
+  clearAuthMessages();
+
+  if (!email || !email.includes('@')) {
+    showAuthError('Please enter a valid email address.');
+    document.getElementById('login-email').classList.add('error');
+    return;
+  }
+  if (!password) {
+    showAuthError('Please enter your password.');
+    document.getElementById('login-password').classList.add('error');
+    return;
+  }
+
+  const accounts = getAccountsDB();
+  const account = accounts.find(a => a.email.toLowerCase() === email);
+
+  if (!account || account.password !== password) {
+    showAuthError('That email and password combination isn\'t right. Please try again, or create a new account.');
+    document.getElementById('login-password').value = '';
+    return;
+  }
+
+  const userOrders = ALL_ORDERS.filter(o => o.email.toLowerCase() === email);
+  currentUser = {
+    id: account.id,
+    name: account.firstName + ' ' + account.lastName,
+    firstName: account.firstName,
+    email: account.email,
+    phone: account.phone || '',
+    address: account.address || '',
+    joined: account.joined,
+    orders: userOrders,
+  };
+  if (remember) saveSession(currentUser);
+  showPortal();
+}
+
+// ── SIGN UP ──
+function doSignup() {
+  const firstName = document.getElementById('signup-firstname').value.trim();
+  const lastName  = document.getElementById('signup-lastname').value.trim();
+  const email     = document.getElementById('signup-email').value.trim().toLowerCase();
+  const phone     = document.getElementById('signup-phone').value.trim();
+  const password  = document.getElementById('signup-password').value;
+  const password2 = document.getElementById('signup-password2').value;
+  const terms     = document.getElementById('signup-terms').checked;
+
+  clearAuthMessages();
+
+  if (!firstName || !lastName) { showAuthError('Please enter your full name.'); return; }
+  if (!email || !email.includes('@')) { showAuthError('Please enter a valid email address.'); return; }
+  if (password.length < 8) { showAuthError('Password must be at least 8 characters.'); return; }
+  if (password !== password2) { showAuthError('Passwords don\'t match. Please check and try again.'); return; }
+  if (!terms) { showAuthError('Please accept the Terms of Service to continue.'); return; }
+
+  const accounts = getAccountsDB();
+  if (accounts.find(a => a.email.toLowerCase() === email)) {
+    showAuthError('An account with that email address already exists. Try signing in instead.');
+    return;
+  }
+
+  const newAccount = {
+    id: 'u' + Date.now(),
+    firstName, lastName, email, phone,
+    address: '',
+    password,
+    joined: new Date().toISOString().slice(0,10),
+  };
+  accounts.push(newAccount);
+  saveAccountsDB(accounts);
+
+  currentUser = {
+    id: newAccount.id,
+    name: firstName + ' ' + lastName,
+    firstName,
+    email,
+    phone,
+    address: '',
+    joined: newAccount.joined,
+    orders: [],
+  };
+  saveSession(currentUser);
+  showPortal();
+  showToastNotif('Welcome to Binder! Your account has been created.');
+}
+
+// ── FORGOT PASSWORD ──
+function showForgotPassword() {
+  document.getElementById('form-login').style.display = 'none';
+  document.getElementById('form-forgot').style.display = 'block';
+  clearAuthMessages();
+}
+
+function doForgotPassword() {
+  const email = document.getElementById('forgot-email').value.trim().toLowerCase();
+  if (!email || !email.includes('@')) {
+    showAuthError('Please enter your email address.');
+    return;
+  }
+  clearAuthMessages();
+  // In production: call your reset password API here
+  showAuthSuccess('If that email has an account with us, we\'ve sent a reset link. Check your inbox (and spam folder, just in case).');
+  setTimeout(() => switchAuthTab('login'), 3500);
+}
+
+// ── AUTH TAB SWITCHER ──
+function switchAuthTab(tab) {
+  clearAuthMessages();
+  document.querySelectorAll('.auth-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-signup').classList.toggle('active', tab==='signup');
+  document.getElementById('form-login').style.display  = tab==='login'  ? 'block' : 'none';
+  document.getElementById('form-signup').style.display = tab==='signup' ? 'block' : 'none';
+  document.getElementById('form-forgot').style.display = 'none';
+}
+
+// ── AUTH MESSAGE HELPERS ──
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.innerHTML = '⚠️ ' + msg;
+  el.style.display = 'flex';
+  document.getElementById('auth-success').style.display = 'none';
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function showAuthSuccess(msg) {
+  const el = document.getElementById('auth-success');
+  el.innerHTML = '✓ ' + msg;
+  el.style.display = 'flex';
+  document.getElementById('auth-error').style.display = 'none';
+}
+function clearAuthMessages() {
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('auth-success').style.display = 'none';
+  document.querySelectorAll('.form-input.error').forEach(el => el.classList.remove('error'));
+}
+
+// ── PASSWORD VISIBILITY ──
+function togglePwVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const isText = input.type === 'text';
+  input.type = isText ? 'password' : 'text';
+  btn.style.opacity = isText ? '0.5' : '1';
+}
+
+// ── PASSWORD STRENGTH ──
+function checkPasswordStrength(pw) {
+  const wrap = document.getElementById('pw-strength');
+  const fill = document.getElementById('pw-strength-fill');
+  const label= document.getElementById('pw-strength-label');
+  if (!pw) { wrap.style.display='none'; return; }
+  wrap.style.display = 'block';
+  let score = 0;
+  if (pw.length >= 8)  score++;
+  if (pw.length >= 12) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const levels = [
+    {w:'20%', bg:'#ef4444', text:'Too short'},
+    {w:'40%', bg:'#f59e0b', text:'Weak'},
+    {w:'60%', bg:'#f59e0b', text:'Fair'},
+    {w:'80%', bg:'var(--accent)', text:'Good'},
+    {w:'100%', bg:'#15803d', text:'Strong ✓'},
+  ];
+  const lvl = levels[Math.min(score, 4)];
+  fill.style.width = lvl.w;
+  fill.style.background = lvl.bg;
+  label.style.color = lvl.bg;
+  label.textContent = lvl.text;
+}
+
+// ── DEMO FILL ──
+
+// ── LOGOUT ──
+function logout() {
+  clearSession();
+  currentUser = null;
+  document.getElementById('login-view').style.display = 'flex';
+  document.getElementById('portal-view').style.display = 'none';
+  document.getElementById('header-login-btn').style.display = '';
+  document.getElementById('header-logout-btn').style.display = 'none';
+  document.getElementById('header-design-btn').style.display = 'none';
+  switchAuthTab('login');
+}
+
+function showLogin() {
+  document.getElementById('login-view').style.display = 'flex';
+  document.getElementById('portal-view').style.display = 'none';
+}
+
+function showPortal() {
+  document.getElementById('login-view').style.display = 'none';
+  document.getElementById('portal-view').style.display = 'block';
+  document.getElementById('header-login-btn').style.display = 'none';
+  document.getElementById('header-logout-btn').style.display = '';
+  document.getElementById('header-design-btn').style.display = '';
+  const blg=document.getElementById('header-blog-link');if(blg)blg.style.display='';
+
+  const initials = currentUser.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('user-avatar').textContent = initials;
+  document.getElementById('dash-welcome').textContent = 'Welcome back, ' + currentUser.firstName;
+  document.getElementById('user-email').textContent = currentUser.email;
+
+  // Pre-fill account settings
+  document.getElementById('acct-name').value    = currentUser.name;
+  document.getElementById('acct-phone').value   = currentUser.phone || '';
+  document.getElementById('acct-address').value = currentUser.address || '';
+
+  renderDashStats();
+  renderGlobalBanner();
+  renderOrders(currentFilter);
+}
+
+// ── DASHBOARD STATS ──
+function renderDashStats() {
+  if (!currentUser) return;
+  const orders = currentUser.orders;
+  const totalSpend = orders.reduce((s,o) => s + parseInt(o.total.replace(/,/g,'')||0), 0);
+  const active = orders.filter(o => !['delivered','cancelled'].includes(o.status)).length;
+  const expiring = orders.filter(o => daysUntilDeletion(o.createdAt) <= WARN_DAYS_1).length;
+  const books = orders.reduce((s,o) => s + (o.qty||1), 0);
+
+  const stats = [
+    {icon:'📚', value:orders.length, label:'Total orders'},
+    {icon:'📖', value:books, label:'Books printed'},
+    {icon:'⏳', value:active, label:'In progress'},
+    {icon:'₹', value:'₹'+totalSpend.toLocaleString('en-IN'), label:'Total spent'},
+  ];
+  if (expiring > 0) stats.push({icon:'⏰', value:expiring, label:'Files expiring', urgent:true});
+
+  document.getElementById('dash-stats').innerHTML = stats.map(s => `
+    <div class="dash-stat-card" style="${s.urgent?'border-color:var(--warn-border);background:var(--warn-bg)':''}">
+      <div class="dash-stat-icon">${s.icon}</div>
+      <div class="dash-stat-value" style="${s.urgent?'color:var(--warn-text)':''}  ">${s.value}</div>
+      <div class="dash-stat-label">${s.label}</div>
+    </div>`).join('');
+}
+
+// ── ACCOUNT SETTINGS PANEL ──
+let accountPanelOpen = false;
+function toggleAccountPanel() {
+  accountPanelOpen = !accountPanelOpen;
+  const panel = document.getElementById('account-panel');
+  const body  = document.getElementById('account-panel-body');
+  const chev  = document.getElementById('account-chevron');
+  panel.style.display = 'block';
+  body.style.display   = accountPanelOpen ? 'block' : 'none';
+  chev.textContent     = accountPanelOpen ? '▴' : '▾';
+  if (!accountPanelOpen) panel.style.display = 'none';
+}
+
+function saveAccountSettings() {
+  const name    = document.getElementById('acct-name').value.trim();
+  const phone   = document.getElementById('acct-phone').value.trim();
+  const address = document.getElementById('acct-address').value.trim();
+  const newPw   = document.getElementById('acct-pw-new').value;
+  const confPw  = document.getElementById('acct-pw-confirm').value;
+
+  if (newPw && newPw.length < 8) { showToastNotif('New password must be at least 8 characters.'); return; }
+  if (newPw && newPw !== confPw) { showToastNotif('Passwords don\'t match.'); return; }
+
+  // Update in-memory user
+  if (name)    { currentUser.name = name; currentUser.firstName = name.split(' ')[0]; }
+  if (phone)   currentUser.phone = phone;
+  if (address) currentUser.address = address;
+
+  // Update in accounts DB
+  const accounts = getAccountsDB();
+  const idx = accounts.findIndex(a => a.id === currentUser.id);
+  if (idx !== -1) {
+    accounts[idx].firstName = currentUser.firstName;
+    accounts[idx].lastName  = name.split(' ').slice(1).join(' ') || accounts[idx].lastName;
+    accounts[idx].phone   = phone;
+    accounts[idx].address = address;
+    if (newPw) accounts[idx].password = newPw;
+    saveAccountsDB(accounts);
+  }
+
+  saveSession(currentUser);
+  document.getElementById('dash-welcome').textContent = 'Welcome back, ' + currentUser.firstName;
+  document.getElementById('acct-pw-new').value = '';
+  document.getElementById('acct-pw-confirm').value = '';
+  toggleAccountPanel();
+  showToastNotif('Account updated successfully ✓');
+}
+
+// ── AUTO-LOGIN FROM SESSION ──
+document.addEventListener('DOMContentLoaded', function() {
+  const session = getSessionUser();
+  if (session) {
+    currentUser = session;
+    // Refresh orders from ALL_ORDERS
+    currentUser.orders = ALL_ORDERS.filter(o => o.email.toLowerCase() === session.email.toLowerCase());
+    showPortal();
+  }
+  const titleEl = document.getElementById('book-title-input');
+  if (titleEl) titleEl.addEventListener('input', () => {});
+});
+
+// ═══════════════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════
+function toggleNotifications() {
+  notificationsEnabled = document.getElementById('notif-toggle').checked;
+  renderGlobalBanner();
+  if (notificationsEnabled) {
+    showToastNotif('Email reminders turned on. We\'ll give you plenty of notice before any files are removed.');
+  } else {
+    showToastNotif('Email reminders turned off. You can turn them back on any time.');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// GLOBAL BANNER
+// ═══════════════════════════════════════════════════════════
+function renderGlobalBanner() {
+  const banner = document.getElementById('global-banner');
+  if (!currentUser) return;
+
+  const urgent = currentUser.orders.filter(o => daysUntilDeletion(o.createdAt) <= WARN_DAYS_4);
+  const soon   = currentUser.orders.filter(o => {
+    const d = daysUntilDeletion(o.createdAt);
+    return d > WARN_DAYS_4 && d <= WARN_DAYS_2;
+  });
+
+  if (!notificationsEnabled) {
+    banner.style.display = 'block';
+    banner.innerHTML = `<div class="notif-banner info">
+      <span class="notif-icon">ℹ️</span>
+      <div>Email reminders are currently off. Your files are still kept for 90 days, but you won't hear from us before they're removed. You can turn reminders back on above.</div>
+    </div>`;
+    return;
+  }
+
+  if (urgent.length > 0) {
+    banner.style.display = 'block';
+    banner.innerHTML = `<div class="notif-banner warn">
+      <span class="notif-icon">⏰</span>
+      <div><strong>A couple of things need your attention.</strong> ${urgent.length} of your order file${urgent.length > 1 ? 's are' : ' is'} due to be removed very soon as part of our 90-day storage policy. The files aren't downloadable, but you're welcome to view them here any time they're still active.</div>
+    </div>`;
+  } else if (soon.length > 0) {
+    banner.style.display = 'block';
+    banner.innerHTML = `<div class="notif-banner info">
+      <span class="notif-icon">📅</span>
+      <div>${soon.length} order file${soon.length > 1 ? 's are' : ' is'} approaching the 90-day limit. No action needed — just a gentle heads-up so there are no surprises.</div>
+    </div>`;
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// FILTER & RENDER ORDERS
+// ═══════════════════════════════════════════════════════════
+function filterOrders(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderOrders(filter);
+}
+
+function renderOrders(filter) {
+  const list = document.getElementById('orders-list');
+  const sub  = document.getElementById('orders-subtitle');
+  if (!currentUser) return;
+
+  let orders = [...currentUser.orders];
+  if (filter === 'active')   orders = orders.filter(o => o.status !== 'delivered');
+  if (filter === 'delivered')orders = orders.filter(o => o.status === 'delivered');
+  if (filter === 'expiring') orders = orders.filter(o => daysUntilDeletion(o.createdAt) <= WARN_DAYS_1);
+
+  sub.textContent = `${currentUser.orders.length} order${currentUser.orders.length !== 1 ? 's' : ''} · files kept for 90 days`;
+
+  if (orders.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">📭</div>
+      <h3>Nothing here yet</h3>
+      <p>No orders match this filter. Try switching to "All" to see everything.</p>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = '';
+  orders.forEach(order => {
+    const card = buildOrderCard(order);
+    list.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// BUILD ORDER CARD
+// ═══════════════════════════════════════════════════════════
+function buildOrderCard(order) {
+  const daysLeft  = daysUntilDeletion(order.createdAt);
+  const level     = expiryLevel(daysLeft);
+  const pct       = Math.max(0, Math.min(100, (daysLeft / RETENTION_DAYS) * 100));
+  const createdFmt= formatDate(order.createdAt);
+  const deleteFmt = formatDate(new Date(new Date(order.createdAt).getTime() + RETENTION_DAYS * 86400000).toISOString());
+
+  const card = document.createElement('div');
+  card.className = `order-card ${level !== 'safe' ? 'expiring-' + level : ''}`;
+  card.id = 'card-' + order.id;
+
+  const statusLabels = {new:'Order received',ready:'Ready to print',printing:'Printing',shipped:'Dispatched',delivered:'Delivered'};
+  const currentStep  = order.statusHistory.filter(s => s.done).length;
+
+  // ── Head ──
+  const head = document.createElement('div');
+  head.className = 'order-head';
+  head.setAttribute('aria-expanded', 'false');
+  head.onclick = () => toggleCard(order.id);
+  head.innerHTML = `
+    <div class="order-head-left">
+      <div class="order-id">${order.id}</div>
+      <div class="order-title">${order.title}</div>
+      <div class="order-meta">
+        <span class="order-meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Ordered ${createdFmt}
+        </span>
+        <span class="order-meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><circle cx="5.5" cy="7.5" r="1" fill="currentColor"/><path d="M5 11l4-3 3 3" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          ${order.size} · ${order.pages} pages
+        </span>
+        <span class="order-meta-item">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 110 12A6 6 0 018 2zM8 5v3.5l2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          ${order.qty} book${order.qty > 1 ? 's' : ''}
+        </span>
+      </div>
+    </div>
+    <div class="order-head-right">
+      <span class="status-pill ${order.status}">${statusLabels[order.status] || order.status}</span>
+      <span class="expiry-chip ${level}" id="chip-${order.id}">${expiryLabel(daysLeft)}</span>
+    </div>
+    <span class="chevron" id="chev-${order.id}">▾</span>
+  `;
+
+  // ── Body ──
+  const body = document.createElement('div');
+  body.className = 'order-body';
+  body.id = 'body-' + order.id;
+
+  // Detail sections
+  const sections = document.createElement('div');
+  sections.className = 'order-sections';
+  sections.innerHTML = `
+    <div class="detail-block">
+      <div class="detail-block-title">Order details</div>
+      <div class="detail-row"><span class="detail-label">Book size</span><span class="detail-value">${order.size}</span></div>
+      <div class="detail-row"><span class="detail-label">Pages</span><span class="detail-value">${order.pages}</span></div>
+      <div class="detail-row"><span class="detail-label">Quantity</span><span class="detail-value">${order.qty} book${order.qty>1?'s':''}</span></div>
+      <div class="detail-row"><span class="detail-label">Total paid</span><span class="detail-value">₹${order.total}</span></div>
+    </div>
+    <div class="detail-block">
+      <div class="detail-block-title">Shipping</div>
+      <div class="detail-row"><span class="detail-label">Name</span><span class="detail-value">${order.name}</span></div>
+      <div class="detail-row"><span class="detail-label">Address</span><span class="detail-value" style="max-width:130px;text-align:right;font-size:12px">${order.address}, ${order.country}</span></div>
+    </div>
+  `;
+
+  // Preview frames (view only — no download)
+  const previewSection = document.createElement('div');
+  previewSection.className = 'preview-section';
+  let framesHTML = '<div class="preview-frames">';
+  framesHTML += `<div class="preview-frame" title="Cover">
+    <span style="font-size:18px;color:rgba(255,255,255,0.7)">📖</span>
+    <div class="preview-frame-label" style="color:rgba(255,255,255,0.5)">Cover</div>
+  </div>`;
+  const spreadCount = Math.floor((order.pages - 1) / 2);
+  for (let i = 1; i <= Math.min(spreadCount, 6); i++) {
+    framesHTML += `<div class="preview-frame" title="Spread ${i}">
+      <span class="preview-frame-icon">📄</span>
+      <div class="preview-frame-label">Spread ${i}</div>
+    </div>`;
+  }
+  if (spreadCount > 6) {
+    framesHTML += `<div class="preview-frame" title="${spreadCount - 6} more spreads" style="background:var(--gray-100)">
+      <span style="font-size:14px;font-weight:700;color:var(--gray-400)">+${spreadCount-6}</span>
+      <div class="preview-frame-label">more</div>
+    </div>`;
+  }
+  framesHTML += '</div>';
+  framesHTML += `<div class="preview-no-download">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="vertical-align:-2px;margin-right:4px"><path d="M13 10v3H3v-3M8 2v7M5 6l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <strong>Files are available to view here</strong> but can't be downloaded directly. If you need a copy of your design, please <a href="mailto:hello@binder.co.in" style="color:var(--accent);text-decoration:none">get in touch</a> and we'll be happy to help.
+  </div>`;
+  previewSection.innerHTML = `<div class="preview-title">Design preview</div>${framesHTML}`;
+
+  // Status timeline
+  const timeline = document.createElement('div');
+  timeline.className = 'timeline';
+  const doneSteps    = order.statusHistory.filter(s => s.done);
+  const pendingSteps = order.statusHistory.filter(s => !s.done);
+  let tlHTML = '<div class="timeline-title">Order progress</div><div class="timeline-track">';
+  order.statusHistory.forEach((step, idx) => {
+    const isCurrent = step.done && (idx === doneSteps.length - 1);
+    const dotClass  = step.done ? (isCurrent ? 'current' : 'done') : 'pending';
+    tlHTML += `<div class="timeline-item">
+      <div class="timeline-dot ${dotClass}"></div>
+      <div class="timeline-text">
+        <strong>${step.label}</strong>
+        <span>${step.date ? formatDate(step.date) : 'Pending'}</span>
+      </div>
+    </div>`;
+  });
+  tlHTML += '</div>';
+  timeline.innerHTML = tlHTML;
+
+  // Deletion countdown
+  const countdown = document.createElement('div');
+  countdown.className = 'countdown-bar-wrap';
+  countdown.innerHTML = `
+    <div class="countdown-bar-label">
+      <span>Design file storage</span>
+      <span>${daysLeft > 0 ? daysLeft + ' days remaining' : 'Expired'}</span>
+    </div>
+    <div class="countdown-bar-track">
+      <div class="countdown-bar-fill ${level}" style="width:${pct}%"></div>
+    </div>
+  `;
+
+  // Expiry notice
+  const expiryNotice = document.createElement('div');
+  expiryNotice.className = `expiry-notice ${level}`;
+  const expiryMessages = {
+    safe: `Your design file is safely stored and will be available here until <strong>${deleteFmt}</strong>. We'll send you a reminder before then.`,
+    soon: `Just a heads-up — your design file will be removed on <strong>${deleteFmt}</strong> as part of our 90-day storage policy. There's no action required, but we wanted to make sure you're aware.`,
+    urgent: `We wanted to give you one last notice — your design file is scheduled to be removed on <strong>${deleteFmt}</strong>. After that it won't be recoverable, but your physical book is of course yours to keep. If you have any questions, please <a href="mailto:hello@binder.co.in" style="color:inherit;font-weight:700">drop us a note</a>.`
+  };
+
+  const noticeIcon = {safe:'🗂️', soon:'📅', urgent:'⏰'}[level];
+  expiryNotice.innerHTML = `<span style="font-size:16px;flex-shrink:0">${noticeIcon}</span><div>${expiryMessages[level]}</div>`;
+
+  // Email preview button inside card
+  const emailBtn = document.createElement('div');
+  emailBtn.style.cssText = 'margin-top:12px;display:flex;justify-content:flex-end';
+  emailBtn.innerHTML = `<button class="send-email-btn" onclick="previewEmailForOrder('${order.id}')">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4l6 5 6-5M2 4h12v8H2V4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    Preview reminder email for this order
+  </button>`;
+
+  // Assemble body
+  body.appendChild(sections);
+  body.appendChild(previewSection);
+  const cols = document.createElement('div');
+  cols.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px';
+  cols.appendChild(countdown);
+  cols.appendChild(timeline);
+  body.appendChild(cols);
+  body.appendChild(expiryNotice);
+  body.appendChild(emailBtn);
+
+  card.appendChild(head);
+  card.appendChild(body);
+  return card;
+}
+
+function toggleCard(orderId) {
+  const body  = document.getElementById('body-' + orderId);
+  const chev  = document.getElementById('chev-' + orderId);
+  const head  = body.previousSibling;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+  if (head) head.setAttribute('aria-expanded', !isOpen);
+}
+
+// ═══════════════════════════════════════════════════════════
+// EMAIL PREVIEW
+// ═══════════════════════════════════════════════════════════
+function previewEmailAll() {
+  // Show for the most urgent order
+  if (!currentUser) return;
+  const sorted = [...currentUser.orders].sort((a,b) => daysUntilDeletion(a.createdAt) - daysUntilDeletion(b.createdAt));
+  previewEmailForOrder(sorted[0].id);
+}
+
+function previewEmailForOrder(orderId) {
+  const order  = ALL_ORDERS.find(o => o.id === orderId);
+  if (!order) return;
+  const daysLeft  = daysUntilDeletion(order.createdAt);
+  const level     = expiryLevel(daysLeft);
+  const deleteFmt = formatDate(new Date(new Date(order.createdAt).getTime() + RETENTION_DAYS * 86400000).toISOString());
+
+  let subject, heading, body1, body2, body3, cta, tone;
+
+  if (daysLeft <= WARN_DAYS_4) {
+    subject = `One last reminder about your Binder order (${order.id})`;
+    tone = 'urgent';
+    heading = 'A final reminder about your design file';
+    body1 = `Hi ${order.name.split(' ')[0]}, we hope your photobook arrived safely — and if it hasn't yet, it's on its way!`;
+    body2 = `We're reaching out because your design file for <strong>${order.title}</strong> is scheduled to be removed from our system on <strong>${deleteFmt}</strong>, as part of our 90-day storage policy.`;
+    body3 = `After that date the file won't be recoverable. Your physical book is, of course, completely yours. If you have any questions or concerns, please don't hesitate to reply to this email — we're always glad to help.`;
+    cta = 'View your order now';
+  } else if (daysLeft <= WARN_DAYS_2) {
+    subject = `Your Binder design file — ${daysLeft} days remaining`;
+    tone = 'soon';
+    heading = 'Just a gentle heads-up about your file';
+    body1 = `Hi ${order.name.split(' ')[0]}, we hope you're enjoying your photobook!`;
+    body2 = `We wanted to let you know that your design file for <strong>${order.title}</strong> will be removed on <strong>${deleteFmt}</strong> as part of our 90-day storage policy. There's nothing you need to do — we just like to keep you informed.`;
+    body3 = `You can still view your order details and design at any time by signing into My Orders. If you need anything, you're always welcome to reach out.`;
+    cta = 'View my orders';
+  } else {
+    subject = `A friendly note about your Binder order`;
+    tone = 'safe';
+    heading = 'A note about your design file';
+    body1 = `Hi ${order.name.split(' ')[0]}, thank you for choosing Binder — we hope you love your photobook!`;
+    body2 = `Just a friendly note: your design file for <strong>${order.title}</strong> is stored in your account and will be available until <strong>${deleteFmt}</strong>. After that, as part of our standard 90-day policy, the file will be removed from our servers.`;
+    body3 = `You'll hear from us again with a reminder as that date approaches. In the meantime, feel free to view your order details any time in My Orders.`;
+    cta = 'View my orders';
+  }
+
+  document.getElementById('email-subject-line').textContent = subject;
+  document.getElementById('email-body-content').innerHTML = `
+    <div class="email-from">From: <strong>Binder &lt;hello@binder.co.in&gt;</strong></div>
+    <div class="email-to">To: <strong>${order.email}</strong></div>
+    <hr class="email-divider">
+    <div class="email-logo-row">
+      <div class="email-logo-mark">B</div>
+      <div class="email-logo-name">Binder</div>
+    </div>
+    <div class="email-content">
+      <h3>${heading}</h3>
+      <p>${body1}</p>
+      <div class="email-highlight-box">
+        <strong>${order.title}</strong>
+        Order ${order.id} · ${order.size} · ${order.pages} pages · Placed ${formatDate(order.createdAt)}
+      </div>
+      <p>${body2}</p>
+      <p>${body3}</p>
+      <button class="email-cta" onclick="closeEmailPanel()">🔗 ${cta}</button>
+    </div>
+    <div class="email-footer">
+      You're receiving this because you placed an order with Binder and have email reminders turned on.<br>
+      To stop receiving these reminders, sign into My Orders and toggle off "Email reminders".<br><br>
+      Binder · hello@binder.co.in<br>
+      <span>Your files are kept privately and securely. We never share your data.</span>
+    </div>
+    <button class="email-close-btn" onclick="closeEmailPanel()">Close preview</button>
+  `;
+
+  document.getElementById('email-panel').classList.add('open');
+}
+
+function closeEmailPanel() {
+  document.getElementById('email-panel').classList.remove('open');
+}
+
+// Close on overlay click
+document.getElementById('email-panel').addEventListener('click', function(e) {
+  if (e.target === this) closeEmailPanel();
+});
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+let _toastEl = null;
+let _toastTimer = null;
+function showToastNotif(msg) {
+  if (!_toastEl) {
+    _toastEl = document.createElement('div');
+    _toastEl.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--black);color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:400;z-index:3000;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;font-family:var(--font-ui)';
+    document.body.appendChild(_toastEl);
+  }
+  _toastEl.textContent = msg;
+  _toastEl.style.opacity = '1';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { _toastEl.style.opacity = '0'; }, 3500);
+}
+
+// ═══════════════════════════════════════════════════════════
+// KEYBOARD
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeEmailPanel();
+});
+</script>
+<footer style="padding:20px 5vw;border-top:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:var(--white)">
+  <div style="font-size:12px;color:var(--gray-400)">© 2026 Binder · A-291/1, Okhla Phase I, Delhi — 110020</div>
+  <div style="display:flex;gap:16px;align-items:center">
+    <a href="https://instagram.com/binderbooks" target="_blank" rel="noopener" style="font-size:12px;color:var(--gray-400);display:flex;align-items:center;gap:5px;transition:color .15s" onmouseover="this.style.color='#00B878'" onmouseout="this.style.color='var(--gray-400)'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5" fill="currentColor" stroke="none"/></svg>
+      Instagram
+    </a>
+    <a href="https://facebook.com/binderbooks" target="_blank" rel="noopener" style="font-size:12px;color:var(--gray-400);display:flex;align-items:center;gap:5px;transition:color .15s" onmouseover="this.style.color='#00B878'" onmouseout="this.style.color='var(--gray-400)'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+      Facebook
+    </a>
+    <a href="index.html" style="font-size:12px;color:var(--gray-400);transition:color .15s" onmouseover="this.style.color='#00B878'" onmouseout="this.style.color='var(--gray-400)'">binder.co.in</a>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binder Admin</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#00B878;--gd:#009962;--gl:rgba(0,184,120,.07);
+  --ink:#111;--text:#4d4d4d;--tl:#7a7a7a;--txl:#adadad;
+  --border:#e8e8e8;--bm:#d0d0d0;--bg:#fafafa;--bgd:#f3f3f3;--white:#fff;
+  --red:#ef4444;--amber:#f59e0b;
+  --font:'Lato',system-ui,sans-serif;
+  --sidebar:240px;--topbar:56px;
+  --r:8px;--rl:12px;
+}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:var(--font)}
+
+/* LOGIN */
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink)}
+.lbox{background:var(--white);border-radius:18px;padding:44px 40px;width:380px;box-shadow:0 32px 80px rgba(0,0,0,.3)}
+.llogo{display:flex;align-items:center;gap:9px;margin-bottom:28px;justify-content:center}
+.llm{width:36px;height:36px;background:var(--ink);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px}
+.lln{font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+.lbox h2{font-size:24px;font-weight:700;text-align:center;margin-bottom:6px;color:var(--ink);font-family:var(--font)}
+.lbox p{font-size:14px;color:var(--tl);text-align:center;margin-bottom:32px;font-weight:300}
+.flab{font-size:12px;font-weight:700;color:var(--tl);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.05em}
+.finp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:15px;outline:none;font-family:var(--font);transition:border .15s;margin-bottom:14px;color:var(--ink)}
+.finp:focus{border-color:var(--g)}
+.lbtn{width:100%;padding:14px;background:var(--g);color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background .2s;margin-top:4px}
+.lbtn:hover{background:var(--g);color:#fff}
+.lerr{background:#fef2f2;border:1px solid #fecaca;color:var(--red);border-radius:var(--r);padding:10px 12px;font-size:13px;margin-bottom:14px;display:none}
+
+/* APP SHELL */
+#app{display:none;height:100vh;flex-direction:column}
+#app.on{display:flex}
+
+/* TOPBAR */
+#topbar{height:var(--topbar);background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:100;flex-shrink:0}
+.tb-logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tb-mark{width:26px;height:26px;background:var(--ink);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px}
+.tb-name{font-size:15px;font-weight:700;color:var(--ink)}
+.tb-badge{font-size:11px;background:var(--gl);color:var(--gd);padding:2px 8px;border-radius:100px;font-weight:700}
+.tb-space{flex:1}
+.tb-status{font-size:12px;color:var(--tl)}
+.tb-status.ok{color:var(--g)}
+.tb-status.dirty{color:var(--amber)}
+.tbtn{height:32px;padding:0 16px;border-radius:100px;font-size:13px;font-weight:400;cursor:pointer;border:none;font-family:var(--font);transition:all .15s;display:flex;align-items:center;gap:5px}
+.tbtn-out{background:transparent;border:1px solid var(--border);color:var(--tl)}
+.tbtn-out:hover{border-color:var(--ink);color:var(--ink)}
+.tbtn-g{background:var(--g);color:#fff;font-weight:700}
+.tbtn-g:hover{background:var(--gd)}
+.tbtn-red{background:transparent;border:1px solid var(--border);color:var(--tl)}
+.tbtn-red:hover{border-color:var(--red);color:var(--red)}
+.tb-sep{width:1px;height:20px;background:var(--border);flex-shrink:0}
+
+/* MAIN LAYOUT */
+#shell{display:flex;flex:1;min-height:0;overflow:hidden}
+
+/* SIDEBAR */
+#sidebar{width:var(--sidebar);background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sgroup{padding:12px 10px 0}
+.sglabel{font-size:10px;font-weight:700;color:var(--txl);text-transform:uppercase;letter-spacing:.07em;padding:0 8px 6px;display:block}
+.nitem{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:var(--r);cursor:pointer;font-size:13px;font-weight:300;color:var(--tl);transition:all .12s;border:none;background:transparent;width:100%;text-align:left;margin-bottom:1px}
+.nitem:hover{background:var(--bg);color:var(--ink)}
+.nitem.active{background:var(--gl);color:var(--gd);font-weight:700}
+.nitem-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.sdivider{height:1px;background:var(--border);margin:10px 10px}
+
+/* MAIN */
+#main{flex:1;overflow-y:auto;padding:32px}
+.page{display:none}
+.page.active{display:block}
+
+/* PAGE HEADER */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+.ph-left h1{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-bottom:4px;color:var(--ink)}
+.ph-left p{font-size:14px;font-weight:300;color:var(--tl)}
+.ph-actions{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:20px}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--bg);display:flex;align-items:center;justify-content:space-between}
+.card-head-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--txl)}
+.card-body{padding:20px}
+
+/* STAT CARDS */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;margin-bottom:24px}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);padding:18px;cursor:default}
+.stat-val{font-size:32px;font-weight:700;color:var(--g);letter-spacing:-.02em;line-height:1;margin-bottom:5px}
+.stat-label{font-size:12px;font-weight:300;color:var(--tl)}
+
+/* FORM ELEMENTS */
+.frow{margin-bottom:16px}
+.frow:last-child{margin-bottom:0}
+.flab{font-size:11px;font-weight:700;color:var(--tl);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;text-transform:uppercase;letter-spacing:.05em}
+.fhint{font-size:10px;color:var(--txl);font-weight:300;text-transform:none;letter-spacing:0}
+.finput{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;outline:none;font-family:var(--font);transition:border .12s;color:var(--ink)}
+.finput:focus{border-color:var(--g)}
+.ftarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;outline:none;resize:vertical;min-height:80px;line-height:1.55;font-family:var(--font);transition:border .12s;color:var(--ink)}
+.ftarea:focus{border-color:var(--g)}
+.fgrid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.fgrid2{grid-template-columns:1fr}}
+
+/* IMAGE UPLOAD */
+.imgzone{border:2px dashed var(--border);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--bg)}
+.imgzone:hover,.imgzone.drag{border-color:var(--g);background:var(--gl)}
+.imgzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.imgzone-icon{font-size:28px;opacity:.5}
+.imgzone-text{font-size:13px;color:var(--tl);line-height:1.5;font-weight:300}
+.imgzone-text strong{color:var(--g);font-weight:700}
+.imgprev{position:relative;border-radius:var(--r);overflow:hidden;margin-top:8px}
+.imgprev img{width:100%;max-height:200px;object-fit:cover;display:block}
+.imgclear{position:absolute;top:6px;right:6px;width:24px;height:24px;background:rgba(0,0,0,.6);border:none;border-radius:50%;color:#fff;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center}
+.imgclear:hover{background:var(--red)}
+.urlrow{display:flex;gap:8px;margin-top:8px}
+.urlrow .finput{font-size:12px;padding:8px 10px}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--txl);border-bottom:1px solid var(--bg);white-space:nowrap}
+.tbl td{padding:12px 14px;border-bottom:1px solid var(--bg);vertical-align:middle;color:var(--text)}
+.tbl tr:last-child td{border:none}
+.tbl tr:hover td{background:var(--bg)}
+.tbl-empty{text-align:center;padding:40px;color:var(--txl)}
+.tbl-empty-icon{font-size:32px;margin-bottom:10px;opacity:.4}
+.tbl-foot{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--tl);border-top:1px solid var(--bg)}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.badge-g{background:var(--gl);color:var(--gd)}
+.badge-gray{background:var(--bg);color:var(--txl)}
+.badge-red{background:#fef2f2;color:var(--red)}
+.badge-amber{background:#fffbeb;color:#b45309}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:100px;font-size:13px;font-weight:400;cursor:pointer;border:none;font-family:var(--font);transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--g);color:#fff;font-weight:700}
+.btn-primary:hover{background:var(--gd)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--tl)}
+.btn-ghost:hover{border-color:var(--ink);color:var(--ink)}
+.btn-danger{background:transparent;border:1px solid var(--border);color:var(--tl)}
+.btn-danger:hover{border-color:var(--red);color:var(--red)}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:100px}
+
+/* BLOG EDITOR */
+.beditor-toolbar{display:flex;gap:3px;padding:8px;background:var(--bg);border-radius:var(--r);margin-bottom:10px;flex-wrap:wrap}
+.btool{padding:5px 10px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-size:13px;font-weight:700;font-family:var(--font);color:var(--tl);transition:all .12s}
+.btool:hover{background:var(--border);color:var(--ink)}
+.beditor{min-height:360px;padding:16px;border:1.5px solid var(--border);border-radius:var(--r);font-size:15px;outline:none;font-family:'Lato',system-ui,sans-serif;line-height:1.75;color:var(--ink)}
+.beditor:focus{border-color:var(--g)}
+.beditor h2{font-size:22px;font-weight:700;margin:16px 0 8px;font-family:var(--font)}
+.beditor h3{font-size:18px;font-weight:700;margin:14px 0 6px;font-family:var(--font)}
+.beditor p{margin-bottom:12px}
+.beditor blockquote{border-left:3px solid var(--g);padding:8px 16px;background:var(--gl);margin:12px 0;font-style:normal;}
+.beditor ul,.beditor ol{padding-left:24px;margin-bottom:12px}
+
+/* MEDIA GRID */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
+.mitem{position:relative;border-radius:var(--r);overflow:hidden;aspect-ratio:1;background:var(--bg);cursor:pointer}
+.mitem img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
+.mitem:hover img{transform:scale(1.05)}
+.mitem-overlay{position:absolute;inset:0;background:rgba(0,0,0,0);display:flex;align-items:center;justify-content:center;transition:background .15s}
+.mitem:hover .mitem-overlay{background:rgba(0,0,0,.45)}
+.mitem-overlay span{color:#fff;font-size:11px;font-weight:700;opacity:0;transition:opacity .15s}
+.mitem:hover .mitem-overlay span{opacity:1}
+.mitem-del{position:absolute;top:4px;right:4px;width:20px;height:20px;background:rgba(0,0,0,.6);border:none;border-radius:50%;color:#fff;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s}
+.mitem:hover .mitem-del{opacity:1}
+.mitem-del:hover{background:var(--red)}
+
+/* MENU EDITOR */
+.menu-item-row{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border-radius:var(--r);margin-bottom:6px;cursor:grab}
+.menu-item-row:active{cursor:grabbing;opacity:.8}
+.menu-handle{color:var(--txl);font-size:16px;cursor:grab;flex-shrink:0}
+.menu-item-inputs{display:flex;gap:8px;flex:1;flex-wrap:wrap}
+.menu-item-inputs input{padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;outline:none;font-family:var(--font);transition:border .12s;color:var(--ink)}
+.menu-item-inputs input:focus{border-color:var(--g)}
+.menu-item-label{flex:1;min-width:100px}
+.menu-item-url{flex:2;min-width:140px}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--g);color:#fff;padding:10px 20px;border-radius:100px;font-size:13px;font-weight:400;z-index:9999;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;font-family:var(--font)}
+#toast.show{opacity:1}
+#toast.ok{background:var(--g);color:#fff}
+#toast.err{background:var(--red)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  #sidebar{display:none}
+  #main{padding:20px}
+  .fgrid2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="lbox">
+    <div class="llogo"><div class="llm">B</div><div class="lln">Binder</div></div>
+    <h2>Admin Panel</h2>
+    <p style="font-weight:300">Sign in to manage your site</p>
+    <div class="lerr" id="lerr">Incorrect password. Please try again.</div>
+    <label class="flab">Password</label>
+    <input class="finp" type="password" id="lpw" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="lbtn" onclick="doLogin()">Sign in →</button>
+    <p style="text-align:center;font-size:11px;color:var(--txl);margin-top:20px;font-weight:300">binder.co.in/admin</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div id="topbar">
+    <div class="tb-logo">
+      <div class="tb-mark">B</div>
+      <div class="tb-name">Binder Admin</div>
+      <span class="tb-badge">Live editor</span>
+    </div>
+    <div class="tb-space"></div>
+    <span class="tb-status" id="tbstatus">All changes saved</span>
+    <div class="tb-sep"></div>
+    <button class="tbtn tbtn-out" onclick="window.open('/?edit=1','_blank')">✏ Edit site live</button>
+    <button class="tbtn tbtn-out" onclick="window.open('/','_blank')">↗ View site</button>
+    <button class="tbtn tbtn-g" id="pub-btn" onclick="publishAll()">🚀 Publish changes</button>
+    <div class="tb-sep"></div>
+    <button class="tbtn tbtn-red" onclick="doLogout()">Sign out</button>
+  </div>
+
+  <div id="shell">
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <div class="sgroup">
+        <span class="sglabel">Overview</span>
+        <button class="nitem active" onclick="goPage('dashboard',this)"><span class="nitem-icon">▪</span>Dashboard</button>
+      </div>
+      <div class="sgroup">
+        <span class="sglabel">Content</span>
+        <button class="nitem" onclick="goPage('homepage',this)"><span class="nitem-icon">🏠</span>Homepage</button>
+        <button class="nitem" onclick="goPage('menu',this)"><span class="nitem-icon">☰</span>Navigation menu</button>
+        <button class="nitem" onclick="goPage('blog',this)"><span class="nitem-icon">📝</span>Blog posts</button>
+        <button class="nitem" onclick="goPage('press',this)"><span class="nitem-icon">📰</span>Press coverage</button>
+      </div>
+      <div class="sgroup">
+        <span class="sglabel">Site</span>
+        <button class="nitem" onclick="goPage('media',this)"><span class="nitem-icon">🖼</span>Media library</button>
+        <button class="nitem" onclick="goPage('settings',this)"><span class="nitem-icon">⚙</span>Settings</button>
+      </div>
+      <div class="sdivider"></div>
+      <div class="sgroup">
+        <button class="nitem" onclick="window.open('/?edit=1','_blank')"><span class="nitem-icon">✏</span>Visual editor</button>
+        <button class="nitem" onclick="window.open('/','_blank')"><span class="nitem-icon">↗</span>View live site</button>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="ph"><div class="ph-left"><h1 id="greeting">Good morning</h1><p>Here's your Binder site overview.</p></div></div>
+        <div class="stats" id="dash-stats"></div>
+        <div class="card">
+          <div class="card-head"><span class="card-head-title">Quick actions</span></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-ghost" style="justify-content:flex-start;border-radius:var(--r);height:40px" onclick="goPage('homepage',null)">✏ Edit homepage text and images</button>
+            <button class="btn btn-ghost" style="justify-content:flex-start;border-radius:var(--r);height:40px" onclick="goPage('menu',null)">☰ Edit navigation menu</button>
+            <button class="btn btn-ghost" style="justify-content:flex-start;border-radius:var(--r);height:40px" onclick="newBlogPost()">📝 Write a new blog post</button>
+            <button class="btn btn-ghost" style="justify-content:flex-start;border-radius:var(--r);height:40px" onclick="goPage('media',null)">🖼 Upload photos to media library</button>
+            <button class="btn btn-ghost" style="justify-content:flex-start;border-radius:var(--r);height:40px" onclick="window.open('/?edit=1','_blank')">🖱 Open visual editor on live site</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOMEPAGE EDITOR -->
+      <div class="page" id="page-homepage">
+        <div class="ph">
+          <div class="ph-left"><h1>Homepage</h1><p>Edit every section of your homepage.</p></div>
+          <div class="ph-actions"><button class="btn btn-primary" onclick="saveHomepage()">Save homepage</button></div>
+        </div>
+
+        <!-- Hero -->
+        <div class="card">
+          <div class="card-head"><span class="card-head-title">Hero section</span></div>
+          <div class="card-body">
+            <div class="frow"><label class="flab">Eyebrow text</label><input class="finput" id="hp-ey" oninput="markDirty()"></div>
+            <div class="frow"><label class="flab">Main headline <span class="fhint">Use * for line break</span></label><input class="finput" id="hp-title" oninput="markDirty()"></div>
+            <div class="frow"><label class="flab">Subtitle paragraph</label><textarea class="ftarea" id="hp-sub" rows="3" oninput="markDirty()"></textarea></div>
+            <div class="fgrid2">
+              <div class="frow"><label class="flab">Primary button text</label><input class="finput" id="hp-cta1" oninput="markDirty()"></div>
+              <div class="frow"><label class="flab">Secondary button text</label><input class="finput" id="hp-cta2" oninput="markDirty()"></div>
+            </div>
+            <div class="frow"><label class="flab">Hero book images <span class="fhint">Upload 3 photos for the stacked books in the hero</span></label>
+              <div class="fgrid2">
+                <div><div class="imgzone" ondragover="this.classList.add('drag');event.preventDefault()" ondragleave="this.classList.remove('drag')" ondrop="dzDrop(event,'hb0')"><input type="file" accept="image/*" onchange="dzPick(event,'hb0')"><div class="imgzone-icon">📷</div><div class="imgzone-text">Book photo 1</div></div><div id="hb0-prev" class="imgprev" style="display:none"><img id="hb0-img" src=""><button class="imgclear" onclick="dzClear('hb0')">✕</button></div></div>
+                <div><div class="imgzone" ondragover="this.classList.add('drag');event.preventDefault()" ondragleave="this.classList.remove('drag')" ondrop="dzDrop(event,'hb1')"><input type="file" accept="image/*" onchange="dzPick(event,'hb1')"><div class="imgzone-icon">📷</div><div class="imgzone-text">Book photo 2</div></div><div id="hb1-prev" class="imgprev" style="display:none"><img id="hb1-img" src=""><button class="imgclear" onclick="dzClear('hb1')">✕</button></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trust bar -->
+        <div class="card">
+          <div class="card-head"><span class="card-head-title">Trust bar (5 items)</span></div>
+          <div class="card-body">
+            <div class="fgrid2">
+              <div class="frow"><label class="flab">Item 1</label><input class="finput" id="hp-t0" oninput="markDirty()"></div>
+              <div class="frow"><label class="flab">Item 2</label><input class="finput" id="hp-t1" oninput="markDirty()"></div>
+              <div class="frow"><label class="flab">Item 3</label><input class="finput" id="hp-t2" oninput="markDirty()"></div>
+              <div class="frow"><label class="flab">Item 4</label><input class="finput" id="hp-t3" oninput="markDirty()"></div>
+              <div class="frow"><label class="flab">Item 5</label><input class="finput" id="hp-t4" oninput="markDirty()"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Banner -->
+        <div class="card">
+          <div class="card-head"><span class="card-head-title">Full-width photo banner</span></div>
+          <div class="card-body">
+            <div class="frow"><label class="flab">Banner image <span class="fhint">2400 × 900px recommended</span></label>
+              <div class="imgzone" id="banner-zone" ondragover="this.classList.add('drag');event.preventDefault()" ondragleave="this.classList.remove('drag')" ondrop="dzDrop(event,'banner')"><input type="file" accept="image/*" onchange="dzPick(event,'banner')"><div class="imgzone-icon">🖼</div><div class="imgzone-text"><strong>Click or drag</strong> to upload banner photo</div></div>
+              <div id="banner-prev" class="imgprev" style="display:none"><img id="banner-img" src=""><button class="imgclear" onclick="dzClear('banner')">✕</button></div>
+            </div>
+            <div class="fgrid2">
+              <div class="frow"><label class="flab">Banner headline</label><input class="finput" id="hp-bh" oninput="markDirty()"></div>
+              <div class="frow"><label class="flab">Banner subline</label><input class="finput" id="hp-bs" oninput="markDirty()"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Features -->
+        <div class="card">
+          <div class="card-head"><span class="card-head-title">Feature tiles (4)</span></div>
+          <div class="card-body" id="features-body"></div>
+        </div>
+
+        <!-- Sizes -->
+        <div class="card">
+          <div class="card-head"><span class="card-head-title">Book sizes & prices</span></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--tl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">6×6"</div>
+                <div class="frow"><label class="flab">Price</label><input class="finput" id="sz0-p" oninput="markDirty()"></div>
+                <div class="imgzone" style="min-height:80px" ondragover="this.classList.add('drag');event.preventDefault()" ondragleave="this.classList.remove('drag')" ondrop="dzDrop(event,'sz0')"><input type="file" accept="image/*" onchange="dzPick(event,'sz0')"><div class="imgzone-text" style="font-size:12px"><strong>Upload</strong> book photo</div></div>
+                <div id="sz0-prev" class="imgprev" style="display:none"><img id="sz0-img" src=""><button class="imgclear" onclick="dzClear('sz0')">✕</button></div>
+              </div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--tl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">8×8"</div>
+                <div class="frow"><label class="flab">Price</label><input class="finput" id="sz1-p" oninput="markDirty()"></div>
+                <div class="imgzone" style="min-height:80px" ondragover="this.classList.add('drag');event.preventDefault()" ondragleave="this.classList.remove('drag')" ondrop="dzDrop(event,'sz1')"><input type="file" accept="image/*" onchange="dzPick(event,'sz1')"><div class="imgzone-text" style="font-size:12px"><strong>Upload</strong> book photo</div></div>
+                <div id="sz1-prev" class="imgprev" style="display:none"><img id="sz1-img" src=""><button class="imgclear" onclick="dzClear('sz1')">✕</button></div>
+              </div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--tl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">12×12"</div>
+                <div class="frow"><label class="flab">Price</label><input class="finput" id="sz2-p" oninput="markDirty()"></div>
+                <div class="imgzone" style="min-height:80px" ondragover="this.classList.add('drag');event.preventDefault()" ondragleave="this.classList.remove('drag')" ondrop="dzDrop(event,'sz2')"><input type="file" accept="image/*" onchange="dzPick(event,'sz2')"><div class="imgzone-text" style="font-size:12px"><strong>Upload</strong> book photo</div></div>
+                <div id="sz2-prev" class="imgprev" style="display:none"><img id="sz2-img" src=""><button class="imgclear" onclick="dzClear('sz2')">✕</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Testimonials -->
+        <div class="card">
+          <div class="card-head"><span class="card-head-title">Testimonials (3)</span></div>
+          <div class="card-body" id="testimonials-body"></div>
+        </div>
+
+        <!-- CTA -->
+        <div class="card">
+          <div class="card-head"><span class="card-head-title">CTA section</span></div>
+          <div class="card-body">
+            <div class="frow"><label class="flab">CTA heading</label><input class="finput" id="hp-ctatitle" oninput="markDirty()"></div>
+            <div class="frow"><label class="flab">CTA subtitle</label><textarea class="ftarea" id="hp-ctasub" rows="2" oninput="markDirty()"></textarea></div>
+            <div class="fgrid2">
+              <div class="frow"><label class="flab">Button 1 text</label><input class="finput" id="hp-ctabtn1" oninput="markDirty()"></div>
+              <div class="frow"><label class="flab">Button 2 text</label><input class="finput" id="hp-ctabtn2" oninput="markDirty()"></div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveHomepage()">Save all homepage changes</button>
+      </div>
+
+      <!-- MENU EDITOR -->
+      <div class="page" id="page-menu">
+        <div class="ph">
+          <div class="ph-left"><h1>Navigation menu</h1><p>Edit the links shown in the top navigation bar. Drag to reorder.</p></div>
+          <div class="ph-actions"><button class="btn btn-ghost" onclick="addMenuItem()">+ Add link</button><button class="btn btn-primary" onclick="saveMenu()">Save menu</button></div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--tl);margin-bottom:16px;font-weight:300">Each row is a navigation link. Edit the label and URL. Drag the ≡ handle to reorder.</p>
+            <div id="menu-items"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:20px">
+          <div class="card-head"><span class="card-head-title">CTA button in nav</span></div>
+          <div class="card-body">
+            <div class="fgrid2">
+              <div class="frow"><label class="flab">Button label</label><input class="finput" id="nav-cta-label" oninput="markDirty()"></div>
+              <div class="frow"><label class="flab">Button URL</label><input class="finput" id="nav-cta-url" oninput="markDirty()"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOG -->
+      <div class="page" id="page-blog">
+        <div class="ph">
+          <div class="ph-left"><h1>Blog posts</h1><p>Write and manage your Binder journal.</p></div>
+          <div class="ph-actions"><button class="btn btn-primary" onclick="newBlogPost()">+ New post</button></div>
+        </div>
+        <div class="card" id="blog-list-card">
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>Title</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="blog-tbody"></tbody>
+          </table></div>
+          <div class="tbl-foot"><span id="blog-count">0 posts</span></div>
+        </div>
+        <!-- Blog form -->
+        <div id="blog-form" style="display:none">
+          <div class="ph" style="margin-top:20px">
+            <div class="ph-left"><h1 id="blog-form-title">New post</h1></div>
+            <div class="ph-actions">
+              <button class="btn btn-ghost" onclick="closeBlogForm()">← All posts</button>
+              <button class="btn btn-ghost" onclick="saveBlogPost('draft')">Save draft</button>
+              <button class="btn btn-primary" onclick="saveBlogPost('published')">Publish</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start">
+            <div>
+              <div class="card" style="margin-bottom:16px">
+                <div class="card-body">
+                  <div class="frow"><label class="flab">Post title</label><input class="finput" id="b-title" style="font-size:18px" oninput="markDirty()"></div>
+                  <div class="frow"><label class="flab">Excerpt <span class="fhint">shown on blog listing</span></label><textarea class="ftarea" id="b-excerpt" rows="2" oninput="markDirty()"></textarea></div>
+                </div>
+              </div>
+              <div class="card" style="margin-bottom:16px">
+                <div class="card-head"><span class="card-head-title">Cover image</span></div>
+                <div class="card-body">
+                  <div class="imgzone" id="bcover-zone" ondragover="this.classList.add('drag');event.preventDefault()" ondragleave="this.classList.remove('drag')" ondrop="dzDrop(event,'bcover')"><input type="file" accept="image/*" onchange="dzPick(event,'bcover')"><div class="imgzone-icon">📷</div><div class="imgzone-text"><strong>Click or drag</strong> to upload cover</div></div>
+                  <div id="bcover-prev" class="imgprev" style="display:none"><img id="bcover-img" src=""><button class="imgclear" onclick="dzClear('bcover')">✕</button></div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-head"><span class="card-head-title">Post content</span></div>
+                <div class="card-body">
+                  <div class="beditor-toolbar">
+                    <button class="btool" onclick="bfmt('bold')"><strong>B</strong></button>
+                    <button class="btool" onclick="bfmt('italic')"><span>I</span></button>
+                    <button class="btool" onclick="bfmt('underline')"><u>U</u></button>
+                    <button class="btool" onclick="bfmtBlock('h2')">H2</button>
+                    <button class="btool" onclick="bfmtBlock('h3')">H3</button>
+                    <button class="btool" onclick="bfmtBlock('p')">¶</button>
+                    <button class="btool" onclick="bfmtBlock('blockquote')">"</button>
+                    <button class="btool" onclick="bfmt('insertUnorderedList')">• List</button>
+                    <button class="btool" onclick="bfmt('insertOrderedList')">1. List</button>
+                    <button class="btool" onclick="bLink()">🔗</button>
+                  </div>
+                  <div class="beditor" id="b-content" contenteditable="true" oninput="markDirty()"></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="card" style="margin-bottom:14px">
+                <div class="card-head"><span class="card-head-title">Post settings</span></div>
+                <div class="card-body">
+                  <div class="frow"><label class="flab">Category</label>
+                    <select class="finput" id="b-cat">
+                      <option value="tips">Design tips</option>
+                      <option value="stories">Stories</option>
+                      <option value="guides">Guides</option>
+                      <option value="print">Print & craft</option>
+                      <option value="news">News</option>
+                    </select>
+                  </div>
+                  <div class="frow"><label class="flab">Author</label><input class="finput" id="b-author" value="Binder Team"></div>
+                  <div class="frow"><label class="flab">URL slug</label><input class="finput" id="b-slug" placeholder="my-post-title" style="font-family:monospace;font-size:12px"></div>
+                </div>
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center;height:40px;border-radius:var(--r);margin-bottom:8px" onclick="saveBlogPost('published')">Publish post</button>
+              <button class="btn btn-ghost" style="width:100%;justify-content:center;height:36px;border-radius:var(--r);margin-bottom:8px" onclick="saveBlogPost('draft')">Save as draft</button>
+              <button class="btn btn-danger" style="width:100%;justify-content:center;height:32px;border-radius:var(--r)" id="b-delete-btn" onclick="deletePost()">Delete post</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRESS -->
+      <div class="page" id="page-press">
+        <div class="ph">
+          <div class="ph-left"><h1>Press coverage</h1><p>Manage press entries shown on your press page.</p></div>
+          <div class="ph-actions"><button class="btn btn-primary" onclick="showPressForm()">+ Add coverage</button></div>
+        </div>
+        <div id="press-form-wrap" class="card" style="display:none;margin-bottom:20px">
+          <div class="card-head"><span class="card-head-title" id="press-form-title">Add coverage</span></div>
+          <div class="card-body">
+            <div class="fgrid2">
+              <div class="frow"><label class="flab">Publication</label><input class="finput" id="cv-pub"></div>
+              <div class="frow"><label class="flab">Date</label><input class="finput" type="date" id="cv-date"></div>
+              <div class="frow" style="grid-column:1/-1"><label class="flab">Article title</label><input class="finput" id="cv-title"></div>
+              <div class="frow" style="grid-column:1/-1"><label class="flab">Excerpt</label><textarea class="ftarea" id="cv-excerpt" rows="2"></textarea></div>
+              <div class="frow" style="grid-column:1/-1"><label class="flab">Article URL</label><input class="finput" type="url" id="cv-url"></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn btn-primary" onclick="saveCoverage()">Save</button>
+              <button class="btn btn-ghost" onclick="document.getElementById('press-form-wrap').style.display='none'">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Publication</th><th>Title</th><th>Date</th><th>Actions</th></tr></thead><tbody id="press-tbody"></tbody></table></div><div class="tbl-foot"><span id="press-count">0 entries</span></div></div>
+      </div>
+
+      <!-- MEDIA LIBRARY -->
+      <div class="page" id="page-media">
+        <div class="ph">
+          <div class="ph-left"><h1>Media library</h1><p>Upload and manage photos. Click any image to copy its URL.</p></div>
+          <div class="ph-actions"><button class="btn btn-primary" onclick="document.getElementById('media-inp').click()">+ Upload photos</button></div>
+        </div>
+        <input type="file" id="media-inp" accept="image/*" multiple style="display:none" onchange="uploadMedia(event)">
+        <div class="card">
+          <div class="card-body">
+            <div class="mgrid" id="mgrid"></div>
+            <div id="mgrid-empty" style="text-align:center;padding:40px;color:var(--txl)"><div style="font-size:32px;margin-bottom:10px;opacity:.3">🖼</div>No media uploaded yet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="page" id="page-settings">
+        <div class="ph"><div class="ph-left"><h1>Site settings</h1><p>Configure your Binder website.</p></div><div class="ph-actions"><button class="btn btn-primary" onclick="saveSettings()">Save settings</button></div></div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-head"><span class="card-head-title">Brand & contact</span></div>
+          <div class="card-body">
+            <div class="fgrid2">
+              <div class="frow"><label class="flab">Site name</label><input class="finput" id="st-name" oninput="markDirty()"></div>
+              <div class="frow"><label class="flab">Tagline</label><input class="finput" id="st-tagline" oninput="markDirty()"></div>
+              <div class="frow"><label class="flab">Contact email</label><input class="finput" id="st-email" oninput="markDirty()"></div>
+              <div class="frow"><label class="flab">Press email</label><input class="finput" id="st-press" oninput="markDirty()"></div>
+              <div class="frow" style="grid-column:1/-1"><label class="flab">Address</label><input class="finput" id="st-addr" oninput="markDirty()"></div>
+              <div class="frow"><label class="flab">Instagram URL</label><input class="finput" id="st-insta" oninput="markDirty()"></div>
+              <div class="frow"><label class="flab">Facebook URL</label><input class="finput" id="st-fb" oninput="markDirty()"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-head"><span class="card-head-title">Footer text</span></div>
+          <div class="card-body">
+            <div class="frow"><label class="flab">Footer tagline</label><input class="finput" id="st-ftag" oninput="markDirty()"></div>
+            <div class="frow"><label class="flab">Copyright line</label><input class="finput" id="st-copy" oninput="markDirty()"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-head"><span class="card-head-title">Admin password</span></div>
+          <div class="card-body">
+            <div class="fgrid2">
+              <div class="frow"><label class="flab">New password</label><input class="finput" type="password" id="new-pw" placeholder="Leave blank to keep current"></div>
+              <div class="frow"><label class="flab">Confirm new password</label><input class="finput" type="password" id="new-pw2" placeholder="Repeat new password"></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">Save all settings</button>
+      </div>
+
+    </div><!-- end #main -->
+  </div><!-- end #shell -->
+</div><!-- end #app -->
+
+<div id="toast"></div>
+
+<script>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BINDER ADMIN — Shopify-style backend
+   No demo logins. Password only.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+const PASS = 'binder2026';
+let isDirty = false;
+let editingBlogId = null;
+let editingCovId = null;
+let dzImgs = {};
+let editingPressId = null;
+
+// ── DB helpers ─────────────────────────────────────────
+function db(k,d){try{const v=localStorage.getItem('bdr_'+k);return v?JSON.parse(v):d;}catch(e){return d;}}
+function dbSet(k,v){try{localStorage.setItem('bdr_'+k,JSON.stringify(v));}catch(e){toast('Storage full','err');}}
+
+// ── AUTH ─────────────────────────────────────────────
+function doLogin(){
+  const pw=document.getElementById('lpw').value;
+  const stored=localStorage.getItem('ba_pw')||PASS;
+  if(pw!==stored){document.getElementById('lerr').style.display='block';return;}
+  sessionStorage.setItem('ba_auth','1');
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').classList.add('on');
+  initApp();
+}
+function doLogout(){sessionStorage.removeItem('ba_auth');location.reload();}
+document.getElementById('lpw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+if(sessionStorage.getItem('ba_auth')){
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').classList.add('on');
+  window.addEventListener('DOMContentLoaded',initApp);
+}
+
+// ── INIT ─────────────────────────────────────────────
+function initApp(){
+  setGreeting();
+  loadHomepage();
+  loadSettings();
+  loadMenu();
+  renderDash();
+  renderBlogList();
+  renderPressList();
+  renderMedia();
+  buildFeatureTiles();
+  buildTestimonials();
+}
+
+function setGreeting(){
+  const h=new Date().getHours();
+  document.getElementById('greeting').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening');
+}
+
+// ── NAV ─────────────────────────────────────────────
+function goPage(page,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nitem').forEach(b=>b.classList.remove('active'));
+  const el=document.getElementById('page-'+page);
+  if(el)el.classList.add('active');
+  if(btn)btn.classList.add('active');
+  else document.querySelectorAll('.nitem').forEach(b=>{
+    if(b.getAttribute('onclick')?.includes("'"+page+"'"))b.classList.add('active');
+  });
+  // Close blog form when navigating away
+  if(page!=='blog')closeBlogForm();
+}
+
+// ── DIRTY STATE ────────────────────────────────────
+function markDirty(){
+  isDirty=true;
+  document.getElementById('tbstatus').textContent='● Unsaved changes';
+  document.getElementById('tbstatus').className='tb-status dirty';
+}
+function markSaved(){
+  isDirty=false;
+  document.getElementById('tbstatus').textContent='All changes saved';
+  document.getElementById('tbstatus').className='tb-status ok';
+  setTimeout(()=>{
+    document.getElementById('tbstatus').textContent='All changes saved';
+    document.getElementById('tbstatus').className='tb-status';
+  },4000);
+}
+
+// ── DASHBOARD ──────────────────────────────────────
+function renderDash(){
+  const posts=db('posts',[]);
+  const press=db('press',[]);
+  const media=db('media',[]);
+  document.getElementById('dash-stats').innerHTML=`
+    <div class="stat"><div class="stat-val">${posts.length}</div><div class="stat-label">Blog posts</div></div>
+    <div class="stat"><div class="stat-val">${posts.filter(p=>p.status==='published').length}</div><div class="stat-label">Published</div></div>
+    <div class="stat"><div class="stat-val">${press.length}</div><div class="stat-label">Press entries</div></div>
+    <div class="stat"><div class="stat-val">${media.length}</div><div class="stat-label">Media files</div></div>
+  `;
+}
+
+// ── HOMEPAGE ───────────────────────────────────────
+const HP_DEF={
+  ey:'Premium photobooks · Delivered across India',
+  title:'Your photos deserve to be held',
+  sub:'Design your photobook in minutes. We print at 300 DPI in CMYK and deliver anywhere in India in 5–7 days.',
+  cta1:'Create your photobook',cta2:'See sizes & pricing',
+  t:['300 DPI CMYK printing','Hardcover binding','5–7 day delivery','Pan-India delivery','Printed in Okhla, Delhi'],
+  bh:'Memories worth holding onto.',bs:'Every spread printed with precision.',
+  features:[
+    {icon:'🎨',title:'True CMYK colour',text:'We print in CMYK at 300 DPI — the same standard used by professional photo labs worldwide.'},
+    {icon:'📐',title:'Premium binding',text:'Our premium binding ensures every spread lies flat and opens beautifully.'},
+    {icon:'✏️',title:'Free online editor',text:'No software to install. Design entirely in your browser with drag-and-drop simplicity.'},
+    {icon:'🚀',title:'5–7 day delivery',text:'From your design to your doorstep in under a week, delivered anywhere in India.'},
+  ],
+  sizes:[{price:'₹1,999'},{price:'₹2,999'},{price:'₹4,499'}],
+  tms:[
+    {text:'"The quality is absolutely stunning. The colours are vivid and the binding is flawless."',name:'Priya S.',loc:'Bengaluru, Karnataka'},
+    {text:'"Ordered 50 copies for our event. Excellent discount, all arrived perfectly packaged."',name:'Rohit V.',loc:'Mumbai, Maharashtra'},
+    {text:'"I designed a baby album in under an hour and the result exceeded every expectation."',name:'Ananya I.',loc:'Chennai, Tamil Nadu'},
+  ],
+  ctatitle:'Your story deserves to be printed',ctasub:'Start designing in minutes. Free to use until you\'re ready to order.',
+  ctabtn1:'Create your photobook',ctabtn2:'Browse the shop',
+};
+
+function loadHomepage(){
+  const hp=db('hp',HP_DEF);
+  sv('hp-ey',hp.ey);sv('hp-title',hp.title);sv('hp-sub',hp.sub);
+  sv('hp-cta1',hp.cta1);sv('hp-cta2',hp.cta2);
+  sv('hp-bh',hp.bh);sv('hp-bs',hp.bs);
+  sv('hp-ctatitle',hp.ctatitle);sv('hp-ctasub',hp.ctasub);
+  sv('hp-ctabtn1',hp.ctabtn1);sv('hp-ctabtn2',hp.ctabtn2);
+  (hp.t||HP_DEF.t).forEach((t,i)=>sv('hp-t'+i,t));
+  (hp.sizes||HP_DEF.sizes).forEach((s,i)=>{sv('sz'+i+'-p',s.price);if(s.img)showImgPrev('sz'+i,s.img);});
+  // Book images
+  ['hb0','hb1','banner'].forEach(k=>{if(hp['img_'+k])showImgPrev(k,hp['img_'+k]);});
+  buildFeatureTiles(hp.features||HP_DEF.features);
+  buildTestimonials(hp.tms||HP_DEF.tms);
+}
+
+function buildFeatureTiles(fts){
+  const f=fts||(db('hp',HP_DEF).features||HP_DEF.features);
+  document.getElementById('features-body').innerHTML=f.map((ft,i)=>`
+    <div style="border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;color:var(--tl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Feature ${i+1}</div>
+      <div class="fgrid2">
+        <div class="frow"><label class="flab">Icon</label><input class="finput" id="ft-ic${i}" value="${ft.icon||''}" oninput="markDirty()"></div>
+        <div class="frow"><label class="flab">Title</label><input class="finput" id="ft-ti${i}" value="${ft.title||''}" oninput="markDirty()"></div>
+        <div class="frow" style="grid-column:1/-1"><label class="flab">Description</label><textarea class="ftarea" id="ft-tx${i}" rows="2" oninput="markDirty()">${ft.text||''}</textarea></div>
+      </div>
+    </div>`).join('');
+}
+
+function buildTestimonials(tms){
+  const t=tms||(db('hp',HP_DEF).tms||HP_DEF.tms);
+  document.getElementById('testimonials-body').innerHTML=t.map((tm,i)=>`
+    <div style="border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;color:var(--tl);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Review ${i+1}</div>
+      <div class="frow"><label class="flab">Quote text</label><textarea class="ftarea" id="tm-tx${i}" rows="3" oninput="markDirty()">${tm.text||''}</textarea></div>
+      <div class="fgrid2">
+        <div class="frow"><label class="flab">Name</label><input class="finput" id="tm-nm${i}" value="${tm.name||''}" oninput="markDirty()"></div>
+        <div class="frow"><label class="flab">Location</label><input class="finput" id="tm-lc${i}" value="${tm.loc||''}" oninput="markDirty()"></div>
+      </div>
+    </div>`).join('');
+}
+
+function saveHomepage(){
+  const hp={
+    ey:gv('hp-ey'),title:gv('hp-title'),sub:gv('hp-sub'),
+    cta1:gv('hp-cta1'),cta2:gv('hp-cta2'),
+    bh:gv('hp-bh'),bs:gv('hp-bs'),
+    ctatitle:gv('hp-ctatitle'),ctasub:gv('hp-ctasub'),
+    ctabtn1:gv('hp-ctabtn1'),ctabtn2:gv('hp-ctabtn2'),
+    t:[0,1,2,3,4].map(i=>gv('hp-t'+i)),
+    features:[0,1,2,3].map(i=>({icon:gv('ft-ic'+i),title:gv('ft-ti'+i),text:gv('ft-tx'+i)})),
+    sizes:[0,1,2].map(i=>({price:gv('sz'+i+'-p'),img:dzImgs['sz'+i]||db('hp',HP_DEF).sizes?.[i]?.img||''})),
+    tms:[0,1,2].map(i=>({text:gv('tm-tx'+i),name:gv('tm-nm'+i),loc:gv('tm-lc'+i)})),
+  };
+  ['hb0','hb1','banner'].forEach(k=>{hp['img_'+k]=dzImgs[k]||db('hp',HP_DEF)['img_'+k]||'';});
+  dbSet('hp',hp);
+  // Push to live site localStorage keys that index.html reads
+  const textMap={
+    'e-ey':hp.ey,'e-title':hp.title,'e-sub':hp.sub,
+    'e-cta1':hp.cta1,'e-cta2':hp.cta2,
+    'e-bh':hp.bh,'e-bs':hp.bs,
+    'e-ctti':hp.ctatitle,'e-ctsu':hp.ctasub,
+    'e-ctb1':hp.ctabtn1,'e-ctb2':hp.ctabtn2,
+  };
+  hp.t.forEach((t,i)=>textMap['e-t'+i]=t);
+  hp.features.forEach((f,i)=>{textMap['e-fi'+i]=f.icon;textMap['e-ft'+i]=f.title;textMap['e-fd'+i]=f.text;});
+  hp.sizes.forEach((s,i)=>textMap['e-sp'+i]=s.price);
+  hp.tms.forEach((tm,i)=>{textMap['e-tx'+i]=tm.text;textMap['e-tn'+i]=tm.name;textMap['e-tl'+i]=tm.loc;});
+  const textArr=Object.keys(textMap).map(id=>({id,v:textMap[id]}));
+  localStorage.setItem('bdr3_text',JSON.stringify(textArr));
+  // Images
+  const imgArr=[];
+  ['hb0','hb1','banner'].forEach(k=>{if(hp['img_'+k])imgArr.push({id:'e-'+k.replace('hb','hb'),src:hp['img_'+k]});});
+  if(hp['img_hb0'])imgArr.push({id:'e-hb0',src:hp['img_hb0']});
+  if(hp['img_hb1'])imgArr.push({id:'e-hb1',src:hp['img_hb1']});
+  if(hp['img_banner'])imgArr.push({id:'e-banner',src:hp['img_banner']});
+  hp.sizes.forEach((s,i)=>{if(s.img)imgArr.push({id:'e-si'+i,src:s.img});});
+  localStorage.setItem('bdr3_imgs',JSON.stringify(imgArr));
+  markSaved();
+  toast('Homepage saved ✓','ok');
+}
+
+// ── MENU ───────────────────────────────────────────
+const MENU_DEF=[
+  {label:'Photobooks',url:'index.html'},
+  {label:'Art Prints',url:'art-prints.html'},
+  {label:'Shop',url:'shop.html'},
+  {label:'Journal',url:'blog.html'},
+  {label:'Orders',url:'my-orders.html'},
+];
+
+function loadMenu(){
+  const menu=db('menu',MENU_DEF);
+  renderMenuItems(menu);
+  const cta=db('nav_cta',{label:'Start designing',url:'photobook-editor.html'});
+  sv('nav-cta-label',cta.label);sv('nav-cta-url',cta.url);
+}
+
+function renderMenuItems(items){
+  document.getElementById('menu-items').innerHTML=items.map((item,i)=>`
+    <div class="menu-item-row" draggable="true" data-idx="${i}">
+      <span class="menu-handle">≡</span>
+      <div class="menu-item-inputs">
+        <input class="finput menu-item-label" value="${item.label||''}" placeholder="Link label" oninput="markDirty()">
+        <input class="finput menu-item-url" value="${item.url||''}" placeholder="URL e.g. shop.html or https://..." oninput="markDirty()">
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="removeMenuItem(${i})">Remove</button>
+    </div>`).join('');
+}
+
+function addMenuItem(){
+  const items=getMenuItems();
+  items.push({label:'New link',url:'#'});
+  renderMenuItems(items);markDirty();
+}
+function removeMenuItem(i){
+  const items=getMenuItems();items.splice(i,1);renderMenuItems(items);markDirty();
+}
+function getMenuItems(){
+  return Array.from(document.querySelectorAll('.menu-item-row')).map(row=>({
+    label:row.querySelector('.menu-item-label').value,
+    url:row.querySelector('.menu-item-url').value,
+  }));
+}
+function saveMenu(){
+  const items=getMenuItems();
+  dbSet('menu',items);
+  const cta={label:gv('nav-cta-label'),url:gv('nav-cta-url')};
+  dbSet('nav_cta',cta);
+  markSaved();toast('Menu saved ✓','ok');
+}
+
+// ── BLOG ───────────────────────────────────────────
+function getPosts(){return db('posts',[]);}
+function setPosts(p){dbSet('posts',p);localStorage.setItem('binder_posts',JSON.stringify(p));}
+
+function renderBlogList(){
+  const posts=getPosts();
+  const tbody=document.getElementById('blog-tbody');
+  if(!posts.length){tbody.innerHTML='<tr><td colspan="4"><div class="tbl-empty"><div class="tbl-empty-icon">📝</div>No posts yet.</div></td></tr>';document.getElementById('blog-count').textContent='0 posts';return;}
+  tbody.innerHTML=posts.map(p=>`<tr>
+    <td style="font-weight:400">${p.title||'Untitled'}</td>
+    <td><span class="badge ${p.status==='published'?'badge-g':'badge-gray'}">${p.status||'draft'}</span></td>
+    <td style="color:var(--tl)">${p.date||''}</td>
+    <td><div style="display:flex;gap:6px">
+      <button class="btn btn-ghost btn-sm" onclick="editPost('${p.id}')">Edit</button>
+      <button class="btn btn-danger btn-sm" onclick="deletePostById('${p.id}')">Delete</button>
+    </div></td>
+  </tr>`).join('');
+  document.getElementById('blog-count').textContent=posts.length+' post'+(posts.length!==1?'s':'');
+}
+
+function newBlogPost(){
+  editingBlogId=null;
+  document.getElementById('blog-form-title').textContent='New post';
+  document.getElementById('b-delete-btn').style.display='none';
+  ['b-title','b-excerpt','b-slug'].forEach(id=>sv(id,''));
+  document.getElementById('b-cat').value='tips';
+  document.getElementById('b-author').value='Binder Team';
+  document.getElementById('b-content').innerHTML='';
+  dzClear('bcover');
+  document.getElementById('blog-list-card').style.display='none';
+  document.getElementById('blog-form').style.display='block';
+  goPage('blog',null);
+}
+
+function editPost(id){
+  const p=getPosts().find(x=>x.id===id);if(!p)return;
+  editingBlogId=id;
+  document.getElementById('blog-form-title').textContent='Edit post';
+  document.getElementById('b-delete-btn').style.display='flex';
+  sv('b-title',p.title);sv('b-excerpt',p.excerpt);sv('b-slug',p.slug);
+  document.getElementById('b-cat').value=p.category||'tips';
+  document.getElementById('b-author').value=p.author||'Binder Team';
+  document.getElementById('b-content').innerHTML=p.content||'';
+  if(p.cover)showImgPrev('bcover',p.cover);else dzClear('bcover');
+  document.getElementById('blog-list-card').style.display='none';
+  document.getElementById('blog-form').style.display='block';
+  goPage('blog',null);
+}
+
+function closeBlogForm(){
+  editingBlogId=null;
+  document.getElementById('blog-form').style.display='none';
+  document.getElementById('blog-list-card').style.display='block';
+  renderBlogList();
+}
+
+function saveBlogPost(status){
+  const title=gv('b-title');if(!title){toast('Please enter a title','err');return;}
+  const slug=gv('b-slug')||title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const posts=getPosts();
+  const cover=dzImgs['bcover']||(editingBlogId?getPosts().find(p=>p.id===editingBlogId)?.cover:'')||'';
+  const post={
+    id:editingBlogId||'p'+Date.now(),
+    title,slug,
+    excerpt:gv('b-excerpt'),
+    category:document.getElementById('b-cat').value,
+    author:document.getElementById('b-author').value,
+    date:new Date().toISOString().slice(0,10),
+    cover,
+    content:document.getElementById('b-content').innerHTML,
+    status,
+  };
+  if(editingBlogId){const idx=posts.findIndex(p=>p.id===editingBlogId);if(idx!==-1)posts[idx]=post;else posts.unshift(post);}
+  else posts.unshift(post);
+  editingBlogId=post.id;
+  setPosts(posts);
+  markSaved();
+  toast(status==='published'?'Post published ✓':'Draft saved ✓','ok');
+  renderDash();
+}
+
+function deletePost(){
+  if(!editingBlogId||!confirm('Delete this post?'))return;
+  deletePostById(editingBlogId);closeBlogForm();
+}
+function deletePostById(id){
+  setPosts(getPosts().filter(p=>p.id!==id));renderBlogList();renderDash();toast('Post deleted');
+}
+
+// Blog toolbar
+function bfmt(cmd){document.getElementById('b-content').focus();document.execCommand(cmd,false,null);markDirty();}
+function bfmtBlock(tag){
+  document.getElementById('b-content').focus();
+  const snips={h2:'<h2>Heading</h2>',h3:'<h3>Subheading</h3>',p:'<p>Paragraph</p>',
+    blockquote:'<blockquote>Quote here</blockquote>'};
+  document.execCommand('insertHTML',false,snips[tag]||'<p></p>');markDirty();
+}
+function bLink(){const url=prompt('Enter URL:','https://');if(url){document.getElementById('b-content').focus();document.execCommand('createLink',false,url);}markDirty();}
+// Auto slug from title
+document.addEventListener('DOMContentLoaded',()=>{
+  const t=document.getElementById('b-title');
+  if(t)t.addEventListener('input',()=>{
+    if(!editingBlogId){const s=document.getElementById('b-slug');if(s)s.value=t.value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+  });
+});
+
+// ── PRESS ─────────────────────────────────────────
+function showPressForm(id){
+  editingPressId=id||null;
+  document.getElementById('press-form-title').textContent=id?'Edit coverage':'Add coverage';
+  if(id){const c=db('press',[]).find(x=>x.id===id)||{};sv('cv-pub',c.pub);sv('cv-title',c.title);sv('cv-excerpt',c.excerpt);sv('cv-url',c.url);document.getElementById('cv-date').value=c.date||'';}
+  else{['cv-pub','cv-title','cv-excerpt','cv-url'].forEach(id=>sv(id,''));document.getElementById('cv-date').value=new Date().toISOString().slice(0,10);}
+  document.getElementById('press-form-wrap').style.display='block';
+}
+function saveCoverage(){
+  const pub=gv('cv-pub'),title=gv('cv-title');if(!pub||!title){toast('Fill publication and title','err');return;}
+  const press=db('press',[]);
+  const entry={id:editingPressId||'c'+Date.now(),pub,title,excerpt:gv('cv-excerpt'),date:document.getElementById('cv-date').value,url:gv('cv-url')};
+  if(editingPressId){const i=press.findIndex(c=>c.id===editingPressId);if(i!==-1)press[i]=entry;else press.unshift(entry);}
+  else press.unshift(entry);
+  dbSet('press',press);
+  document.getElementById('press-form-wrap').style.display='none';
+  renderPressList();markSaved();toast('Coverage saved ✓','ok');
+}
+function renderPressList(){
+  const press=db('press',[]);
+  const tbody=document.getElementById('press-tbody');
+  if(!press.length){tbody.innerHTML='<tr><td colspan="4"><div class="tbl-empty"><div class="tbl-empty-icon">📰</div>No press entries yet.</div></td></tr>';document.getElementById('press-count').textContent='0 entries';return;}
+  tbody.innerHTML=press.map(c=>`<tr>
+    <td style="font-weight:400">${c.pub}</td>
+    <td>${c.title}</td>
+    <td style="color:var(--tl)">${c.date}</td>
+    <td><div style="display:flex;gap:6px">
+      ${c.url?`<a href="${c.url}" target="_blank" class="btn btn-ghost btn-sm">View</a>`:''}
+      <button class="btn btn-ghost btn-sm" onclick="showPressForm('${c.id}')">Edit</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteCov('${c.id}')">Remove</button>
+    </div></td>
+  </tr>`).join('');
+  document.getElementById('press-count').textContent=press.length+' entr'+(press.length===1?'y':'ies');
+}
+function deleteCov(id){if(!confirm('Remove?'))return;dbSet('press',db('press',[]).filter(c=>c.id!==id));renderPressList();}
+
+// ── MEDIA ─────────────────────────────────────────
+function uploadMedia(e){
+  Array.from(e.target.files).forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const media=db('media',[]);
+      media.unshift({id:'m'+Date.now()+Math.random().toString(36).slice(2),name:file.name,src:ev.target.result,date:new Date().toISOString().slice(0,10)});
+      dbSet('media',media);renderMedia();renderDash();toast('Uploaded ✓','ok');
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+function renderMedia(){
+  const media=db('media',[]);
+  const grid=document.getElementById('mgrid');
+  const empty=document.getElementById('mgrid-empty');
+  if(!media.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML=media.map(m=>`
+    <div class="mitem" onclick="copyUrl('${m.id}')" title="${m.name}">
+      <img src="${m.src}" loading="lazy">
+      <div class="mitem-overlay"><span>Copy URL</span></div>
+      <button class="mitem-del" onclick="event.stopPropagation();delMedia('${m.id}')">✕</button>
+    </div>`).join('');
+}
+function copyUrl(id){
+  const m=db('media',[]).find(x=>x.id===id);if(!m)return;
+  navigator.clipboard.writeText(m.src).then(()=>toast('URL copied ✓','ok')).catch(()=>prompt('Copy URL:',m.src));
+}
+function delMedia(id){if(!confirm('Remove?'))return;dbSet('media',db('media',[]).filter(m=>m.id!==id));renderMedia();renderDash();}
+
+// ── SETTINGS ──────────────────────────────────────
+function loadSettings(){
+  const s=db('settings',{name:'Binder',tagline:'Premium photobooks crafted with care',email:'hello@binder.co.in',press:'press@binder.co.in',addr:'A-291/1, Okhla Phase I, Delhi — 110020',insta:'https://instagram.com/binderbooks',fb:'https://facebook.com/binderbooks',ftag:'Premium photobooks crafted with care. 300 DPI CMYK · Hardcover · Pan-India delivery.',copy:'© 2026 Binder. All rights reserved.'});
+  sv('st-name',s.name);sv('st-tagline',s.tagline);sv('st-email',s.email);sv('st-press',s.press);sv('st-addr',s.addr);sv('st-insta',s.insta);sv('st-fb',s.fb);sv('st-ftag',s.ftag);sv('st-copy',s.copy);
+}
+function saveSettings(){
+  const npw=document.getElementById('new-pw').value;
+  const npw2=document.getElementById('new-pw2').value;
+  if(npw){if(npw!==npw2){toast('Passwords do not match','err');return;}localStorage.setItem('ba_pw',npw);}
+  const s={name:gv('st-name'),tagline:gv('st-tagline'),email:gv('st-email'),press:gv('st-press'),addr:gv('st-addr'),insta:gv('st-insta'),fb:gv('st-fb'),ftag:gv('st-ftag'),copy:gv('st-copy')};
+  dbSet('settings',s);
+  // Push footer & contact to live site text
+  const extra=localStorage.getItem('bdr3_text');
+  let texts=[];try{texts=JSON.parse(extra||'[]');}catch(e){}
+  const upd={'e-ftag':s.ftag,'e-fcopy':s.copy,'e-fadr':s.addr,'e-fbrand':s.name};
+  Object.keys(upd).forEach(id=>{const i=texts.findIndex(x=>x.id===id);if(i>-1)texts[i].v=upd[id];else texts.push({id,v:upd[id]});});
+  localStorage.setItem('bdr3_text',JSON.stringify(texts));
+  markSaved();toast('Settings saved ✓','ok');
+}
+
+// ── IMAGE ZONES ───────────────────────────────────
+function dzPick(e,key){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{dzImgs[key]=ev.target.result;showImgPrev(key,ev.target.result);markDirty();toast('Image ready ✓','ok');};
+  reader.readAsDataURL(file);e.target.value='';
+}
+function dzDrop(e,key){
+  e.preventDefault();e.currentTarget.classList.remove('drag');
+  const file=e.dataTransfer.files[0];if(!file||!file.type.startsWith('image/'))return;
+  const reader=new FileReader();
+  reader.onload=ev=>{dzImgs[key]=ev.target.result;showImgPrev(key,ev.target.result);markDirty();toast('Image ready ✓','ok');};
+  reader.readAsDataURL(file);
+}
+function showImgPrev(key,src){
+  const zone=document.getElementById(key+'-zone');
+  const prev=document.getElementById(key+'-prev');
+  const img=document.getElementById(key+'-img');
+  if(zone)zone.style.display='none';
+  if(img)img.src=src;
+  if(prev)prev.style.display='block';
+}
+function dzClear(key){
+  delete dzImgs[key];
+  const zone=document.getElementById(key+'-zone');
+  const prev=document.getElementById(key+'-prev');
+  if(zone)zone.style.display='flex';
+  if(prev)prev.style.display='none';
+  markDirty();
+}
+
+// ── PUBLISH ───────────────────────────────────────
+function publishAll(){
+  saveHomepage();
+  saveSettings();
+  toast('Published — your live site is updated ✓','ok');
+}
+
+// ── HELPERS ───────────────────────────────────────
+function gv(id){const el=document.getElementById(id);return el?el.value||el.innerHTML||''||(el.tagName==='TEXTAREA'?el.value:el.value)||'':'';}
+function sv(id,val){const el=document.getElementById(id);if(el&&val!==undefined){if(el.tagName==='TEXTAREA'||el.tagName==='INPUT')el.value=val||'';else el.innerHTML=val||'';}}
+
+let _tt;
+function toast(msg,type=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='show'+(type?' '+type:'');
+  clearTimeout(_tt);_tt=setTimeout(()=>{el.className='';},3000);
+}
+</script>
+</body>
+</html>

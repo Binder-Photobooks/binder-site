@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — Binder</title>
+<meta name="description" content="Stories, tips, and inspiration from Binder — India's premium photobook brand.">
+
+<noscript></noscript>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#00B878;--accent-h:#009962;--accent-l:#e8f7f0;
+  --black:#0a0a0a;--white:#fff;
+  --g50:#f9f9f9;--g100:#f2f2f2;--g200:#e4e4e4;--g300:#c8c8c8;--g400:#999;--g500:#666;
+  --font:'Lato',system-ui,sans-serif;--font-serif:'Lato',system-ui,sans-serif;
+  --max-w:1060px;--radius:10px;--radius-lg:16px;
+  --shadow:0 2px 8px rgba(0,0,0,.05),0 6px 20px rgba(0,0,0,.04);
+}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--white);color:var(--black);line-height:1.6}
+a{text-decoration:none;color:inherit}
+.wrap{max-width:var(--max-w);margin:0 auto;padding:0 5vw}
+
+/* NAV */
+nav{position:sticky;top:0;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--g200);z-index:100;padding:0 5vw}
+.nav-inner{display:flex;align-items:center;height:62px;gap:28px}
+.nav-logo{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.nav-logo-mark{width:34px;height:34px;background:var(--black);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--white);font-weight:700;font-size:16px}
+.nav-logo-name{font-size:15px;font-weight:700}
+.nav-links{display:flex;gap:24px;flex:1}
+.nav-links a{font-size:13px;color:var(--g400);font-weight:400;transition:color .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--black)}
+.nav-cta{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:var(--font);transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:var(--white)}
+.btn-primary:hover{background:var(--accent-h)}
+.btn-outline{background:transparent;border:1.5px solid var(--g200);color:var(--g500)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PAGE HEADER */
+.page-header{padding:72px 5vw 52px;background:var(--g50);border-bottom:1px solid var(--g200)}
+.page-header-inner{max-width:var(--max-w);margin:0 auto}
+.page-eyebrow{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.page-title{font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-.4px;margin-bottom:10px;font-family:'Lato',system-ui,sans-serif}
+.page-sub{font-size:15px;color:var(--g400);max-width:480px;line-height:1.7}
+
+/* CATEGORY FILTER */
+.category-bar{padding:20px 5vw;border-bottom:1px solid var(--g100);background:var(--white);position:sticky;top:62px;z-index:90}
+.category-bar-inner{max-width:var(--max-w);margin:0 auto;display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.category-bar-inner::-webkit-scrollbar{display:none}
+.cat-btn{padding:6px 16px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--g200);background:transparent;color:var(--g500);font-family:var(--font);transition:all .15s;white-space:nowrap;flex-shrink:0}
+.cat-btn:hover,.cat-btn.active{background:var(--accent);color:var(--white);border-color:var(--accent)}
+
+/* FEATURED POST */
+.featured-wrap{padding:48px 5vw 0}
+.featured-post{display:grid;grid-template-columns:1.1fr 1fr;gap:0;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);max-width:var(--max-w);margin:0 auto;cursor:pointer;transition:box-shadow .2s}
+.featured-post:hover{box-shadow:0 8px 32px rgba(0,0,0,.1)}
+.featured-post__image{background:var(--g100);min-height:320px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.featured-post__image img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.img-ph{width:100%;height:100%;min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,var(--g100),var(--g200));color:var(--g300)}
+.img-ph svg{opacity:.4;width:40px;height:40px}
+.img-ph span{font-size:11px;color:var(--g400);font-weight:400;text-transform:uppercase;letter-spacing:.4px;opacity:.7}
+.featured-post__body{background:var(--white);padding:40px 36px;display:flex;flex-direction:column;justify-content:center}
+.post-badge{display:inline-flex;background:var(--accent-l);color:var(--accent-h);font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:14px;width:fit-content}
+.featured-post__title{font-size:clamp(20px,2.5vw,28px);font-weight:700;line-height:1.25;letter-spacing:-.3px;margin-bottom:12px;font-family:'Lato',system-ui,sans-serif}
+.featured-post__excerpt{font-size:14px;color:var(--g500);line-height:1.7;margin-bottom:20px}
+.post-meta{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--g400)}
+.post-meta-dot{width:3px;height:3px;background:var(--g300);border-radius:50%}
+.post-read-more{display:inline-flex;align-items:center;gap:5px;color:var(--accent);font-size:13px;font-weight:700;margin-top:20px;transition:gap .15s}
+.post-read-more:hover{gap:8px}
+
+/* BLOG GRID */
+.blog-grid-section{padding:48px 5vw 80px}
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;max-width:var(--max-w);margin:0 auto}
+.post-card{border-radius:var(--radius-lg);overflow:hidden;background:var(--white);box-shadow:var(--shadow);cursor:pointer;transition:all .2s}
+.post-card:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.09)}
+.post-card__image{height:196px;background:var(--g100);position:relative;overflow:hidden}
+.post-card__image img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.post-card__body{padding:20px}
+.post-card__cat{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);margin-bottom:8px}
+.post-card__title{font-size:16px;font-weight:700;line-height:1.35;margin-bottom:8px;letter-spacing:-.1px;font-family:'Lato',system-ui,sans-serif}
+.post-card__excerpt{font-size:13px;color:var(--g500);line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.post-card__meta{font-size:11px;color:var(--g400);display:flex;gap:8px;align-items:center}
+
+/* NEWSLETTER */
+.newsletter-section{background:var(--g50);border-top:1px solid var(--g100);padding:64px 5vw}
+.newsletter-inner{max-width:500px;margin:0 auto;text-align:center}
+.newsletter-inner h3{font-size:22px;font-weight:700;margin-bottom:8px;font-family:'Lato',system-ui,sans-serif}
+.newsletter-inner p{font-size:14px;color:var(--g500);margin-bottom:24px;line-height:1.6}
+.newsletter-form{display:flex;gap:8px}
+.newsletter-input{flex:1;padding:12px 16px;border:1.5px solid var(--g200);border-radius:var(--radius);font-size:14px;outline:none;font-family:var(--font)}
+.newsletter-input:focus{border-color:var(--accent)}
+
+/* FOOTER */
+footer{padding:32px 5vw;border-top:1px solid var(--g200);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:var(--white)}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{font-size:12px;color:var(--g400);transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+.footer-copy{font-size:12px;color:var(--g400)}
+
+@media(max-width:900px){
+  .featured-post{grid-template-columns:1fr}
+  .blog-grid{grid-template-columns:1fr 1fr}
+  .nav-links{display:none}
+}
+@media(max-width:580px){
+  .blog-grid{grid-template-columns:1fr}
+  .newsletter-form{flex-direction:column}
+  .newsletter-form .btn{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">B</div>
+      <div class="nav-logo-name">Binder</div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#sizes">Sizes & Pricing</a>
+      <a href="art-prints.html">Art Prints</a>
+      <a href="blog.html" class="active">Blog</a>
+      <a href="press.html">Press</a>
+      <a href="my-orders.html">My Account</a>
+    </div>
+    <div class="nav-cta">
+      <a href="my-orders.html" class="btn btn-outline">Sign in</a>
+      <a href="photobook-editor.html" class="btn btn-primary">Start designing →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-eyebrow">The Binder Journal</div>
+    <h1 class="page-title">Stories, tips &amp; inspiration</h1>
+    <p class="page-sub">Ideas for preserving your memories, photography tips, and behind-the-scenes from our print studio.</p>
+  </div>
+</div>
+
+<div class="category-bar">
+  <div class="category-bar-inner">
+    <button class="cat-btn active" onclick="filterCat('all',this)">All posts</button>
+    <button class="cat-btn" onclick="filterCat('tips',this)">Design tips</button>
+    <button class="cat-btn" onclick="filterCat('stories',this)">Stories</button>
+    <button class="cat-btn" onclick="filterCat('guides',this)">Guides</button>
+    <button class="cat-btn" onclick="filterCat('print',this)">Print & craft</button>
+    <button class="cat-btn" onclick="filterCat('news',this)">News</button>
+  </div>
+</div>
+
+<!-- FEATURED POST (auto-populated from first post in posts array) -->
+<div class="featured-wrap" id="featured-wrap"></div>
+
+<!-- BLOG GRID -->
+<div class="blog-grid-section">
+  <div class="blog-grid" id="blog-grid"></div>
+  <div id="empty-state" style="display:none;text-align:center;padding:60px 0;color:var(--g400)">
+    <div style="font-size:40px;margin-bottom:12px;opacity:.4">📝</div>
+    <div style="font-size:15px">No posts in this category yet.</div>
+  </div>
+</div>
+
+<!-- NEWSLETTER -->
+<div class="newsletter-section">
+  <div class="newsletter-inner">
+    <h3>Stay inspired</h3>
+    <p>New posts on photography, design ideas, and special offers — straight to your inbox. No spam, ever.</p>
+    <div class="newsletter-form">
+      <input class="newsletter-input" type="email" placeholder="your@email.com" id="nl-email">
+      <button class="btn btn-primary" onclick="subscribeNewsletter()">Subscribe</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="photobook-editor.html">Design a book</a>
+    <a href="press.html">Press</a>
+    <a href="my-orders.html">My orders</a>
+    <a href="admin-cms.html" style="opacity:.35">Admin</a>
+  </div>
+  <div class="footer-copy">© 2026 Binder · A-291/1, Okhla Phase I, Delhi — 110020</div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <a href="https://instagram.com/binderbooks" target="_blank" rel="noopener" style="color:var(--g400);display:flex;align-items:center;gap:4px;font-size:12px;transition:color .15s" onmouseover="this.style.color='#00B878'" onmouseout="this.style.color='var(--g400)'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5" fill="currentColor" stroke="none"/></svg>
+      @binderbooks
+    </a>
+    <a href="https://facebook.com/binderbooks" target="_blank" rel="noopener" style="color:var(--g400);display:flex;align-items:center;gap:4px;font-size:12px;transition:color .15s" onmouseover="this.style.color='#00B878'" onmouseout="this.style.color='var(--g400)'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+      Binder Books
+    </a>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// BLOG POSTS DATA
+// Stored in sessionStorage so admin CMS can write to it.
+// In production this is your CMS database / Shopify blog API.
+// ═══════════════════════════════════════════════════════
+const DEFAULT_POSTS = [
+  {
+    id: 'post-1',
+    title: 'How to choose the right photobook size for your memories',
+    excerpt: 'From intimate pocket books to statement coffee-table albums — here\'s how to pick the size that works best for your story.',
+    category: 'guides',
+    categoryLabel: 'Guide',
+    image: 'https://images.unsplash.com/photo-1603792907191-89e55f70099a?w=800&h=450&q=85&fit=crop',   // Add image URL here: 'images/post-1.jpg'
+    author: 'Binder Team',
+    date: '2026-06-01',
+    featured: true,
+    slug: 'choosing-photobook-size',
+  },
+  {
+    id: 'post-2',
+    title: '10 layout ideas for your wedding photobook',
+    excerpt: 'Make your wedding album feel like a story, not a slideshow. These ten layout ideas will help you arrange your photos beautifully.',
+    category: 'tips',
+    categoryLabel: 'Design tips',
+    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=450&q=85&fit=crop',
+    author: 'Binder Team',
+    date: '2026-05-22',
+    featured: false,
+    slug: 'wedding-photobook-layouts',
+  },
+  {
+    id: 'post-3',
+    title: 'Behind the press: how your photobook is printed',
+    excerpt: 'A look inside our print facility in Okhla, Delhi — from the moment your file arrives to the moment your book is bound.',
+    category: 'print',
+    categoryLabel: 'Print & craft',
+    image: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&h=450&q=85&fit=crop',
+    author: 'Binder Team',
+    date: '2026-05-10',
+    featured: false,
+    slug: 'behind-the-press',
+  },
+  {
+    id: 'post-4',
+    title: 'The perfect baby\'s first year photobook',
+    excerpt: 'Month-by-month milestones, tiny hands, first smiles — a guide to creating a baby album that the whole family will treasure.',
+    category: 'stories',
+    categoryLabel: 'Story',
+    image: '',
+    author: 'Binder Team',
+    date: '2026-04-28',
+    featured: false,
+    slug: 'baby-first-year-album',
+  },
+  {
+    id: 'post-5',
+    title: 'Why colour calibration matters for print',
+    excerpt: 'sRGB on screen vs CMYK on paper — understanding why the same photo can look different when printed, and how we fix that.',
+    category: 'print',
+    categoryLabel: 'Print & craft',
+    image: '',
+    author: 'Binder Team',
+    date: '2026-04-14',
+    featured: false,
+    slug: 'colour-calibration-print',
+  },
+  {
+    id: 'post-6',
+    title: 'Binder is now live — our story so far',
+    excerpt: 'From a small print setup in Delhi to a full online photobook platform. Here\'s how Binder came to be, and where we\'re headed.',
+    category: 'news',
+    categoryLabel: 'News',
+    image: '',
+    author: 'Binder Team',
+    date: '2026-03-01',
+    featured: false,
+    slug: 'binder-launch-story',
+  },
+];
+
+function loadPosts() {
+  try {
+    const saved = sessionStorage.getItem('binder_posts');
+    return saved ? JSON.parse(saved) : DEFAULT_POSTS;
+  } catch(e) { return DEFAULT_POSTS; }
+}
+
+function savePosts(posts) {
+  try { sessionStorage.setItem('binder_posts', JSON.stringify(posts)); } catch(e) {}
+}
+
+let allPosts = loadPosts();
+let currentCat = 'all';
+
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'});
+}
+
+function renderFeatured(post) {
+  const wrap = document.getElementById('featured-wrap');
+  if (!post) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `
+    <a href="blog-post.html?slug=${post.slug}" class="featured-post">
+      <div class="featured-post__image">
+        ${post.image
+          ? `<img src="${post.image}" alt="${post.title}">`
+          : `<div class="img-ph"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg><span>Add cover image</span></div>`
+        }
+      </div>
+      <div class="featured-post__body">
+        <div class="post-badge">Featured · ${post.categoryLabel}</div>
+        <div class="featured-post__title">${post.title}</div>
+        <div class="featured-post__excerpt">${post.excerpt}</div>
+        <div class="post-meta">
+          <span>${post.author}</span>
+          <span class="post-meta-dot"></span>
+          <span>${formatDate(post.date)}</span>
+        </div>
+        <span class="post-read-more">Read article <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+    </a>
+  `;
+}
+
+function renderGrid(posts) {
+  const grid = document.getElementById('blog-grid');
+  const empty = document.getElementById('empty-state');
+  if (posts.length === 0) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = posts.map(post => `
+    <a href="blog-post.html?slug=${post.slug}" class="post-card" data-cat="${post.category}">
+      <div class="post-card__image">
+        ${post.image
+          ? `<img src="${post.image}" alt="${post.title}">`
+          : `<div class="img-ph" style="height:196px"><svg fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 16l5-4 4 4 3-3 4 3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg><span>Add cover image</span></div>`
+        }
+      </div>
+      <div class="post-card__body">
+        <div class="post-card__cat">${post.categoryLabel}</div>
+        <div class="post-card__title">${post.title}</div>
+        <div class="post-card__excerpt">${post.excerpt}</div>
+        <div class="post-card__meta">
+          <span>${post.author}</span>
+          <span>·</span>
+          <span>${formatDate(post.date)}</span>
+        </div>
+      </div>
+    </a>`).join('');
+}
+
+function filterCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const filtered = cat === 'all' ? allPosts : allPosts.filter(p => p.category === cat);
+  const featured = filtered.find(p => p.featured) || filtered[0];
+  const grid = filtered.filter(p => p.id !== (featured?.id));
+  renderFeatured(featured || null);
+  renderGrid(grid);
+}
+
+function subscribeNewsletter() {
+  const email = document.getElementById('nl-email').value.trim();
+  if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
+  document.getElementById('nl-email').value = '';
+  alert('Thank you! You\'re subscribed to the Binder journal.');
+}
+
+// Initial render
+(function() {
+  const featured = allPosts.find(p => p.featured) || allPosts[0];
+  const gridPosts = allPosts.filter(p => p.id !== featured?.id);
+  renderFeatured(featured);
+  renderGrid(gridPosts);
+})();
+</script>
+
+<script>
+// ── BINDER CMS LOADER ──────────────────────────────────────────
+// Reads content saved by cms.html and applies it to this page
+(function() {
+  function get(k) {
+    try { var v=localStorage.getItem('binder_cms_'+k); return v?JSON.parse(v):null; } catch(e){return null;}
+  }
+
+  // ── Homepage content ──────────────────────────────────────────
+  var hp = get('homepage');
+  if (hp && document.querySelector('.hero-title')) {
+    if (hp.eyebrow) { var e=document.querySelector('.hero-eyebrow'); if(e) e.textContent=hp.eyebrow; }
+    if (hp.title1||hp.title2) { var t=document.querySelector('.hero-title'); if(t) t.innerHTML=(hp.title1||'')+'<br><span>'+(hp.title2||'')+'</span>'; }
+    if (hp.sub) { var s=document.querySelector('.hero-sub'); if(s) s.textContent=hp.sub; }
+    if (hp.bannerImg) {
+      var bi=document.querySelector('.photo-banner-inner');
+      if(bi) bi.innerHTML='<img src="'+hp.bannerImg+'" style="width:100%;height:100%;object-fit:cover;object-position:center" alt="Binder photobooks">';
+    }
+    if (hp.bannerH) { var bh=document.querySelector('.banner-text h2'); if(bh) bh.textContent=hp.bannerH; }
+    if (hp.bannerS) { var bs=document.querySelector('.banner-text p'); if(bs) bs.textContent=hp.bannerS; }
+    if (hp.features) {
+      var blocks=document.querySelectorAll('.feature-block');
+      hp.features.forEach(function(f,i){
+        if(!blocks[i])return;
+        var ic=blocks[i].querySelector('.feature-icon');
+        var ti=blocks[i].querySelector('.feature-title');
+        var de=blocks[i].querySelector('.feature-desc');
+        if(ic&&f.icon) ic.textContent=f.icon;
+        if(ti&&f.title) ti.textContent=f.title;
+        if(de&&f.desc) de.textContent=f.desc;
+      });
+    }
+    if (hp.testimonials) {
+      var cards=document.querySelectorAll('.testimonial');
+      hp.testimonials.forEach(function(t,i){
+        if(!cards[i])return;
+        var tx=cards[i].querySelector('.testimonial-text');
+        var au=cards[i].querySelector('.testimonial-name');
+        var lo=cards[i].querySelector('.testimonial-loc');
+        var av=cards[i].querySelector('.testimonial-avatar');
+        if(tx&&t.text) tx.textContent=t.text;
+        if(au&&t.author) au.textContent=t.author;
+        if(lo&&t.loc) lo.textContent=t.loc;
+        if(av&&t.author) av.textContent=t.author.split(' ').map(function(w){return w[0];}).join('').substring(0,2);
+      });
+    }
+    if (hp.sizes) {
+      var sc=document.querySelectorAll('.size-card');
+      var sd=[hp.sizes.s6,hp.sizes.s8,hp.sizes.s12];
+      sc.forEach(function(card,i){
+        if(!sd[i])return;
+        var pr=card.querySelector('.size-card__price');
+        var di=card.querySelector('.size-card__dim');
+        var im=card.querySelector('.size-card__image');
+        if(pr&&sd[i].price) pr.textContent='\u20b9'+sd[i].price;
+        if(di&&sd[i].desc) di.textContent=sd[i].desc;
+        if(im&&sd[i].image) im.innerHTML='<img src="'+sd[i].image+'" style="width:100%;height:100%;object-fit:cover" alt="">';
+      });
+    }
+  }
+
+  // ── Blog posts ────────────────────────────────────────────────
+  var posts = null;
+  try {
+    var bp=localStorage.getItem('binder_posts')||localStorage.getItem('binder_cms_posts');
+    if(bp) posts=JSON.parse(bp);
+  } catch(e){}
+  if (posts && window.allPosts !== undefined) window.allPosts = posts;
+
+  // ── Site settings ─────────────────────────────────────────────
+  var st = get('settings');
+  if (st) {
+    if (st.address) document.querySelectorAll('[data-cms="address"]').forEach(function(el){el.textContent=st.address;});
+    if (st.insta) document.querySelectorAll('a[aria-label="Instagram"]').forEach(function(el){el.href=st.insta;});
+    if (st.fb) document.querySelectorAll('a[aria-label="Facebook"]').forEach(function(el){el.href=st.fb;});
+    if (st.email) document.querySelectorAll('[data-cms="email"]').forEach(function(el){el.textContent=st.email;if(el.tagName==='A')el.href='mailto:'+st.email;});
+  }
+
+  // ── SEO ───────────────────────────────────────────────────────
+  var seo = get('seo');
+  if (seo) {
+    if(seo.homeTitle&&document.querySelector('.hero-title')) document.title=seo.homeTitle;
+    var md=document.querySelector('meta[name="description"]');
+    if(md&&seo.homeDesc) md.content=seo.homeDesc;
+  }
+})();
+</script>
+
+</body>
+</html>
