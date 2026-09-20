@@ -66,6 +66,10 @@ const SEO_META={
     keywords:'photo scanning services Delhi, negative scanning India, document digitisation Delhi NCR, archival photo scanning'},
   photography:{title:'Photography Services Delhi — Architecture & Editorial',desc:'Professional photography in Delhi across architecture, editorial, corporate, and institutional work — from the team behind Binder\'s photobook printing studio.',
     keywords:'architecture photography Delhi, editorial photography India, corporate photography Delhi, professional photographer Delhi'},
+  sitemap:{title:'Sitemap | Binder',desc:'A full map of every page on Binder — photobooks, trade books, art prints, scanning and photography services, the store, Kagaz Journal, and more.',
+    keywords:'binder sitemap'},
+  templates:{title:'Ready-to-go Templates — Photobook, Trade Book & Art Print Starters | Binder',desc:'Blank starting templates sized exactly for each Binder format — cover, back cover, and pages ready to go. Pick a size and start designing.',
+    keywords:'photobook template blank, trade book template, art print template, book layout starter India'},
 };
 const DEFAULT_OG_IMAGE='https://www.binder.co.in/images/img-hero.jpg';
 function setPageSchema(obj){ const el=$('ldPage'); if(el)el.textContent=JSON.stringify(obj); }
@@ -162,6 +166,7 @@ function go(v,push){
   if(v==='home')setPageSchema(buildFaqSchema()); // FAQ section only actually renders on the home view
   if(push!==false)setPath(pathForView(v));
   if(v==='journal')renderBlog(); if(v==='store')renderStore(); if(v==='clients')renderClients(); if(v==='gallery')renderGallery();
+  if(v==='templates')renderTemplatesPageV2();
   if(v==='dashboard')renderCustomerDashboard();
   if(v==='scanning'){const vid=$('scanHeroVideo');if(vid){vid.style.display='block';$('scanHeroStill').style.display='none';vid.currentTime=0;vid.play().catch(()=>{});}}
 }
@@ -476,10 +481,48 @@ async function uploadPhotoToStorage(photoId,blob,filename){
     if(error)throw error;
     const {data}=sb.storage.from('photos').getPublicUrl(path);
     PHOTO_PERMANENT_URLS[photoId]=data.publicUrl;
+    swapToPermanentPhotoUrl(photoId,data.publicUrl);
   }catch(e){console.warn('Photo upload failed, staying local for this session:',e.message||e)}
   finally{PENDING_UPLOADS--;}
 }
 const PHOTO_PERMANENT_URLS={}; // photoId -> permanent Supabase Storage URL, once uploaded
+// A newly-added photo displays instantly via a blob: URL (createObjectURL) while the real
+// upload happens in the background — but a blob: URL only lives as long as this browser tab
+// does. Until now, nothing ever replaced it with the permanent Storage URL once the upload
+// finished, so a photo would silently break — reverting to a broken-image icon with no way to
+// recover it in that project — the moment the tab was reloaded or the blob was released for any
+// reason, even though a permanent, reload-safe URL had been sitting there the whole time. This
+// swaps every reference to the photo over to the permanent URL the instant it's available, and
+// re-renders anywhere it's currently showing so the fix is visible immediately, not just after
+// the next save/reload.
+function swapToPermanentPhotoUrl(photoId,permanentUrl){
+  Object.values(EDS).forEach(ed=>{
+    const ph=ed.photos&&ed.photos.find(p=>p.id===photoId);
+    if(ph&&ph.url!==permanentUrl){
+      if(String(ph.url).startsWith('blob:'))URL.revokeObjectURL(ph.url);
+      ph.url=permanentUrl;
+      if(ed.doc)ed.renderAll();
+    }
+  });
+  if(typeof AP!=='undefined'&&AP.photos){
+    const ph=AP.photos.find(p=>p.id===photoId);
+    if(ph&&ph.url!==permanentUrl){
+      if(String(ph.url).startsWith('blob:'))URL.revokeObjectURL(ph.url);
+      ph.url=permanentUrl;
+      if(typeof renderArtPrints==='function')renderArtPrints();
+    }
+  }
+  if(typeof AP_SINGLE!=='undefined'){
+    Object.keys(AP_SINGLE).forEach(key=>{
+      const st=AP_SINGLE[key]; const ph=st&&st.photos&&st.photos.find(p=>p.id===photoId);
+      if(ph&&ph.url!==permanentUrl){
+        if(String(ph.url).startsWith('blob:'))URL.revokeObjectURL(ph.url);
+        ph.url=permanentUrl;
+        if(typeof renderApSingle==='function')renderApSingle(key);
+      }
+    });
+  }
+}
 
 // Per-file upload cap for the book editors' photo tray. The Supabase "photos" storage bucket
 // must ALSO be configured to allow files this large (its own file-size limit defaults to a much
@@ -530,11 +573,460 @@ function shapeClip(key){const s=SHAPES.find(x=>x.key===key);return s?s.clip:'non
 function mkShape(shapeKey,isPlaceholder,x,y,w,h){return {id:uid(),shapeKey,isPlaceholder,photo:null,x,y,w,h,rot:0,
   fill:isPlaceholder?'hsla(0,0%,80%,0.8)':'hsla(0,0%,0%,0.5)',b:100,c:100,sat:100};}
 
+/* ============================================================================================
+   CUSTOM TEMPLATES — blank, admin-built starting points, one per product/size
+   ============================================================================================
+   Unlike the old code-authored template system, these are pure data with zero pre-designed
+   content: a template is just the right *shape* for its product (single front cover, N blank
+   interior pages, single back cover for book-type products; blank board(s) for Art Prints),
+   built out by the admin inside the real editor via "Edit layout", exactly like a customer
+   would build a real project. Everything is stored in the same CMS table as the rest of the
+   site, under the 'custom_templates' key, so it's editable from any device and syncs to every
+   visitor. */
+function blankPage(){return {bg:'#FFFFFF',images:[],texts:[],shapes:[]};}
+const CUSTOM_TEMPLATE_DEFAULT_PAGES=20; // matches every book editor's own minPages floor
+const TEMPLATE_EDITOR_OPTIONS=[
+  {key:'photobook',label:'Photobook 8.5″×8.5″',kind:'book'},
+  {key:'photobook12',label:'Photobook 12″×12″',kind:'book'},
+  {key:'photobook18',label:'Photobook 12″×18″',kind:'book'},
+  {key:'tradebook',label:'Trade Book',kind:'book'},
+  {key:'artprints',label:'Art Prints (Set of 4)',kind:'artprints'},
+  {key:'artprint12x18',label:'Art Print 12″×18″ (Single)',kind:'artprint-single'},
+  {key:'artprint16x20',label:'Art Print 16″×20″ (Single)',kind:'artprint-single'},
+];
+function templateEditorMeta(editorKey){ return TEMPLATE_EDITOR_OPTIONS.find(o=>o.key===editorKey)||TEMPLATE_EDITOR_OPTIONS[0]; }
+function newBlankTemplate(editorKey,label){
+  const meta=templateEditorMeta(editorKey);
+  const t={id:uid(),label:label||meta.label,description:'',editorKey,thumbUrl:null,assets:[]};
+  if(meta.kind==='book'){ t.cover=blankPage(); t.pages=Array.from({length:CUSTOM_TEMPLATE_DEFAULT_PAGES},blankPage); t.backCover=blankPage(); }
+  else if(meta.kind==='artprints'){ t.boards=[null,null,null,null]; }
+  else { t.board=null; }
+  return t;
+}
+function defaultCustomTemplates(){
+  return [
+    newBlankTemplate('photobook','Photobook 8.5″×8.5″'),
+    newBlankTemplate('photobook12','Photobook 12″×12″'),
+    newBlankTemplate('photobook18','Photobook 12″×18″'),
+    newBlankTemplate('tradebook','Trade Book'),
+    newBlankTemplate('artprints','Art Prints (Set of 4)'),
+    newBlankTemplate('artprint12x18','Art Print (Single)'),
+  ];
+}
+let CUSTOM_TEMPLATES=loadJSON('cms_custom_templates',null)||defaultCustomTemplates();
+function saveCustomTemplates(){
+  saveJSON('cms_custom_templates',CUSTOM_TEMPLATES);
+  cmsSet('custom_templates',CUSTOM_TEMPLATES).then(ok=>{toast(ok?'Saved ✓ — visible to all visitors':'⚠ Saved on this device only — cloud sync failed');});
+  renderTemplatesPageV2();
+}
+function templatePageCountV2(t){ return (t.pages||[]).length; }
+
+/* ---------- Public /templates page ---------- */
+function renderTemplatesPageV2(){
+  const wrap=$('tplGridV2'); if(!wrap)return;
+  if(!CUSTOM_TEMPLATES.length){ wrap.innerHTML='<p style="color:var(--slate-l);font-size:14px;grid-column:1/-1">No templates added yet — check back soon.</p>'; return; }
+  wrap.innerHTML=CUSTOM_TEMPLATES.map(t=>{
+    const meta=templateEditorMeta(t.editorKey);
+    const thumbHtml=t.thumbUrl
+      ? `<img src="${esc(t.thumbUrl)}" alt="${esc(t.label)}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`
+      : `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M3 9h18M9 9v12" stroke="currentColor" stroke-width="1.4"/></svg>`;
+    const metaLine=meta.kind==='book' ? `${templatePageCountV2(t)} pages + cover` : meta.kind==='artprints' ? 'Set of 4 prints' : 'Single print';
+    const desc=t.description||`A blank ${meta.label.toLowerCase()} starter, ready for your own layout.`;
+    return `
+    <div class="tpl-card">
+      <div class="tpl-card-thumb">${thumbHtml}</div>
+      <div class="tpl-card-body">
+        <h3>${esc(t.label)}</h3>
+        <p>${esc(desc)}</p>
+        <div class="tpl-card-meta">${metaLine}</div>
+      </div>
+      <div class="tpl-card-foot">
+        <button class="btn btn-accent sm" onclick="startCustomTemplate('${t.id}')">Use this template</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+// Merges a template's asset library into an editor's photo tray so any asset images already
+// placed on the template's pages resolve and render correctly (images are always looked up by
+// id against ed.photos, whether the id belongs to a customer's own upload or an admin asset).
+function seedTemplateAssetsIntoPhotos(ed,t){
+  (t.assets||[]).forEach(a=>{
+    if(!ed.photos.find(p=>p.id===a.id))ed.photos.push({id:a.id,name:a.name,url:a.url,w:a.w||1000,h:a.h||1000,isAsset:true});
+  });
+}
+// Customer-facing "Use this template" — opens the one specific editor/size this template was
+// built for (no size picker needed, since a template's layout is no longer shared across sizes)
+// and loads its content straight in.
+function editorHasContent(doc){
+  if(!doc)return false;
+  const pages=[doc.cover,doc.backCover,...(doc.pages||[])].filter(Boolean);
+  return pages.some(p=>(p.images&&p.images.length)||(p.texts&&p.texts.length)||(p.shapes&&p.shapes.length));
+}
+function startCustomTemplate(templateId){
+  const t=CUSTOM_TEMPLATES.find(x=>x.id===templateId); if(!t)return;
+  const meta=templateEditorMeta(t.editorKey);
+  if(meta.kind==='book'){
+    const ed=EDS[t.editorKey]; if(!ed)return toast('Editor not available.');
+    if(editorHasContent(ed.doc)&&!confirm('Load the "'+t.label+'" template? This replaces the current, unsaved '+ed.pageCount()+'-page project in this editor. This can\'t be undone once you navigate away.'))return;
+    ed.doc.cover=JSON.parse(JSON.stringify(t.cover||blankPage()));
+    ed.doc.pages=JSON.parse(JSON.stringify((t.pages&&t.pages.length)?t.pages:[blankPage()]));
+    ed.doc.backCover=JSON.parse(JSON.stringify(t.backCover||blankPage()));
+    ed.doc.title=t.label;
+    ed._savedId=null;
+    seedTemplateAssetsIntoPhotos(ed,t);
+    openEditor(t.editorKey);
+    toast('Template loaded ✓');
+  }else if(meta.kind==='artprints'){
+    if(AP.boards.some(Boolean)&&!confirm('Load the "'+t.label+'" template? This replaces the current, unsaved art print set. This can\'t be undone once you navigate away.'))return;
+    AP.boards=JSON.parse(JSON.stringify(t.boards||[null,null,null,null]));
+    AP.title='Untitled Art Print Set'; AP._savedId=null;
+    openEditor('artprints');
+    toast('Template loaded ✓');
+  }else{
+    const st=AP_SINGLE[t.editorKey]; if(!st)return toast('Editor not available.');
+    if(st.board&&!confirm('Load the "'+t.label+'" template? This replaces the current, unsaved print. This can\'t be undone once you navigate away.'))return;
+    st.board=t.board?JSON.parse(JSON.stringify(t.board)):null;
+    st._savedId=null;
+    openEditor(t.editorKey);
+    toast('Template loaded ✓');
+  }
+}
+
+/* ---------- Admin: template CRUD, thumbnails, assets ---------- */
+function populateNewTplEditorSelect(){
+  const sel=$('newTplEditorSelect'); if(!sel)return;
+  sel.innerHTML=TEMPLATE_EDITOR_OPTIONS.map(o=>`<option value="${o.key}">${esc(o.label)}</option>`).join('');
+}
+function addCustomTemplateFromAdmin(){
+  const sel=$('newTplEditorSelect'); const editorKey=sel?sel.value:'photobook';
+  const nameInput=$('newTplNameInput'); const customName=nameInput?nameInput.value.trim():'';
+  CUSTOM_TEMPLATES.push(newBlankTemplate(editorKey,customName||null));
+  if(nameInput)nameInput.value='';
+  saveCustomTemplates(); renderCustomTemplatesAdmin();
+}
+function deleteCustomTemplate(id){
+  if(!confirm('Delete this template? This cannot be undone.'))return;
+  CUSTOM_TEMPLATES=CUSTOM_TEMPLATES.filter(t=>t.id!==id);
+  saveCustomTemplates(); renderCustomTemplatesAdmin();
+}
+function updateCustomTemplateField(id,field,value){
+  const t=CUSTOM_TEMPLATES.find(x=>x.id===id); if(!t)return;
+  t[field]=value; saveCustomTemplates();
+}
+function updateCustomTemplateEditorKey(id,editorKey){
+  const t=CUSTOM_TEMPLATES.find(x=>x.id===id); if(!t)return;
+  const oldMeta=templateEditorMeta(t.editorKey), newMeta=templateEditorMeta(editorKey);
+  if(oldMeta.kind!==newMeta.kind){
+    if(!confirm('Switching to a different product type will reset this template\'s blank pages/boards to match it. Continue?')){renderCustomTemplatesAdmin();return;}
+    const fresh=newBlankTemplate(editorKey,t.label);
+    Object.keys(t).forEach(k=>delete t[k]);
+    Object.assign(t,fresh);
+  }else{
+    t.editorKey=editorKey;
+  }
+  saveCustomTemplates(); renderCustomTemplatesAdmin();
+}
+async function uploadCustomTemplateThumb(id,file){
+  if(!file)return;
+  toast('Uploading thumbnail…');
+  try{
+    const path=`custom-templates/${id}-${uid()}`;
+    const {error,url}=await uploadWebImage(path,file,1200);
+    if(error)throw error;
+    const t=CUSTOM_TEMPLATES.find(x=>x.id===id); if(!t)return;
+    t.thumbUrl=url;
+    saveCustomTemplates(); renderCustomTemplatesAdmin();
+  }catch(e){
+    console.warn('Template thumbnail upload failed:',e.message||e);
+    toast('⚠ Thumbnail upload failed — is the "cms-images" storage bucket created (public) in Supabase? '+(e.message||''));
+  }
+}
+function removeCustomTemplateThumb(id){
+  const t=CUSTOM_TEMPLATES.find(x=>x.id===id); if(!t)return;
+  t.thumbUrl=null; saveCustomTemplates(); renderCustomTemplatesAdmin();
+}
+async function uploadCustomTemplateAssets(templateId,fileList){
+  const files=Array.from(fileList||[]).filter(Boolean); if(!files.length)return;
+  const t=CUSTOM_TEMPLATES.find(x=>x.id===templateId); if(!t)return;
+  toast(`Uploading ${files.length} asset${files.length>1?'s':''}…`);
+  let okCount=0, failCount=0;
+  for(const file of files){
+    try{
+      const path=`template-assets/${templateId}/${uid()}`;
+      const {error,url}=await uploadWebImage(path,file,2000);
+      if(error)throw error;
+      const dim=await new Promise(res=>{const im=new Image();im.onload=()=>res({w:im.naturalWidth,h:im.naturalHeight});im.onerror=()=>res({w:1000,h:1000});im.src=url;});
+      t.assets=t.assets||[];
+      t.assets.push({id:uid(),url,name:file.name,w:dim.w,h:dim.h});
+      okCount++;
+    }catch(e){
+      console.warn('Asset upload failed:',file.name,e.message||e);
+      failCount++;
+    }
+  }
+  saveCustomTemplates(); renderCustomTemplatesAdmin();
+  if(failCount)toast(`⚠ ${okCount} uploaded, ${failCount} failed — is the "cms-images" storage bucket created (public) in Supabase?`);
+  else toast(`${okCount} asset${okCount>1?'s':''} uploaded ✓`);
+}
+function deleteCustomTemplateAsset(templateId,assetId){
+  const t=CUSTOM_TEMPLATES.find(x=>x.id===templateId); if(!t)return;
+  if(!confirm('Remove this asset? Any copies already placed on the template\'s pages will stay as-is.'))return;
+  t.assets=(t.assets||[]).filter(a=>a.id!==assetId);
+  saveCustomTemplates(); renderCustomTemplatesAdmin();
+}
+function renderCustomTemplatesAdmin(){
+  populateNewTplEditorSelect();
+  const wrap=$('customTemplatesAdminRows'); if(!wrap)return; wrap.innerHTML='';
+  CUSTOM_TEMPLATES.forEach(t=>{
+    const meta=templateEditorMeta(t.editorKey);
+    const url=t.thumbUrl;
+    const row=document.createElement('div');
+    row.style.cssText='border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff';
+    row.innerHTML=`
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <div style="flex:0 0 auto;width:150px">
+          <div style="position:relative">
+            <div style="width:100%;aspect-ratio:4/3;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:${url?`url(${url}) center/cover`:'var(--cream)'};display:flex;align-items:center;justify-content:center;cursor:pointer" data-role="tile">
+              ${url?'':'<span style="font-size:10px;color:var(--slate-l);text-align:center;padding:0 10px">Click to upload thumbnail</span>'}
+            </div>
+            ${url?'<button style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#fff;border:1px solid var(--line);cursor:pointer;font-size:12px;line-height:1;color:var(--slate)" title="Remove thumbnail" data-role="remove">×</button>':''}
+          </div>
+          <input type="file" accept="image/*" style="display:none" data-role="thumbInput">
+          <div style="font-size:11px;color:var(--slate-l);margin-top:8px">${meta.kind==='book'?templatePageCountV2(t)+' pages + cover':meta.kind==='artprints'?'Set of 4':'Single print'}</div>
+          <button type="button" class="btn btn-accent xs" style="width:100%;justify-content:center;margin-top:8px" data-role="editLayout">Edit layout</button>
+          <button type="button" class="btn btn-ghost xs" style="width:100%;justify-content:center;margin-top:6px;color:#B0432E" data-role="deleteTpl">Delete template</button>
+        </div>
+        <div style="flex:1 1 260px;min-width:220px">
+          <label style="font-size:10.5px;color:var(--slate-l);text-transform:uppercase;letter-spacing:.05em;font-weight:700">Product / size</label>
+          <select class="field" style="margin:4px 0 10px" data-role="editorSelect">${TEMPLATE_EDITOR_OPTIONS.map(o=>`<option value="${o.key}" ${o.key===t.editorKey?'selected':''}>${esc(o.label)}</option>`).join('')}</select>
+          <label style="font-size:10.5px;color:var(--slate-l);text-transform:uppercase;letter-spacing:.05em;font-weight:700">Card title</label>
+          <input class="field" style="margin:4px 0 10px" data-role="labelInput" value="${esc(t.label)}">
+          <label style="font-size:10.5px;color:var(--slate-l);text-transform:uppercase;letter-spacing:.05em;font-weight:700">Card description</label>
+          <textarea class="field" style="margin:4px 0;min-height:60px;resize:vertical" data-role="descInput" placeholder="Shown on the public Templates page">${esc(t.description||'')}</textarea>
+        </div>
+        <div style="flex:1 1 220px;min-width:200px">
+          <label style="font-size:10.5px;color:var(--slate-l);text-transform:uppercase;letter-spacing:.05em;font-weight:700">Assets (shows as "Clip Art" in the editor)</label>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:8px;margin:8px 0" data-role="assetGrid">
+            ${(t.assets||[]).map(a=>`
+              <div style="position:relative">
+                <div style="width:100%;aspect-ratio:1/1;border:1px solid var(--line);border-radius:8px;background:url(${esc(a.url)}) center/contain no-repeat,repeating-conic-gradient(#f0f0f0 0 25%,#fff 0 50%) 0 0/10px 10px" title="${esc(a.name)}"></div>
+                <button style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:#fff;border:1px solid var(--line);cursor:pointer;font-size:10px;line-height:1;color:var(--slate)" data-role="deleteAsset" data-asset-id="${a.id}">×</button>
+              </div>`).join('')}
+            ${meta.kind!=='book'?'':`<button type="button" style="width:100%;aspect-ratio:1/1;border:1.5px dashed var(--line);border-radius:8px;background:none;cursor:pointer;color:var(--slate-l);font-size:20px" data-role="addAsset" title="Add asset">＋</button>`}
+          </div>
+          <input type="file" accept="image/*,.svg" multiple style="display:none" data-role="assetInput">
+          ${meta.kind!=='book'?'<div class="hint">Assets apply to book-type templates only.</div>':''}
+        </div>
+      </div>`;
+    row.querySelector('[data-role="tile"]').onclick=()=>row.querySelector('[data-role="thumbInput"]').click();
+    row.querySelector('[data-role="thumbInput"]').onchange=function(){uploadCustomTemplateThumb(t.id,this.files[0]);};
+    const removeBtn=row.querySelector('[data-role="remove"]');
+    if(removeBtn)removeBtn.onclick=(e)=>{e.stopPropagation();removeCustomTemplateThumb(t.id);};
+    row.querySelector('[data-role="editLayout"]').onclick=()=>openCustomTemplateEditor(t.id);
+    row.querySelector('[data-role="deleteTpl"]').onclick=()=>deleteCustomTemplate(t.id);
+    row.querySelector('[data-role="editorSelect"]').addEventListener('change',function(){updateCustomTemplateEditorKey(t.id,this.value);});
+    row.querySelector('[data-role="labelInput"]').addEventListener('change',function(){updateCustomTemplateField(t.id,'label',this.value);});
+    row.querySelector('[data-role="descInput"]').addEventListener('change',function(){updateCustomTemplateField(t.id,'description',this.value);});
+    const addAssetBtn=row.querySelector('[data-role="addAsset"]');
+    if(addAssetBtn)addAssetBtn.onclick=()=>row.querySelector('[data-role="assetInput"]').click();
+    const assetInput=row.querySelector('[data-role="assetInput"]');
+    if(assetInput)assetInput.onchange=function(){uploadCustomTemplateAssets(t.id,this.files);this.value='';};
+    row.querySelectorAll('[data-role="deleteAsset"]').forEach(btn=>{
+      btn.onclick=()=>deleteCustomTemplateAsset(t.id,btn.dataset.assetId);
+    });
+    wrap.appendChild(row);
+  });
+}
+
+/* ---------- Admin: "Edit layout" (opens the template in the real editor) ---------- */
+let ADMIN_EDIT_TEMPLATE=null; // {id, editorKey, kind}
+function openCustomTemplateEditor(templateId){
+  const t=CUSTOM_TEMPLATES.find(x=>x.id===templateId); if(!t)return;
+  const meta=templateEditorMeta(t.editorKey);
+  ADMIN_EDIT_TEMPLATE={id:templateId,editorKey:t.editorKey,kind:meta.kind};
+  if(meta.kind==='book'){
+    const ed=EDS[t.editorKey]; if(!ed)return toast('Editor not available.');
+    ed.doc.cover=JSON.parse(JSON.stringify(t.cover||blankPage()));
+    ed.doc.pages=JSON.parse(JSON.stringify((t.pages&&t.pages.length)?t.pages:[blankPage()]));
+    ed.doc.backCover=JSON.parse(JSON.stringify(t.backCover||blankPage()));
+    ed.doc.title=t.label;
+    ed._savedId=null;
+    seedTemplateAssetsIntoPhotos(ed,t);
+    openEditor(t.editorKey);
+    ed.cur='cover'; ed.sel=null; ed.renderAll();
+    showUploadsTool(t.editorKey,true);
+  }else if(meta.kind==='artprints'){
+    AP.boards=JSON.parse(JSON.stringify(t.boards||[null,null,null,null]));
+    AP.title=t.label; AP._savedId=null;
+    openEditor('artprints');
+  }else{
+    const st=AP_SINGLE[t.editorKey]; if(!st)return toast('Editor not available.');
+    st.board=t.board?JSON.parse(JSON.stringify(t.board)):null;
+    st.title=t.label; st._savedId=null;
+    openEditor(t.editorKey);
+  }
+  showTemplateEditBar(t,t.editorKey);
+}
+function showUploadsTool(key,show){
+  document.querySelectorAll('#editor-'+key+' [data-tool="uploads"]').forEach(b=>b.style.display=show?'':'none');
+}
+// Hides/repurposes the parts of the normal editor chrome that don't make sense while editing a
+// template (ordering a print, saving to "My Dashboard" as if it were a real project) and adds a
+// banner explaining the mode, with Save/Exit actions. Everything overridden here is restored by
+// hideTemplateEditBar() on exit — nothing here permanently changes the editor for real customers.
+// Works for every editor kind (book and Art Print alike) since they all share the same generic
+// ed-top toolbar structure (back icon-button, brand link, Save/Preview/Order print/My Dashboard).
+function showTemplateEditBar(t,key){
+  const root=$('editor-'+key); if(!root)return;
+  const top=root.querySelector('.ed-top'); if(!top)return;
+  const backBtn=top.children[0], brandLink=top.querySelector('.ed-brand');
+  [backBtn,brandLink].forEach(el=>{
+    if(!el)return;
+    el._tplOrigOnclick=el.onclick;
+    el.onclick=(e)=>{e.preventDefault();exitCustomTemplateEditor();};
+  });
+  top.querySelectorAll('button').forEach(btn=>{
+    const txt=btn.textContent.trim();
+    if(txt==='Order print →'||txt==='My Dashboard'){ btn.dataset.tplHidden='1'; btn.style.display='none'; }
+    if(txt==='Save'){ btn._tplOrigOnclick=btn.onclick; btn.onclick=(e)=>{e.preventDefault();saveCustomTemplateLayout();}; }
+  });
+  let bar=$('templateEditBar'); if(bar)bar.remove();
+  bar=document.createElement('div');
+  bar.id='templateEditBar';
+  bar.style.cssText='background:#EAF3FF;border-bottom:1px solid #C5DCF8;color:#1A4A7A;padding:10px 18px;font-size:13px;display:flex;align-items:center;gap:14px;flex-wrap:wrap';
+  bar.innerHTML=`<span>✏️ Editing the <strong>${esc(t.label)}</strong> template. Changes here update the template for every future customer who uses it — not any single project.</span>
+    <span style="flex:1"></span>
+    <button class="btn btn-ghost sm" onclick="exitCustomTemplateEditor()">Exit without saving</button>
+    <button class="btn btn-accent sm" onclick="saveCustomTemplateLayout()">Save as Template</button>`;
+  top.insertAdjacentElement('afterend',bar);
+}
+function hideTemplateEditBar(key){
+  const root=$('editor-'+key); if(!root)return;
+  const top=root.querySelector('.ed-top');
+  if(top){
+    const backBtn=top.children[0], brandLink=top.querySelector('.ed-brand');
+    [backBtn,brandLink].forEach(el=>{ if(el&&el._tplOrigOnclick!==undefined){ el.onclick=el._tplOrigOnclick; delete el._tplOrigOnclick; } });
+    top.querySelectorAll('button').forEach(btn=>{
+      if(btn.dataset.tplHidden){ btn.style.display=''; delete btn.dataset.tplHidden; }
+      if(btn._tplOrigOnclick!==undefined){ btn.onclick=btn._tplOrigOnclick; delete btn._tplOrigOnclick; }
+    });
+  }
+  showUploadsTool(key,false);
+  const bar=$('templateEditBar'); if(bar)bar.remove();
+}
+async function saveCustomTemplateLayout(){
+  if(!ADMIN_EDIT_TEMPLATE)return;
+  const {id,editorKey,kind}=ADMIN_EDIT_TEMPLATE;
+  const t=CUSTOM_TEMPLATES.find(x=>x.id===id); if(!t)return;
+  if(kind==='book'){
+    const ed=EDS[editorKey]; if(!ed)return;
+    const pages=JSON.parse(JSON.stringify(ed.doc.pages||[]));
+    if(!pages.length){toast('A template needs at least one interior page.');return;}
+    t.cover=JSON.parse(JSON.stringify(ed.doc.cover||blankPage()));
+    t.pages=pages;
+    t.backCover=JSON.parse(JSON.stringify(ed.doc.backCover||blankPage()));
+  }else if(kind==='artprints'){
+    t.boards=JSON.parse(JSON.stringify(AP.boards||[null,null,null,null]));
+  }else{
+    const st=AP_SINGLE[editorKey]; if(st)t.board=st.board?JSON.parse(JSON.stringify(st.board)):null;
+  }
+  saveCustomTemplates();
+  toast('Template saved ✓ — used by every new customer from now on');
+  exitCustomTemplateEditor();
+}
+function exitCustomTemplateEditor(){
+  if(!ADMIN_EDIT_TEMPLATE)return;
+  const {editorKey}=ADMIN_EDIT_TEMPLATE;
+  hideTemplateEditBar(editorKey);
+  ADMIN_EDIT_TEMPLATE=null;
+  ACTIVE_EDITOR=null;
+  document.querySelectorAll('.ed-root').forEach(x=>x.classList.remove('active'));
+  document.querySelector('.site-nav').style.display='';
+  if($('siteFooter'))$('siteFooter').style.display='block';
+  go('admin');
+  adminTab('templates');
+}
+
 /* Fits a photo into a slot (x,y,w,h in %) preserving the photo's true pixel aspect
    ratio, so it is never stretched or cropped — shrinks to fit within the slot and
    centers there. containerR is the on-screen width/height ratio of the box the
    percentages are relative to (a page, or an Art Print board), since a % box only
    looks square/rectangular on screen if the container itself is that shape. */
+/* ============================================================================================
+   REAL per-pixel Shadows/Highlights (canvas-based, non-destructive proof of concept)
+   ============================================================================================
+   Everything else in Photo Edit (brightness, contrast, saturation, temperature, blur) stays as
+   simple CSS filters — fast, and guaranteed to render identically live and in the exported PDF,
+   since html2canvas (the print/PDF renderer) only understands the standard CSS Filter Functions,
+   not custom per-pixel processing. Shadows/Highlights is the one adjustment that genuinely needs
+   real pixel access — no combination of brightness()/contrast() can selectively brighten only
+   the dark pixels of a photo. So for this one adjustment, we actually read and rewrite pixels on
+   an offscreen canvas, then bake the result into a plain <img> (via a data URL) — which sidesteps
+   the html2canvas-compatibility risk entirely, since by the time the page is captured for print,
+   it's just a normal image, identical in the browser and in the PDF.
+
+   Non-destructive: only the two numbers (shadows, highlights) are ever stored on the image
+   object, exactly like every other Photo Edit slider — the original uploaded photo is never
+   touched or replaced. The adjusted pixels are recomputed on demand, cached in memory by
+   (photo, shadow value, highlight value, resolution) so repeated renders at the same settings
+   are instant, and cleared automatically as soon as the browser tab closes. */
+const TONE_CANVAS_CACHE=new Map();
+const TONE_SOURCE_IMG_CACHE=new Map(); // photo URL -> loaded <img>, so repeat processing doesn't re-fetch over the network
+function loadImageElForTone(url){
+  if(TONE_SOURCE_IMG_CACHE.has(url))return TONE_SOURCE_IMG_CACHE.get(url);
+  const p=new Promise((resolve,reject)=>{
+    const im=new Image(); im.crossOrigin='anonymous';
+    im.onload=()=>resolve(im); im.onerror=reject;
+    im.src=url;
+  });
+  TONE_SOURCE_IMG_CACHE.set(url,p);
+  return p;
+}
+// The actual per-pixel algorithm. Luminance-weighted so shadows and highlights can be pushed
+// independently: dark pixels respond almost entirely to the Shadows control, bright pixels
+// almost entirely to Highlights, with a smooth handoff through the midtones — the same basic
+// idea as Photoshop's Shadow/Highlight tool, applied equally to R/G/B to keep hue stable.
+function applyShadowHighlightPixels(imageData,shadowVal,highlightVal){
+  if(!shadowVal&&!highlightVal)return;
+  const d=imageData.data;
+  const sAmt=(shadowVal||0)/100*90, hAmt=(highlightVal||0)/100*90; // up to ±90 luminance units at full effect
+  for(let i=0;i<d.length;i+=4){
+    const r=d[i],g=d[i+1],b=d[i+2];
+    const lum=0.299*r+0.587*g+0.114*b; // 0–255
+    const shadowWeight=Math.max(0,1-lum/128);       // 1 at black, 0 by mid-grey
+    const highlightWeight=Math.max(0,(lum-128)/127); // 0 at mid-grey, 1 at white
+    const delta=sAmt*shadowWeight+hAmt*highlightWeight;
+    if(delta===0)continue;
+    d[i]=Math.max(0,Math.min(255,r+delta));
+    d[i+1]=Math.max(0,Math.min(255,g+delta));
+    d[i+2]=Math.max(0,Math.min(255,b+delta));
+  }
+}
+// Renders the source photo through the pixel algorithm at up to maxDim on its long edge, and
+// returns a PNG data URL. maxDim keeps live-preview processing fast (a downscaled pass is
+// imperceptibly different on screen but far cheaper); PDF export calls this with no cap so the
+// printed file gets the full-resolution treatment.
+async function getToneAdjustedImageUrl(sourceUrl,shadowVal,highlightVal,maxDim){
+  const cacheKey=`${sourceUrl}|${shadowVal||0}|${highlightVal||0}|${maxDim||'full'}`;
+  if(TONE_CANVAS_CACHE.has(cacheKey))return TONE_CANVAS_CACHE.get(cacheKey);
+  const promise=(async()=>{
+    const img=await loadImageElForTone(sourceUrl);
+    let w=img.naturalWidth,h=img.naturalHeight;
+    if(maxDim&&Math.max(w,h)>maxDim){const s=maxDim/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s);}
+    const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
+    const ctx=canvas.getContext('2d');
+    ctx.drawImage(img,0,0,w,h);
+    if(shadowVal||highlightVal){
+      const data=ctx.getImageData(0,0,w,h);
+      applyShadowHighlightPixels(data,shadowVal,highlightVal);
+      ctx.putImageData(data,0,0);
+    }
+    return canvas.toDataURL('image/png');
+  })();
+  TONE_CANVAS_CACHE.set(cacheKey,promise);
+  return promise;
+}
+
 function fitPhotoBox(ph,containerR,x,y,w,h){
   const pr=(ph&&ph.w&&ph.h)?ph.w/ph.h:1;
   let fw=w, fh=w*containerR/pr;
@@ -559,7 +1051,7 @@ function dpiWarningEl(dpi){
   if(dpi===null||dpi>=MIN_PRINT_DPI)return null;
   const el=document.createElement('div'); el.className='dpi-warning';
   el.title='This photo is too low-resolution for a sharp print at its current size — use a higher-resolution photo, or shrink it on the board.';
-  el.textContent=`⚠ ${dpi} DPI — below ${MIN_PRINT_DPI} recommended`;
+  el.textContent=`⚠ ${dpi} DPI — ${MIN_PRINT_DPI} Recommended`;
   return el;
 }
 function createEditor(key,cfg){
@@ -580,6 +1072,33 @@ function createEditor(key,cfg){
       orientation:cfg.hasOrientation?(cfg.defaultOrientation||'portrait'):undefined},
     cur:-1, sel:null, tool:'photos', armed:null, history:[], future:[], _coverZone:'cover', grid:false, zoom:100,
     fitBox(ph,x,y,w,h){return fitPhotoBox(ph,pageR(),x,y,w,h);},
+    // Places one photo seamlessly across BOTH pages of an open two-page spread — used when a
+    // photo is dropped or click-placed near the shared gutter between them, rather than confined
+    // to a single page. Reuses the exact same fitPhotoBox() "contain" math already used for every
+    // other photo placement in this editor (so it stays visually consistent with "Fit whole
+    // photo" elsewhere), just computed against a box twice as wide — the two open pages side by
+    // side — instead of one page alone. The resulting box is given to BOTH pages verbatim, with
+    // the second page's copy shifted left by exactly 100% (one page-width) of page-relative
+    // percentage space; each page's own overflow:hidden then naturally clips it to that page's
+    // own bounds, with the crop lining up exactly at the seam since both copies come from the
+    // one shared computation, not two independent fits that would have to coincidentally agree.
+    trySpanningPlace(ph,pageRef,siblingIdx,side,cx){
+      if(!side||siblingIdx==null)return false;
+      const nearGutter = side==='l' ? cx>=80 : cx<=20; // rightmost/leftmost 20% of this page, i.e. near the shared spine
+      if(!nearGutter)return false;
+      const box=fitPhotoBox(ph, 2*pageR(), 0, 0, 200, 100); // 200%-wide box = both open pages combined
+      const leftIdx = side==='l' ? pageRef : siblingIdx;
+      const rightIdx = side==='l' ? siblingIdx : pageRef;
+      ed.mutate(d=>{
+        const leftImg=mkImg(ph.id, box.x, box.y, box.w, box.h);
+        const rightImg=mkImg(ph.id, box.x-100, box.y, box.w, box.h); // shifted one page-width left, so the same underlying scale/position is windowed by the right page's own 0–100% instead
+        d.pages[leftIdx].images.push(leftImg);
+        d.pages[rightIdx].images.push(rightImg);
+      });
+      ed.sel={page:pageRef,kind:'image',id:ed.pageRefObj(pageRef).images.slice(-1)[0].id};
+      toast('Placed across both pages — drag either half to fine-tune, they\'re independent from here');
+      return true;
+    },
     /* ---------- Orientation (portrait/landscape) — only wired up for editors created with
        cfg.hasOrientation:true. Swaps cfg.pageInW/pageInH/aspect between the base (portrait)
        dimensions and their landscape flip, then re-renders. Content stays in place because every
@@ -684,7 +1203,28 @@ function createEditor(key,cfg){
       const st=$(cfg.prefix+'-stage');if(st)st.style.transform='scale('+(ed.zoom/100)+')';
       const lbl=$(cfg.prefix+'-zoomVal');if(lbl)lbl.textContent=ed.zoom+'%';},
 
-    imgFilter(im,blurScale){let f=`brightness(${im.b??100}%) contrast(${im.c??100}%) saturate(${im.sat??100}%)`;
+    imgFilter(im,blurScale){
+      // Shadows/Highlights are folded into brightness+contrast rather than a true per-pixel
+      // tone curve — html2canvas (used for print/PDF export) only understands the standard CSS
+      // Filter Functions (brightness, contrast, saturate, sepia, hue-rotate, blur, grayscale),
+      // not custom SVG filter references, so this keeps what's on screen and what actually
+      // prints guaranteed identical rather than risking a look that silently doesn't export.
+      // NOTE: this approximation is now only used as the instant first paint before the real
+      // canvas-based pixel pass (see getToneAdjustedImageUrl) finishes and takes over — see
+      // imgFilterBase() for the CSS filter used once that real version is showing.
+      const shadows=im.shadows||0, highlights=im.highlights||0;
+      const bAdj=(im.b??100)+shadows*0.15+highlights*0.1, cAdj=(im.c??100)-shadows*0.1+highlights*0.05;
+      let f=`brightness(${bAdj}%) contrast(${cAdj}%) saturate(${im.sat??100}%)`;
+      const t=im.temp||0;
+      if(!cfg.monochrome&&t>0)f+=` sepia(${Math.round(t*0.35)}%) saturate(${100+t*0.3}%)`;
+      if(!cfg.monochrome&&t<0)f+=` hue-rotate(${Math.round(t*0.25)}deg) saturate(${100+t*0.15}%)`;
+      if(im.blur)f+=` blur(${(im.blur*(blurScale||1)).toFixed(2)}px)`;
+      if(cfg.monochrome)f+=' grayscale(100%)';return f},
+    // Same as imgFilter() but WITHOUT the shadow/highlight brightness/contrast approximation —
+    // used once the real per-pixel canvas version of the photo has loaded, since applying both
+    // would double up the effect.
+    imgFilterBase(im,blurScale){
+      let f=`brightness(${im.b??100}%) contrast(${im.c??100}%) saturate(${im.sat??100}%)`;
       const t=im.temp||0;
       if(!cfg.monochrome&&t>0)f+=` sepia(${Math.round(t*0.35)}%) saturate(${100+t*0.3}%)`;
       if(!cfg.monochrome&&t<0)f+=` hue-rotate(${Math.round(t*0.25)}deg) saturate(${100+t*0.15}%)`;
@@ -726,7 +1266,10 @@ function createEditor(key,cfg){
     // preserves the object's original aspect ratio; Alt (like moving) temporarily disables
     // snapping. `onStart` fires at mousedown (e.g. to select the object); `onDone` fires once,
     // after mouseup, for resize-only side effects (e.g. growing a photo back out to bleed).
-    wireResizeHandles(d,obj,page,el,onStart,onDone){
+    // lockAspect: when true (images), every handle — edges included — always preserves the
+    // object's original aspect ratio, with no way to distort it; when false (shapes), behaves
+    // as before — free-form by default, Shift held on a corner handle locks proportions.
+    wireResizeHandles(d,obj,page,el,onStart,onDone,lockAspect){
       ['n','s','e','w','ne','nw','se','sw'].forEach(dir=>{
         const rh=document.createElement('div'); rh.className='rh rh-'+dir; d.appendChild(rh);
         rh.onmousedown=e=>{
@@ -765,9 +1308,16 @@ function createEditor(key,cfg){
               t=Math.min(t,bottom-MIN);
               ny=t; nh=bottom-t;
             }
-            if(ev.shiftKey&&dir.length===2){ // corner handle — preserve original aspect ratio
-              if(Math.abs(dx)>=Math.abs(dy)){nh=nw*ratio; if(dir.includes('n'))ny=bottom-nh;}
-              else{nw=nh/ratio; if(dir.includes('w'))nx=right-nw;}
+            if(lockAspect||(ev.shiftKey&&dir.length===2)){
+              if(dir.length===2){ // corner — whichever axis moved further drives the resize
+                if(Math.abs(dx)>=Math.abs(dy)){nh=nw*ratio; if(dir.includes('n'))ny=bottom-nh;}
+                else{nw=nh/ratio; if(dir.includes('w'))nx=right-nw;}
+              }else if(dir==='e'||dir==='w'){ // edge — width drives, height follows, centered
+                nh=nw*ratio; ny=oy+(oh-nh)/2;
+              }else{ // 'n' or 's' — height drives, width follows, centered
+                nw=nh/ratio; nx=ox+(ow-nw)/2;
+              }
+              nw=Math.max(MIN,nw); nh=Math.max(MIN,nh);
             }
             obj.x=nx;obj.y=ny;obj.w=nw;obj.h=nh;
             d.style.left=nx+'%';d.style.top=ny+'%';d.style.width=nw+'%';d.style.height=nh+'%';
@@ -780,7 +1330,7 @@ function createEditor(key,cfg){
       });
     },
 
-    buildPage(page,pageRef,_pgNum,_side,interactive,showSafeArea){
+    buildPage(page,pageRef,siblingIdx,side,interactive,showSafeArea){
       // Applied here, at the top of the one function every page (cover/back/spine/interior) goes
       // through on every render, rather than only once when the editor first opens — that one-time
       // approach turned out to miss sessions where the editor was already open, or where a page
@@ -824,8 +1374,16 @@ function createEditor(key,cfg){
           let tf=`rotate(${im.rot}deg)`;
           if(fit==='cover'){img.style.objectPosition=`${im.fx??50}% ${im.fy??50}%`;if((im.zoom||100)!==100)tf+=` scale(${(im.zoom/100).toFixed(2)})`;}
           img.style.transform=tf;
-          d.appendChild(img);}
+          d.appendChild(img);
+          if((im.shadows||im.highlights)&&!cfg.monochrome){
+            const genAt=++img._toneGen||(img._toneGen=1);
+            getToneAdjustedImageUrl(ph.url,im.shadows||0,im.highlights||0,1400).then(url=>{
+              if(img._toneGen!==genAt||!img.isConnected)return; // a newer edit or a re-render superseded this one
+              img.src=url; img.style.filter=ed.imgFilterBase(im);
+            }).catch(()=>{}); // network/CORS hiccup — the CSS approximation stays showing, nothing breaks
+          }}
         if(!interactive){el.appendChild(d);return}
+        if(ph){const dpiEl=dpiWarningEl(computePrintDpi(ph,cfg.pageInW,cfg.pageInH,im)); if(dpiEl)d.appendChild(dpiEl);}
         const addDel=()=>{if(im.locked||d.querySelector('.obj-del'))return;const del=document.createElement('div');del.className='obj-del';del.textContent='×';
           del.onmousedown=e=>{e.preventDefault();e.stopPropagation()};
           del.onclick=e=>{e.preventDefault();e.stopPropagation();ed.mutate(()=>{const arr=ed.pageRefObj(pageRef).images;const i=arr.findIndex(o=>o.id===im.id);if(i>-1)arr.splice(i,1)});ed.sel=null;ed.renderAll()};
@@ -847,7 +1405,7 @@ function createEditor(key,cfg){
             im.x=nx;im.y=ny; d.style.left=im.x+'%';d.style.top=im.y+'%';};
           const up=()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseup',up);ed.clearGuides(el);if(moved){ed.growEdgesToBleed(im);ed.snap();ed.autosave();ed.renderStrip();ed.renderAll();}};
           window.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);};
-        if(!im.locked)ed.wireResizeHandles(d,im,page,el,select,()=>ed.growEdgesToBleed(im));
+        if(!im.locked)ed.wireResizeHandles(d,im,page,el,select,()=>ed.growEdgesToBleed(im),true);
         d.ondragover=ev=>{ev.preventDefault();d.classList.add('dragover')};
         d.ondragleave=()=>d.classList.remove('dragover');
         d.ondrop=ev=>{ev.preventDefault();d.classList.remove('dragover');const id=ev.dataTransfer.getData('photo');if(!id)return;
@@ -866,6 +1424,7 @@ function createEditor(key,cfg){
         else{mask.style.background=sh.fill;}
         d.appendChild(mask);
         if(!interactive){el.appendChild(d);return}
+        if(ph){const dpiEl=dpiWarningEl(computePrintDpi(ph,cfg.pageInW,cfg.pageInH,sh)); if(dpiEl)d.appendChild(dpiEl);}
         const addDel=()=>{if(d.querySelector('.obj-del'))return;const del=document.createElement('div');del.className='obj-del';del.textContent='×';
           del.onmousedown=e=>{e.preventDefault();e.stopPropagation()};
           del.onclick=e=>{e.preventDefault();e.stopPropagation();ed.mutate(()=>{const arr=ed.pageRefObj(pageRef).shapes||[];const i=arr.findIndex(o=>o.id===sh.id);if(i>-1)arr.splice(i,1)});ed.sel=null;ed.renderAll()};
@@ -887,7 +1446,7 @@ function createEditor(key,cfg){
             sh.x=nx;sh.y=ny;d.style.left=sh.x+'%';d.style.top=sh.y+'%';};
           const up=()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseup',up);ed.clearGuides(el);if(moved){ed.snap();ed.autosave();ed.renderStrip();}};
           window.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);};
-        if(!sh.locked)ed.wireResizeHandles(d,sh,page,el,select);
+        if(!sh.locked)ed.wireResizeHandles(d,sh,page,el,select,null,!!sh.isPlaceholder);
         if(sh.isPlaceholder){
           d.ondragover=ev=>{ev.preventDefault();d.classList.add('dragover')};
           d.ondragleave=()=>d.classList.remove('dragover');
@@ -942,6 +1501,7 @@ function createEditor(key,cfg){
         el.onclick=e=>{
           if(ed.armed&&e.target===el){const ph=ed.photos.find(p=>p.id===ed.armed);if(ph){
             const rect=el.getBoundingClientRect();const cx=(e.clientX-rect.left)/rect.width*100,cy=(e.clientY-rect.top)/rect.height*100;
+            if(ed.trySpanningPlace(ph,pageRef,siblingIdx,side,cx)){ed.armed=null;ed.renderAll();return;}
             const fb=ed.fitBox(ph,cx-18,cy-18,36,36);
             ed.mutate(()=>{ed.pageRefObj(pageRef).images.push(mkImg(ph.id,Math.max(0,Math.min(100-fb.w,fb.x)),Math.max(0,Math.min(100-fb.h,fb.y)),fb.w,fb.h))});
             ed.armed=null;ed.sel={page:pageRef,kind:'image',id:ed.pageRefObj(pageRef).images.slice(-1)[0].id};ed.renderAll();return;}}
@@ -959,6 +1519,7 @@ function createEditor(key,cfg){
           const id=e.dataTransfer.getData('photo');if(!id)return;
           const ph=ed.photos.find(p=>p.id===id);if(!ph)return;
           const rect=el.getBoundingClientRect();const cx=(e.clientX-rect.left)/rect.width*100,cy=(e.clientY-rect.top)/rect.height*100;
+          if(ed.trySpanningPlace(ph,pageRef,siblingIdx,side,cx)){ed.renderAll();return;}
           const fb=ed.fitBox(ph,cx-18,cy-18,36,36);
           ed.mutate(()=>{ed.pageRefObj(pageRef).images.push(mkImg(id,Math.max(0,fb.x),Math.max(0,fb.y),fb.w,fb.h))});
           ed.sel={page:pageRef,kind:'image',id:ed.pageRefObj(pageRef).images.slice(-1)[0].id};ed.renderAll();};
@@ -1018,8 +1579,8 @@ function createEditor(key,cfg){
           spread.classList.add('single');
           spread.appendChild(ed.buildPage(ed.doc.pages[item.idx],item.idx,null,null,true,true));
         }else{
-          spread.appendChild(ed.buildPage(ed.doc.pages[item.l],item.l,null,null,true,true));
-          spread.appendChild(ed.buildPage(ed.doc.pages[item.r],item.r,null,null,true,true));
+          spread.appendChild(ed.buildPage(ed.doc.pages[item.l],item.l,item.r,'l',true,true));
+          spread.appendChild(ed.buildPage(ed.doc.pages[item.r],item.r,item.l,'r',true,true));
         }
       }
       st.appendChild(spread);
@@ -1238,13 +1799,31 @@ function genericRenderPanel(ed){
       g.appendChild(d)});
     if(!ed.photos.length)g.innerHTML='<div class="hint" style="grid-column:1/-1">Your tray is empty.</div>';
   }
+  else if(ed.tool==='uploads'){
+    // Admin-only, shown while building a template (see showUploadsTool) — a read-only browsable
+    // library of this template's reusable graphics (logos, badges, borders, etc.), placed onto
+    // the page the exact same way a customer's own photo is: click to arm, then click the page.
+    // Uploading/removing assets themselves happens in Admin → Templates, not here.
+    const assets=ed.photos.filter(p=>p.isAsset);
+    P.innerHTML=`<h4>Clip Art</h4>
+      <div class="photo-grid" id="${ed.cfg.prefix}-uGrid"></div>`;
+    const g=$(ed.cfg.prefix+'-uGrid');
+    assets.forEach(ph=>{const d=document.createElement('div');
+      d.className='photo-th'+(ed.armed===ph.id?' armed':'');
+      d.style.backgroundImage=`url(${ph.url})`;
+      d.title=ph.name; d.draggable=true;
+      d.ondragstart=e=>e.dataTransfer.setData('photo',ph.id);
+      d.onclick=()=>{ed.armed=ed.armed===ph.id?null:ph.id;ed.renderPanel();if(ed.armed)toast('Armed — click the page to place')};
+      g.appendChild(d)});
+    if(!assets.length)g.innerHTML='<div class="hint" style="grid-column:1/-1">No assets yet — add some from Admin → Templates.</div>';
+  }
   else if(ed.tool==='shapes'){
     const sh=ed.curShape();
     const hue=sh?ed.hueOf(sh.fill):0;
     const density=sh?(100-ed.lightnessOf(sh.fill)):100;
     const alpha=sh?ed.alphaOf(sh.fill):50;
     P.innerHTML=`<h4>Shapes</h4>
-      <div class="hint">Click a placeholder or shape below to drop it onto the page, then drag to move, use any of the 8 edge/corner handles to resize (hold Shift on a corner to keep its proportions), and drag a photo from the Photos tab onto a placeholder to fill it.</div>
+      <div class="hint">Click a placeholder or shape below to drop it onto the page, then drag to move, use any of the 8 edge/corner handles to resize — photos and placeholders always keep their proportions; hold Shift on a decorative shape's corner to keep its proportions too — and drag a photo from the Photos tab onto a placeholder to fill it.</div>
       <div class="rte-label">Image placeholders</div>
       <div class="hint" style="margin-bottom:8px">Hold a photo, keep its shape.</div>
       ${shapeGridHTML(ed.key,true)}
@@ -1283,15 +1862,15 @@ function genericRenderPanel(ed){
   }
   else if(ed.tool==='adjust'){
     const im=(ed.sel&&ed.sel.kind==='image')?ed.pageRefObj(ed.sel.page).images.find(o=>o.id===ed.sel.id):null;
-    if(!im){P.innerHTML=`<h4>Adjust photo</h4><div class="hint">Select a photo to correct brightness, contrast${ed.cfg.monochrome?'':', saturation, temperature,'} blur, opacity and shadow — or apply a one-click look.</div>`;return}
+    if(!im){P.innerHTML=`<h4>Photo Edit</h4><div class="hint">Select a photo to correct brightness, contrast${ed.cfg.monochrome?'':', saturation, temperature, shadows, highlights,'} blur, opacity and shadow — or apply a one-click look.</div>`;return}
     const ph=ed.photos.find(p=>p.id===im.photo);
     const sliders=ed.cfg.monochrome
       ?[['Brightness','b',50,150,'%'],['Contrast','c',50,150,'%'],['Blur','blur',0,8,'px'],['Opacity','op',10,100,'%'],['Drop shadow','shadow',0,30,'']]
-      :[['Brightness','b',50,150,'%'],['Contrast','c',50,150,'%'],['Saturation','sat',0,200,'%'],['Temperature','temp',-100,100,''],['Blur','blur',0,8,'px'],['Opacity','op',10,100,'%'],['Drop shadow','shadow',0,30,'']];
+      :[['Brightness','b',50,150,'%'],['Contrast','c',50,150,'%'],['Saturation','sat',0,200,'%'],['Shadows','shadows',-100,100,''],['Highlights','highlights',-100,100,''],['Temperature','temp',-100,100,''],['Blur','blur',0,8,'px'],['Opacity','op',10,100,'%'],['Drop shadow','shadow',0,30,'']];
     const presets=ed.cfg.monochrome
       ?[['Original','orig'],['Soft','matte'],['Punch','noir']]
-      :[['Original','orig'],['Vivid','vivid'],['Warm','warm'],['Cool','cool'],['Matte','matte'],['Noir','noir'],['Fade','fade']];
-    P.innerHTML=`<h4>Adjust photo</h4>
+      :[['Original','orig'],['Vivid','vivid'],['Warm','warm'],['Cool','cool'],['Matte','matte'],['Noir','noir'],['Fade','fade'],['Film','film'],['Vintage','vintage'],['B&W','bw'],['Golden','golden']];
+    P.innerHTML=`<h4>Photo Edit</h4>
       ${ph&&ph.lowRes?'<div class="quality-warn">⚠ This photo is below 300 DPI for full-size print — consider a higher-resolution version.</div>':''}
       <div class="rte-label">Frame fit</div>
       <div class="align-row" style="margin-bottom:10px">
@@ -1393,6 +1972,7 @@ function genericRenderPanel(ed){
       </div>`}
       <input class="font-search" id="${ed.cfg.prefix}-fontSearch" placeholder="Search fonts…" oninput="EDS.${ed.key}.renderFontList(this.value)">
       <div class="font-list" id="${ed.cfg.prefix}-fontList"></div>
+      <button class="btn btn-ghost xs" style="width:100%;justify-content:center;margin-top:8px" onclick="EDS.${ed.key}.applyFontToWholeBook()">Apply this font to the whole book</button>
       <div class="rte-row" style="margin-top:10px">
         <button onclick="EDS.${ed.key}.dupText()">⧉ Duplicate</button>
         <button onclick="EDS.${ed.key}.layerText('front')">To front</button>
@@ -1479,19 +2059,36 @@ function wireEditorMethods(ed){
         el.style.objectPosition=`${im.fx??50}% ${im.fy??50}%`;
         let tf=`rotate(${im.rot||0}deg)`;if((im.zoom||100)!==100)tf+=` scale(${(im.zoom/100).toFixed(2)})`;
         el.style.transform=tf;}}
+    else if(k==='shadows'||k==='highlights'){
+      const el=d.querySelector('img');if(!el)return;
+      el.style.filter=ed.imgFilter(im); // instant approximate feedback while dragging — no lag
+      const ph=ed.photos.find(p=>p.id===im.photo);if(!ph)return;
+      clearTimeout(el._toneTimer);
+      el._toneTimer=setTimeout(()=>{
+        const genAt=++el._toneGen||(el._toneGen=1);
+        getToneAdjustedImageUrl(ph.url,im.shadows||0,im.highlights||0,1400).then(url=>{
+          if(el._toneGen!==genAt||!el.isConnected)return;
+          el.src=url; el.style.filter=ed.imgFilterBase(im);
+        }).catch(()=>{});
+      },120); // waits for the drag to pause briefly before running the real (heavier) pixel pass
+    }
     else{const el=d.querySelector('img');if(el)el.style.filter=ed.imgFilter(im);}};
   ed.applyPreset=(key)=>{const P={
-      orig:{b:100,c:100,sat:100,temp:0,blur:0},
-      vivid:{b:104,c:118,sat:145,temp:0,blur:0},
-      warm:{b:103,c:104,sat:110,temp:45,blur:0},
-      cool:{b:102,c:106,sat:105,temp:-45,blur:0},
-      matte:{b:108,c:82,sat:88,temp:8,blur:0},
-      noir:{b:98,c:132,sat:0,temp:0,blur:0},
-      fade:{b:112,c:88,sat:70,temp:12,blur:0}}[key];if(!P)return;
+      orig:{b:100,c:100,sat:100,temp:0,blur:0,shadows:0,highlights:0},
+      vivid:{b:104,c:118,sat:145,temp:0,blur:0,shadows:0,highlights:0},
+      warm:{b:103,c:104,sat:110,temp:45,blur:0,shadows:0,highlights:0},
+      cool:{b:102,c:106,sat:105,temp:-45,blur:0,shadows:0,highlights:0},
+      matte:{b:108,c:82,sat:88,temp:8,blur:0,shadows:20,highlights:-10},
+      noir:{b:98,c:132,sat:0,temp:0,blur:0,shadows:-15,highlights:-10},
+      fade:{b:112,c:88,sat:70,temp:12,blur:0,shadows:25,highlights:-15},
+      film:{b:105,c:92,sat:88,temp:20,blur:0,shadows:15,highlights:-20},
+      vintage:{b:107,c:85,sat:65,temp:30,blur:0,shadows:25,highlights:-10},
+      bw:{b:102,c:104,sat:0,temp:0,blur:0,shadows:0,highlights:0},
+      golden:{b:106,c:98,sat:112,temp:55,blur:0,shadows:10,highlights:-15}}[key];if(!P)return;
     ed.mutate(()=>{const im=ed.pageRefObj(ed.sel.page).images.find(o=>o.id===ed.sel.id);if(im)Object.assign(im,P);});
     ed.renderAll();};
   ed.rotImg=()=>{ed.mutate(()=>{const im=ed.pageRefObj(ed.sel.page).images.find(o=>o.id===ed.sel.id);im.rot=(im.rot+90)%360});ed.renderAll();};
-  ed.resetImg=()=>{ed.mutate(()=>{Object.assign(ed.pageRefObj(ed.sel.page).images.find(o=>o.id===ed.sel.id),{b:100,c:100,sat:100,rot:0,temp:0,blur:0,op:100,shadow:0,fit:'contain',zoom:100,fx:50,fy:50})});ed.renderAll();};
+  ed.resetImg=()=>{ed.mutate(()=>{Object.assign(ed.pageRefObj(ed.sel.page).images.find(o=>o.id===ed.sel.id),{b:100,c:100,sat:100,rot:0,temp:0,blur:0,op:100,shadow:0,shadows:0,highlights:0,fit:'contain',zoom:100,fx:50,fy:50})});ed.renderAll();};
   ed.setFit=(mode)=>{ed.mutate(()=>{const im=ed.pageRefObj(ed.sel.page).images.find(o=>o.id===ed.sel.id);if(!im)return;im.fit=mode==='bleed'?'cover':mode;im._fullBleed=false;if(mode==='cover'||mode==='bleed'){im.zoom=im.zoom||100;im.fx=im.fx??50;im.fy=im.fy??50;}});ed.renderAll();};
   ed.setFullBleed=()=>{ed.mutate(()=>{const im=ed.pageRefObj(ed.sel.page).images.find(o=>o.id===ed.sel.id);if(!im)return;im.fit='cover';im.x=0;im.y=0;im.w=100;im.h=100;im.zoom=100;im.fx=50;im.fy=50;im._fullBleed=true;});ed.renderAll();};
   // If a photo's edge is dragged or resized to (or very near) the trim line, it should actually
@@ -1605,6 +2202,21 @@ function wireEditorMethods(ed){
     ed.renderAll();
   };
   ed.tAdjCommit=()=>{ed.autosave();};
+  // "Global project settings" (matching what larger photobook platforms call whole-project
+  // styling) — applies the currently-selected text box's font to every text box in the book at
+  // once (cover, every interior page, back cover) instead of requiring it one box at a time.
+  ed.applyFontToWholeBook=()=>{
+    const t=ed._findSel(); if(!t||!t.font)return;
+    const font=t.font;
+    if(!confirm('Apply "'+font+'" to every text box in this book — cover, all pages, and back cover? This can be undone with Ctrl+Z.'))return;
+    ed.mutate(d=>{
+      const allPages=[d.cover,d.backCover,...(d.pages||[])].filter(Boolean);
+      allPages.forEach(p=>{(p.texts||[]).forEach(tx=>{tx.font=font;});});
+    });
+    loadGoogleFont(font);
+    ed.renderAll();
+    toast('Applied "'+font+'" to every text box in the book ✓');
+  };
   ed.delText=()=>{const o=ed._findSel();if(o&&o.locked)return toast('Locked — unlock it in the Layers panel first');
     ed.mutate(()=>{const arr=ed.pageRefObj(ed.sel.page).texts;const i=arr.findIndex(o=>o.id===ed.sel.id);if(i>-1)arr.splice(i,1)});ed.sel=null;ed.renderAll();};
   ed.dupText=()=>{let newId;ed.mutate(()=>{const arr=ed.pageRefObj(ed.sel.page).texts;const src=arr.find(o=>o.id===ed.sel.id);if(!src)return;
@@ -1733,6 +2345,7 @@ function openEditor(key,push){
 }
 function exitEditor(){
   if(ADMIN_EDIT_ORDER){ exitAdminEditor(false); return; }
+  if(ADMIN_EDIT_TEMPLATE){ exitCustomTemplateEditor(); return; }
   ACTIVE_EDITOR=null; go('home');
 }
 
@@ -2163,7 +2776,19 @@ function pdfBuildPage(page,dims,photoMap,dpi,monochrome,textOnly,imagesOnly){
   const el=document.createElement('div');
   el.style.cssText=`position:relative;width:${wpx}px;height:${hpx}px;background:${(page&&page.bg)||'#FFFFFF'};overflow:hidden`;
   if(!page)return el;
-  const printFilter=(o,blurScale)=>{let f=`brightness(${o.b??100}%) contrast(${o.c??100}%) saturate(${o.sat??100}%)`;
+  // Shadows/Highlights print via this same brightness/contrast approximation the live editor
+  // shows for the first instant before its real per-pixel canvas pass swaps in (see imgFilter/
+  // imgFilterBase) — intentionally NOT running that per-pixel pass again here at full, uncapped
+  // print resolution. Doing that per-image, synchronously, inside this page-building loop was
+  // producing PDFs with no images at all — almost certainly a hang or unhandled slowdown on a
+  // large source photo stalling the whole sequential loop, so every image after it in the loop
+  // silently never got built. Reliability at export time matters more than exactness on this one
+  // adjustment, so this reverts to the simpler, proven-stable approximation for print only; the
+  // live editor keeps the real pixel-level version, unaffected by this.
+  const printFilter=(o,blurScale)=>{
+    const shadows=o.shadows||0, highlights=o.highlights||0;
+    const bAdj=(o.b??100)+shadows*0.15+highlights*0.1, cAdj=(o.c??100)-shadows*0.1+highlights*0.05;
+    let f=`brightness(${bAdj}%) contrast(${cAdj}%) saturate(${o.sat??100}%)`;
     const t=o.temp||0;
     if(!monochrome&&t>0)f+=` sepia(${Math.round(t*0.35)}%) saturate(${100+t*0.3}%)`;
     if(!monochrome&&t<0)f+=` hue-rotate(${Math.round(t*0.25)}deg) saturate(${100+t*0.15}%)`;
@@ -2236,7 +2861,6 @@ async function pdfRenderPhotoLayer(page, dims, photoMap, dpi, monochrome, bleedI
 
   const holder = document.createElement('div');
   holder.style.cssText = `position:fixed;left:-99999px;top:0;width:${wpx}px;height:${hpx}px;background:transparent`;
-
   // Any image positioned or resized so it extends past the trim edge (dragging already allowed
   // this; resizing was fixed to allow it too) needs its pixels to actually reach the bleed edge
   // in print — pdfBuildPage's page element clips everything at the trim line, so left alone the
@@ -2273,7 +2897,14 @@ async function pdfRenderPhotoLayer(page, dims, photoMap, dpi, monochrome, bleedI
     scale: 1,
     useCORS: true,
     allowTaint: false,
-    backgroundColor: null,
+    // Was `null` (transparent) — but this canvas gets converted to JPEG a few lines up the call
+    // stack in pdfPageHybrid, and JPEG has no alpha channel at all. Browsers silently fill
+    // transparent JPEG pixels with solid BLACK by default — which is exactly what was showing
+    // up as a black margin anywhere the bleed area wasn't covered by an actual photo (the bleed
+    // strip on every edge, and any gaps between images). Compositing against the page's real
+    // background colour here means there's no transparency left by the time it becomes a JPEG,
+    // so those areas correctly show the intended background instead of defaulting to black.
+    backgroundColor: (page && page.bg) || '#FFFFFF',
     width: wpx,
     height: hpx,
     logging: false
@@ -2465,115 +3096,173 @@ async function pdfPageCanvas(page,dims,photoMap,dpi,monochrome,bleedIn,hardMono)
   return canvas;
 }
 function pdfTrimMarks(doc,totalWIn,totalHIn,bleedIn){
-  const PT=72; const len=0.15*PT;
+  // Industry-standard crop marks: short hairlines at each trim corner, pointing OUTWARD into
+  // the bleed margin — away from the printable page — never into it. The previous version had
+  // this backwards, drawing marks that crossed into the visible trimmed area, which is exactly
+  // what a print shop's crop marks must never do. A small gap keeps the mark from touching the
+  // trim line itself, matching standard convention; both gap and length are sized to fit safely
+  // within a 0.2in (14.4pt) bleed margin, which is what every Binder product uses.
+  const PT=72;
+  const gap=2, len=10; // points
   const tw=totalWIn*PT, th=totalHIn*PT, bl=bleedIn*PT;
-  doc.setDrawColor(0); doc.setLineWidth(0.4); // 0.4pt hairline
-  [[bl,bl,1,1],[tw-bl,bl,-1,1],[bl,th-bl,1,-1],[tw-bl,th-bl,-1,-1]].forEach(([x,y,dx,dy])=>{
-    doc.line(x,y,x+dx*len,y); doc.line(x,y,x,y+dy*len);
+  doc.setDrawColor(0); doc.setLineWidth(0.5); // a touch heavier than a true hairline so marks reproduce reliably at any print shop's RIP
+  [[bl,bl,-1,-1],[tw-bl,bl,1,-1],[bl,th-bl,-1,1],[tw-bl,th-bl,1,1]].forEach(([x,y,dx,dy])=>{
+    doc.line(x+dx*gap, y, x+dx*(gap+len), y); // horizontal mark
+    doc.line(x, y+dy*gap, x, y+dy*(gap+len)); // vertical mark
   });
 }
 function finalizePdf(pdfDoc,order,fileKey){
   const blob=pdfDoc.output('blob'); const url=URL.createObjectURL(blob);
+  const prevUrl=PDF_BLOBS[order.id+'|'+fileKey]; if(prevUrl)URL.revokeObjectURL(prevUrl); // re-rendering the same file (e.g. after an admin edit) would otherwise leak the old blob
   PDF_BLOBS[order.id+'|'+fileKey]=url;
   order.pdfFiles[fileKey]='Ready'; saveJSON('binder_orders',S.orders); renderPdfRows();
   toast('Rendered ✦ "'+fileKey+'" is ready to download — a high-resolution proof PDF.');
 }
-async function generatePdfForOrder(orderId,fileKey,btn){
-  const o=S.orders.find(x=>x.id===orderId);
-  if(!o||!o.snapshot)return toast('No design data was saved with this order — this can happen for orders placed before PDF rendering was added.');
-  if(btn){btn.disabled=true;btn.textContent='Rendering…';}
-  try{
-    await ensurePdfLibs();
-    const {jsPDF}=window.jspdf; const BLEED=0.2, DPI=300; const PT=72;
+// Pure rendering core — given a full order object (snapshot + product) and which file to build
+// (a cover set or the interior pages), assembles and returns the finished jsPDF document with NO
+// browser-UI side effects at all (no toasts, no button state, nothing written to S.orders or
+// localStorage). This is what actually does the work; both the interactive "Render" button
+// (generatePdfForOrder, below) and the headless server-side render worker (renderOrderHeadless,
+// further below — driven by a real headless browser, see /render-service in the deployment
+// package) call this exact same function, so there is only ever one rendering code path to keep
+// correct, not two that can quietly drift apart.
+async function buildPdfForOrder(o,fileKey,onProgress){
+  await ensurePdfLibs();
+  const {jsPDF}=window.jspdf; const BLEED=0.2, DPI=300; const PT=72;
 
-    // ── Art Prints ──────────────────────────────────────────────────────────
-    if(o.product==='artprints'){
-      const boardOrient=o.snapshot.orient||['landscape','landscape','landscape','landscape'];
-      let doc=null;
-      for(let i=0;i<o.snapshot.boards.length;i++){
-        const orient=boardOrient[i]||'landscape';
-        const dims=orient==='portrait'?{w:4,h:6,ref:4*DPI}:{w:6,h:4,ref:6*DPI};
-        const tw=dims.w+2*BLEED, th=dims.h+2*BLEED;
-        const pageOrientation=tw>th?'landscape':'portrait';
-        if(!doc)doc=new jsPDF({orientation:pageOrientation,unit:'pt',format:[tw*PT,th*PT]});
-        else doc.addPage([tw*PT,th*PT],pageOrientation);
-        const b=o.snapshot.boards[i];
-        const page={bg:'#FFFFFF',images:b?[{photo:b.photoId,x:b.x,y:b.y,w:b.w,h:b.h,b:100,c:100,sat:100,rot:0,fit:'cover',fx:50,fy:50}]:[],texts:[],shapes:[]};
-        await pdfPageHybrid(doc,page,dims,o.snapshot.photoMap,DPI,false,BLEED,false,0,0);
-        pdfTrimMarks(doc,tw,th,BLEED);
-      }
-      finalizePdf(doc,o,fileKey); return;
-    }
-
-    // ── Single Art Print (12×18 or 16×20) ────────────────────────────────────
-    if(AP_SINGLE_VARIANTS[o.product]){
-      const variant=AP_SINGLE_VARIANTS[o.product];
-      const orient=o.snapshot.orient||'portrait';
-      const wIn=orient==='portrait'?variant.wIn:variant.hIn, hIn=orient==='portrait'?variant.hIn:variant.wIn;
-      const dims={w:wIn,h:hIn,ref:wIn*DPI};
-      const tw=wIn+2*BLEED, th=hIn+2*BLEED;
-      const doc=new jsPDF({orientation:th>tw?'portrait':'landscape',unit:'pt',format:[tw*PT,th*PT]});
-      const b=o.snapshot.board;
+  // ── Art Prints ──────────────────────────────────────────────────────────
+  if(o.product==='artprints'){
+    const boardOrient=o.snapshot.orient||['landscape','landscape','landscape','landscape'];
+    let doc=null;
+    for(let i=0;i<o.snapshot.boards.length;i++){
+      const orient=boardOrient[i]||'landscape';
+      const dims=orient==='portrait'?{w:4,h:6,ref:4*DPI}:{w:6,h:4,ref:6*DPI};
+      const tw=dims.w+2*BLEED, th=dims.h+2*BLEED;
+      const pageOrientation=tw>th?'landscape':'portrait';
+      if(!doc)doc=new jsPDF({orientation:pageOrientation,unit:'pt',format:[tw*PT,th*PT]});
+      else doc.addPage([tw*PT,th*PT],pageOrientation);
+      const b=o.snapshot.boards[i];
       const page={bg:'#FFFFFF',images:b?[{photo:b.photoId,x:b.x,y:b.y,w:b.w,h:b.h,b:100,c:100,sat:100,rot:0,fit:'cover',fx:50,fy:50}]:[],texts:[],shapes:[]};
       await pdfPageHybrid(doc,page,dims,o.snapshot.photoMap,DPI,false,BLEED,false,0,0);
       pdfTrimMarks(doc,tw,th,BLEED);
-      finalizePdf(doc,o,fileKey); return;
+    }
+    return doc;
+  }
+
+  // ── Single Art Print (12×18 or 16×20) ────────────────────────────────────
+  if(AP_SINGLE_VARIANTS[o.product]){
+    const variant=AP_SINGLE_VARIANTS[o.product];
+    const orient=o.snapshot.orient||'portrait';
+    const wIn=orient==='portrait'?variant.wIn:variant.hIn, hIn=orient==='portrait'?variant.hIn:variant.wIn;
+    const dims={w:wIn,h:hIn,ref:wIn*DPI};
+    const tw=wIn+2*BLEED, th=hIn+2*BLEED;
+    const doc=new jsPDF({orientation:th>tw?'portrait':'landscape',unit:'pt',format:[tw*PT,th*PT]});
+    const b=o.snapshot.board;
+    const page={bg:'#FFFFFF',images:b?[{photo:b.photoId,x:b.x,y:b.y,w:b.w,h:b.h,b:100,c:100,sat:100,rot:0,fit:'cover',fx:50,fy:50}]:[],texts:[],shapes:[]};
+    await pdfPageHybrid(doc,page,dims,o.snapshot.photoMap,DPI,false,BLEED,false,0,0);
+    pdfTrimMarks(doc,tw,th,BLEED);
+    return doc;
+  }
+
+  const ed=EDS[o.product];
+  // Orientation-switchable editors (12×18 photobook) aren't in the static PAGE_DIMS table since
+  // their trim size depends on the doc — derive it from the saved order snapshot's orientation
+  // rather than the live editor's current cfg, since the two can differ (e.g. the customer opened
+  // a different project in the same tab after ordering).
+  let dims=PAGE_DIMS[o.product];
+  if(!dims){
+    const orient=(o.snapshot&&o.snapshot.doc&&o.snapshot.doc.orientation)||'portrait';
+    const baseW=ed.cfg._baseW||ed.cfg.pageInW, baseH=ed.cfg._baseH||ed.cfg.pageInH;
+    dims=orient==='landscape'?{w:baseH,h:baseW,ref:420}:{w:baseW,h:baseH,ref:420};
+  }
+  const mono=ed.cfg.monochrome;
+
+  // ── Cover: three separate single pages (back, spine, front) ─────────────
+  if(fileKey.indexOf('cover')===0){
+    const spineIn=ed.cfg.hasSpine?+((o.snapshot.doc.pages.length)*(ed.cfg.spineCaliperIn||0.0035)).toFixed(3):0;
+
+    // Page 1: Back cover
+    const backW=dims.w+2*BLEED, backH=dims.h+2*BLEED;
+    const doc=new jsPDF({orientation:backH>backW?'portrait':'landscape',unit:'pt',format:[backW*PT,backH*PT]});
+    await pdfPageHybrid(doc,o.snapshot.doc.backCover||{},dims,o.snapshot.photoMap,DPI,mono,BLEED,false,0,0);
+    pdfTrimMarks(doc,backW,backH,BLEED);
+
+    // Page 2: Spine (only for books with a spine)
+    if(ed.cfg.hasSpine&&spineIn>0){
+      const spineW=spineIn+2*BLEED, spineH=dims.h+2*BLEED;
+      doc.addPage([spineW*PT,spineH*PT],spineH>spineW?'portrait':'landscape');
+      const spineDims={w:spineIn,h:dims.h,ref:spineIn*DPI};
+      await pdfPageHybrid(doc,o.snapshot.doc.spine||{},spineDims,o.snapshot.photoMap,DPI,mono,BLEED,false,0,0);
+      pdfTrimMarks(doc,spineW,spineH,BLEED);
     }
 
-    const ed=EDS[o.product];
-    // Orientation-switchable editors (12×18 photobook) aren't in the static PAGE_DIMS table since
-    // their trim size depends on the doc — derive it from the saved order snapshot's orientation
-    // rather than the live editor's current cfg, since the two can differ (e.g. the customer opened
-    // a different project in the same tab after ordering).
-    let dims=PAGE_DIMS[o.product];
-    if(!dims){
-      const orient=(o.snapshot&&o.snapshot.doc&&o.snapshot.doc.orientation)||'portrait';
-      const baseW=ed.cfg._baseW||ed.cfg.pageInW, baseH=ed.cfg._baseH||ed.cfg.pageInH;
-      dims=orient==='landscape'?{w:baseH,h:baseW,ref:420}:{w:baseW,h:baseH,ref:420};
-    }
-    const mono=ed.cfg.monochrome;
+    // Page 3: Front cover
+    doc.addPage([backW*PT,backH*PT],backH>backW?'portrait':'landscape');
+    await pdfPageHybrid(doc,o.snapshot.doc.cover,dims,o.snapshot.photoMap,DPI,mono,BLEED,false,0,0);
+    pdfTrimMarks(doc,backW,backH,BLEED);
 
-    // ── Cover: three separate single pages (back, spine, front) ─────────────
-    if(fileKey.indexOf('cover')===0){
-      const spineIn=ed.cfg.hasSpine?+((o.snapshot.doc.pages.length)*(ed.cfg.spineCaliperIn||0.0035)).toFixed(3):0;
+    return doc;
+  }
 
-      // Page 1: Back cover
-      const backW=dims.w+2*BLEED, backH=dims.h+2*BLEED;
-      const doc=new jsPDF({orientation:backH>backW?'portrait':'landscape',unit:'pt',format:[backW*PT,backH*PT]});
-      await pdfPageHybrid(doc,o.snapshot.doc.backCover||{},dims,o.snapshot.photoMap,DPI,mono,BLEED,false,0,0);
-      pdfTrimMarks(doc,backW,backH,BLEED);
+  // ── Interior pages ────────────────────────────────────────────────────────
+  const totalW=dims.w+2*BLEED, totalH=dims.h+2*BLEED;
+  const doc=new jsPDF({orientation:totalH>totalW?'portrait':'landscape',unit:'pt',format:[totalW*PT,totalH*PT]});
+  const pages=o.snapshot.doc.pages;
+  for(let i=0;i<pages.length;i++){
+    if(i>0)doc.addPage([totalW*PT,totalH*PT]);
+    await pdfPageHybrid(doc,pages[i],dims,o.snapshot.photoMap,DPI,mono,BLEED,mono,0,0);
+    pdfTrimMarks(doc,totalW,totalH,BLEED);
+    if(onProgress&&i%5===0)onProgress(i+1,pages.length);
+  }
+  return doc;
+}
 
-      // Page 2: Spine (only for books with a spine)
-      if(ed.cfg.hasSpine&&spineIn>0){
-        const spineW=spineIn+2*BLEED, spineH=dims.h+2*BLEED;
-        doc.addPage([spineW*PT,spineH*PT],spineH>spineW?'portrait':'landscape');
-        const spineDims={w:spineIn,h:dims.h,ref:spineIn*DPI};
-        await pdfPageHybrid(doc,o.snapshot.doc.spine||{},spineDims,o.snapshot.photoMap,DPI,mono,BLEED,false,0,0);
-        pdfTrimMarks(doc,spineW,spineH,BLEED);
-      }
-
-      // Page 3: Front cover
-      doc.addPage([backW*PT,backH*PT],backH>backW?'portrait':'landscape');
-      await pdfPageHybrid(doc,o.snapshot.doc.cover,dims,o.snapshot.photoMap,DPI,mono,BLEED,false,0,0);
-      pdfTrimMarks(doc,backW,backH,BLEED);
-
-      finalizePdf(doc,o,fileKey); return;
-    }
-
-    // ── Interior pages ────────────────────────────────────────────────────────
-    const totalW=dims.w+2*BLEED, totalH=dims.h+2*BLEED;
-    const doc=new jsPDF({orientation:totalH>totalW?'portrait':'landscape',unit:'pt',format:[totalW*PT,totalH*PT]});
-    const pages=o.snapshot.doc.pages;
-    for(let i=0;i<pages.length;i++){
-      if(i>0)doc.addPage([totalW*PT,totalH*PT]);
-      await pdfPageHybrid(doc,pages[i],dims,o.snapshot.photoMap,DPI,mono,BLEED,mono,0,0);
-      pdfTrimMarks(doc,totalW,totalH,BLEED);
-      if(btn&&i%5===0)btn.textContent=`Rendering… ${i+1}/${pages.length}`;
-    }
+async function generatePdfForOrder(orderId,fileKey,btn){
+  let o=S.orders.find(x=>x.id===orderId);
+  if(!o||!o.snapshot){
+    // The local browser's copy is missing the design data — most likely because this order was
+    // placed on a different device/session than whoever is rendering it right now (or this
+    // session's localStorage was cleared/hit its size limit). Supabase is the real source of
+    // truth — every order's snapshot is saved there at checkout — so fall back to fetching it
+    // from there rather than incorrectly reporting the order as unrenderable.
+    const {data:dbOrder}=await sb.from('orders').select('*').eq('id',orderId).single();
+    if(dbOrder&&dbOrder.snapshot)o={...(o||{}),...dbOrder};
+  }
+  if(!o||!o.snapshot)return toast('No design data was saved with this order — this can happen for orders placed before PDF rendering was added.');
+  if(btn){btn.disabled=true;btn.textContent='Rendering…';}
+  try{
+    const doc=await buildPdfForOrder(o,fileKey,(done,total)=>{if(btn)btn.textContent=`Rendering… ${done}/${total}`;});
     finalizePdf(doc,o,fileKey);
   }catch(e){console.error(e);toast('Render failed: '+(e.message||e));}
   if(btn){btn.disabled=false;btn.textContent='Re-render';}
 }
+
+// Headless entry point for the server-side render worker (see /render-service in the deployment
+// package, a small Node service run separately from this site — not part of the Vercel deploy).
+// That service fetches an order's full data itself, server-side, using the Supabase service-role
+// key (so this function needs no special auth or permissions of its own), drives a real headless
+// Chrome instance to this site, and calls this function directly once the page has loaded —
+// passing the order object straight in as a JS argument rather than this page ever needing to
+// query Supabase itself. Reuses buildPdfForOrder exactly as the interactive Render button does,
+// so there is no separate rendering logic to drift out of sync — the same DOM building, image
+// placement, and DPI math that already work in the browser today.
+//
+// Deliberately does NOT return the PDF data from this function. Puppeteer's page.evaluate() has
+// a hard ~100MB limit on what it can pass back to Node — confirmed directly against Puppeteer's
+// own issue tracker — and a full-resolution, many-page, high-photo-count book can exceed that
+// easily as a base64 string, silently failing (which is exactly what was producing blank PDFs
+// for real orders while small test ones worked fine). Instead, this triggers a real browser
+// download of the finished file; the server-side worker intercepts that download directly via
+// Chrome's own download mechanism (see render-worker.js), which has no such size ceiling.
+window.renderOrderHeadless=async(order,fileKey)=>{
+  try{
+    const doc=await buildPdfForOrder(order,fileKey);
+    doc.save('render-output.pdf'); // jsPDF's own save() — triggers a standard browser download
+    return {ok:true};
+  }catch(e){
+    return {ok:false,error:(e&&e.message)||String(e)};
+  }
+};
 function downloadPdf(orderId,fileKey){
   const order=S.orders.find(o=>o.id===orderId);
   if(!order||!order.paymentId){toast('A print order must be placed before downloading the PDF.');return;}
@@ -2581,95 +3270,6 @@ function downloadPdf(orderId,fileKey){
   if(!url)return toast('Render it first — the file lives in this browser session only.');
   const a=document.createElement('a'); a.href=url; a.download=orderId+' — '+fileKey+'.pdf'; a.click();
 }
-
-/* ---------- Preview ---------- */
-let PV={key:null,idx:-1};
-function openPreview(key){PV.key=key;PV.idx=(EDS[key]&&EDS[key].cfg.hasSpine)?'coverspread':'cover';pvRender();show('previewModal')}
-function pvRender(){
-  const st=$('pvStage');st.innerHTML='';
-  if(PV.key==='artprints'){
-    const grid=document.createElement('div');grid.className='artboard-grid';grid.style.cssText+='background:transparent;box-shadow:none;width:min(640px,80vw)';
-    AP.boards.forEach((b,i)=>{
-      const orient=(AP.orient&&AP.orient[i])||'landscape';
-      const board=document.createElement('div');board.className='artboard';board.style.cssText=`width:100%;aspect-ratio:${orient==='portrait'?'4/6':'6/4'}`;
-      if(b){const ph=AP.photos.find(p=>p.id===b.photoId);
-        if(ph){const im=document.createElement('div');im.style.cssText=`position:absolute;left:${b.x??16.6}%;top:${b.y??16.6}%;width:${b.w??66.8}%;height:${b.h??66.8}%;overflow:hidden`;
-          const img=document.createElement('img');img.src=ph.url;img.style.cssText='width:100%;height:100%;object-fit:contain';im.appendChild(img);board.appendChild(im);}
-      }
-      grid.appendChild(board);
-    });
-    st.appendChild(grid);
-    $('pvLabel').textContent='4 artboards · 6″×4″ (or 4″×6″ portrait)';
-    document.querySelectorAll('#previewModal .pv-navbtn').forEach(b=>b.style.display='none');
-    return;
-  }
-  if(AP_SINGLE_VARIANTS[PV.key]){
-    const variant=AP_SINGLE_VARIANTS[PV.key], stv=AP_SINGLE[PV.key];
-    const dims=apSingleDims(PV.key,stv.orient);
-    // Deliberately NOT using .artboard-grid here — that class lays out a 2-column grid meant for
-    // the 4-print set's boards, so a single board dropped into it only ever occupied one column
-    // (roughly half the intended width), rendering small and pushed to one side instead of
-    // centered. Dimensions are computed explicitly in px (rather than aspect-ratio+auto sizing)
-    // because auto-sizing collapses to 0×0 here — the board has no normal-flow content to anchor
-    // an intrinsic size to, since its photo is positioned absolutely.
-    const maxW=Math.min(560,window.innerWidth*0.8), maxH=window.innerHeight*0.6;
-    let boardWpx=maxW, boardHpx=maxW*(dims.h/dims.w);
-    if(boardHpx>maxH){boardHpx=maxH; boardWpx=maxH*(dims.w/dims.h);}
-    const wrap=document.createElement('div');wrap.style.cssText='display:flex;justify-content:center;padding:20px';
-    const board=document.createElement('div');board.className='artboard';
-    board.style.cssText=`width:${Math.round(boardWpx)}px;height:${Math.round(boardHpx)}px;flex-shrink:0;background:#fff`;
-    const b=stv.board;
-    if(b){const ph=stv.photos.find(p=>p.id===b.photoId);
-      if(ph){const im=document.createElement('div');im.style.cssText=`position:absolute;left:${b.x??8.3}%;top:${b.y??8.3}%;width:${b.w??83.4}%;height:${b.h??83.4}%;overflow:hidden`;
-        const img=document.createElement('img');img.src=ph.url;img.style.cssText='width:100%;height:100%;object-fit:contain';im.appendChild(img);board.appendChild(im);}
-    }
-    wrap.appendChild(board);
-    st.appendChild(wrap);
-    $('pvLabel').textContent=`${variant.label} · ${dims.w}″×${dims.h}″`;
-    document.querySelectorAll('#previewModal .pv-navbtn').forEach(b=>b.style.display='none');
-    return;
-  }
-  document.querySelectorAll('#previewModal .pv-navbtn').forEach(b=>b.style.display='');
-  const ed=EDS[PV.key];
-  if(PV.idx==='coverspread'){
-    const wrap=document.createElement('div');wrap.className='spread wrap-cover';
-    const back=ed.buildPage(ed.doc.backCover,'back',null,null,false);
-    const spineEl=ed.buildPage(ed.doc.spine,'spine',null,null,false);
-    const spineWidthPx=Math.max(14,ed.spineWidthIn()*140);
-    spineEl.style.width=spineWidthPx+'px';spineEl.style.aspectRatio='unset';spineEl.style.height='auto';spineEl.classList.add('spine-zone');
-    const front=ed.buildPage(ed.doc.cover,'cover',null,null,false);
-    wrap.append(back,spineEl,front);
-    wrap.querySelectorAll('.book-page').forEach(p=>{if(!p.classList.contains('spine-zone'))p.style.width='200px'});
-    st.appendChild(wrap);
-    $('pvLabel').textContent=`Cover · Spine (${ed.spineWidthIn()}″) · Back`;
-    return;
-  }
-  const spread=document.createElement('div');spread.className='spread';
-  if(PV.idx==='cover'||PV.idx==='back'){spread.classList.add('single');spread.appendChild(ed.buildPage(PV.idx==='cover'?ed.doc.cover:ed.doc.backCover,PV.idx,null,null,false));$('pvLabel').textContent=PV.idx==='cover'?'Cover':'Back cover';}
-  else{
-    const item=ed.interiorLayout()[PV.idx];
-    if(item.type==='single'){
-      spread.classList.add('single');
-      spread.appendChild(ed.buildPage(ed.doc.pages[item.idx],item.idx,null,null,false));
-      $('pvLabel').textContent=`Page ${item.idx+1} of ${ed.pageCount()}`;
-    }else{
-      spread.appendChild(ed.buildPage(ed.doc.pages[item.l],item.l,null,null,false));
-      spread.appendChild(ed.buildPage(ed.doc.pages[item.r],item.r,null,null,false));
-      $('pvLabel').textContent=`Pages ${item.l+1}–${item.r+1} of ${ed.pageCount()}`;
-    }
-  }
-  spread.querySelectorAll('.book-page').forEach(p=>{p.style.width='280px'});
-  st.appendChild(spread);
-}
-function pvNav(d){if(PV.key==='artprints')return;const ed=EDS[PV.key];const max=ed.interiorLayout().length-1;
-  if(ed.cfg.hasSpine){
-    if(PV.idx==='coverspread')PV.idx=d>0?0:'coverspread';
-    else{PV.idx+=d; if(PV.idx<0)PV.idx='coverspread'; if(PV.idx>max)PV.idx=max;}
-  }else{
-    if(PV.idx==='cover')PV.idx=d>0?0:'cover'; else if(PV.idx==='back')PV.idx=d<0?max:'back';
-    else{PV.idx+=d; if(PV.idx<0)PV.idx='cover'; if(PV.idx>max)PV.idx='back';}
-  }
-  pvRender();}
 
 /* ================= ART PRINTS EDITOR ================= */
 const AP={title:'Untitled Art Print Set',photos:[],boards:[null,null,null,null],orient:['landscape','landscape','landscape','landscape']}; // each board: {photoId,x,y,w,h} or null
@@ -2719,10 +3319,14 @@ function wireArtBoardResize(im,board,b,targets,onResized){
         if(dir.includes('w')){let l=ox+dx; if(!ev.altKey)l=snap(l,targets.xs,'v'); l=Math.min(l,right-MIN); nx=l; nw=right-l;}
         if(dir.includes('s')){let bo=bottom+dy; if(!ev.altKey)bo=snap(bo,targets.ys,'h'); nh=Math.max(MIN,bo-oy);}
         if(dir.includes('n')){let t=oy+dy; if(!ev.altKey)t=snap(t,targets.ys,'h'); t=Math.min(t,bottom-MIN); ny=t; nh=bottom-t;}
-        if(ev.shiftKey&&dir.length===2){ // corner handle — preserve original aspect ratio
+        // A board always holds a single photo, so — same as the book editors — proportions are
+        // always preserved here, on every handle, not just corners with Shift held.
+        if(dir.length===2){
           if(Math.abs(dx)>=Math.abs(dy)){nh=nw*ratio; if(dir.includes('n'))ny=bottom-nh;}
           else{nw=nh/ratio; if(dir.includes('w'))nx=right-nw;}
-        }
+        }else if(dir==='e'||dir==='w'){ nh=nw*ratio; ny=oy+(oh-nh)/2; }
+        else{ nw=nh/ratio; nx=ox+(ow-nw)/2; }
+        nw=Math.max(MIN,nw); nh=Math.max(MIN,nh);
         b.x=nx;b.y=ny;b.w=nw;b.h=nh;
         im.style.left=nx+'%';im.style.top=ny+'%';im.style.width=nw+'%';im.style.height=nh+'%';
       };
@@ -2981,7 +3585,7 @@ async function cmsRetryDirtyKeys(){
   }
   refreshCmsSyncBanner();
 }
-const CMS_KEY_LABELS={content:'Site text/images',catalog:'Store products',posts:'Kagaz Journal posts',clients:'Clients list',site_cfg:'Site settings',faq:'FAQ'};
+const CMS_KEY_LABELS={content:'Site text/images',catalog:'Store products',posts:'Kagaz Journal posts',clients:'Clients list',site_cfg:'Site settings',faq:'FAQ',custom_templates:'Templates'};
 function refreshCmsSyncBanner(){
   const banner=$('cmsSyncBanner'); if(!banner)return;
   const stuck=CMS_KNOWN_KEYS.filter(k=>cmsIsDirty(k));
@@ -3004,7 +3608,7 @@ async function cmsClearCache(key){
 }
 
 // Load ALL cms keys at startup in one query — fast, single round trip
-const CMS_KNOWN_KEYS=['content','catalog','posts','clients','site_cfg','faq','photo_services','gallery'];
+const CMS_KNOWN_KEYS=['content','catalog','posts','clients','site_cfg','faq','photo_services','gallery','custom_templates'];
 async function cmsLoadAll(){
   const fetchStartedAt = Date.now(); // captured BEFORE asking Supabase, so we can tell if a
   // local write happened while this request was in flight — see below.
@@ -3082,7 +3686,7 @@ const CONTENT_DEFAULTS={
   startPhotobookIntro:'Everything worth knowing before you lay out your first spread — trim size, page limits, image resolution, and how the free-form editor works.',
   startTradebookIntro:'Everything worth knowing before you drop in your manuscript — trim size, page limits, typography, and how ISBN and cover design work.',
   startArtprintsIntro:'Everything worth knowing before you pick your four images — print size, paper, and how orientation and cropping work.',
-  storeBooksTagline:'Linen covers, archival sleeves, and gifting editions — finishing touches for every Binder book.',
+  storeBooksTagline:'',
   storePhotoTagline:'Loose prints and framing-ready editions, pulled on 300gsm archival stock.',
   heroHeading:"It's your moment, live it.",
   heroBody:'A publishing platform for everyone. Publish photobooks, novel-grade trade books, and gallery art prints, all professional grade.',
@@ -3143,7 +3747,7 @@ function applyContent(){
 }
 
 /* ---- Site Config (colours, contact, footer, social) ---- */
-let SITE_CFG=loadJSON('cms_site_cfg',{accentColor:'#52B57D',siteFont:'',headingWeight:'300',contactEmail:'',contactPhone:'',instagram:'',twitter:'',facebook:'',whatsapp:'',footerTagline:'',address:''});
+let SITE_CFG=loadJSON('cms_site_cfg',{accentColor:'#52B57D',siteFont:'',headingWeight:'300',contactEmail:'',contactPhone:'',instagram:'',twitter:'',facebook:'',whatsapp:'',footerTagline:'',address:'',renderServiceUrl:'',renderServiceSecret:''});
 function saveSiteCfg(){
   SITE_CFG.contactEmail=($('cfgContactEmail')||{value:''}).value.trim();
   SITE_CFG.contactPhone=($('cfgContactPhone')||{value:''}).value.trim();
@@ -3153,6 +3757,8 @@ function saveSiteCfg(){
   SITE_CFG.whatsapp=($('cfgWhatsapp')||{value:''}).value.trim();
   SITE_CFG.footerTagline=($('cfgFooterTagline')||{value:''}).value.trim();
   SITE_CFG.address=($('cfgAddress')||{value:''}).value.trim();
+  SITE_CFG.renderServiceUrl=($('cfgRenderServiceUrl')||{value:''}).value.trim().replace(/\/$/,'');
+  SITE_CFG.renderServiceSecret=($('cfgRenderServiceSecret')||{value:''}).value.trim();
   saveJSON('cms_site_cfg',SITE_CFG);
   applySiteCfgToPublicSite();
   cmsSet('site_cfg',SITE_CFG).then(ok=>{toast(ok?'Saved ✓ — visible to all visitors':'⚠ Saved on this device only — cloud sync failed, other visitors won\'t see this yet');});
@@ -3238,6 +3844,8 @@ function loadSiteCfgIntoAdmin(){
   if($('cfgWhatsapp'))$('cfgWhatsapp').value=SITE_CFG.whatsapp||'';
   if($('cfgFooterTagline'))$('cfgFooterTagline').value=SITE_CFG.footerTagline||'';
   if($('cfgAddress'))$('cfgAddress').value=SITE_CFG.address||'';
+  if($('cfgRenderServiceUrl'))$('cfgRenderServiceUrl').value=SITE_CFG.renderServiceUrl||'';
+  if($('cfgRenderServiceSecret'))$('cfgRenderServiceSecret').value=SITE_CFG.renderServiceSecret||'';
 }
 // Apply saved config on load
 (function initSiteCfg(){
@@ -3766,7 +4374,7 @@ function renderStore(){
     const inner=document.createElement('div');
     inner.className='store-drawer-inner';
     const grid=document.createElement('div');
-    grid.className='store-grid';
+    grid.className='store-grid'+(cat==='Books'?' store-grid-books':'');
     if(items.length){
       items.forEach((p,i)=>grid.appendChild(productCardEl(p,i)));
     }else{
@@ -3847,6 +4455,7 @@ let CHECKOUT_CTX=null;
 function openStoreCheckout(){pruneInvalidCartItems();if(!S.cart.length)return toast('Cart is empty');if(!S.user){authGo('login');show('authModal');toast('Sign in to check out');return}
   closeCart();CHECKOUT_CTX={type:'store',addons:[],gift:null,couponCode:null,couponPercent:0};
   $('coSub').textContent=S.cart.reduce((a,c)=>a+c.qty,0)+' item(s)';
+  $('coFinishRow').style.display='none'; // Store items are already-printed, ready-made pieces — not a customisable print order
   $('coAddonsRow').style.display='none';
   $('coGiftRow').style.display='block'; resetGiftForm();
   resetCoupon();
@@ -4035,6 +4644,7 @@ function openCheckout(editorKey){
   const showQty=(editorKey==='photobook'||editorKey==='photobook12'||editorKey==='photobook18'||editorKey==='tradebook');
   $('coQtyRow').style.display=showQty?'block':'none';
   $('coQtyNudge').style.display=showQty?'block':'none';
+  $('coFinishRow').style.display='block';
   $('coBindingRow').style.display=(editorKey==='photobook12'||editorKey==='photobook18')?'block':'none';
   if($('coQty'))$('coQty').value=1;
   renderCheckoutAddons();
@@ -4526,10 +5136,11 @@ async function deleteCoupon(id){
   renderCouponRows();
 }
 function adminTab(t){document.querySelectorAll('.admin-side button[data-ap]').forEach(b=>b.classList.toggle('on',b.dataset.ap===t));
-  ['dashboard','orders','pdf','fonts','content','gallery-edit','products','journal','customers','payments','seomoat','coupons'].forEach(x=>{const el=$('ap-'+x);if(el)el.style.display=x===t?'block':'none'});
+  ['dashboard','orders','pdf','fonts','content','gallery-edit','templates','products','journal','customers','payments','seomoat','coupons'].forEach(x=>{const el=$('ap-'+x);if(el)el.style.display=x===t?'block':'none'});
   if(t==='dashboard')renderDashboard(); if(t==='orders')renderOrderRows(); if(t==='pdf')renderPdfRows();
   if(t==='fonts')renderFontRows();
   if(t==='gallery-edit'){renderGalAdmin();migrateOversizedGalleryImages();} if(t==='products'){renderProductRows();migrateOversizedProductImages();}
+  if(t==='templates')renderCustomTemplatesAdmin();
   if(t==='content'){renderContentFields();loadSiteCfgIntoAdmin();renderClientsAdmin();renderPhotoServicesAdmin();migrateOversizedContentImages();migrateOversizedPhotoServiceImages();}
   if(t==='journal'){renderJournalAdmin();migrateOversizedHeroImages();}
   if(t==='customers')renderCustomerRows(); if(t==='payments')renderPaymentsForm();
@@ -4628,12 +5239,6 @@ function exitAdminEditor(andReload){
   if(andReload) renderPdfRows();
 }
 
-function adminEditorPreview(){
-  const key = ACTIVE_EDITOR || (ADMIN_EDIT_ORDER?.product);
-  if(!key) return;
-  openPreview(key);
-}
-
 async function adminSaveAndRerender(){
   if(!ADMIN_EDIT_ORDER) return toast('No order being edited.');
   const btn = $('adminSaveRerenderBtn');
@@ -4723,7 +5328,7 @@ async function renderPdfRows(){
   const bookOrders=S.orders.filter(o=>o.pdfFiles||o.product);
   if(!bookOrders.length){tb.innerHTML='<tr><td colspan="6" style="color:#86868B;padding:24px">No orders queued.</td></tr>';return;}
   const ids=bookOrders.map(o=>o.id);
-  const {data:dbOrders}=await sb.from('orders').select('id,render_status,pdf_files,render_error,pdf_version,edit_history,customer_email').in('id',ids);
+  const {data:dbOrders}=await sb.from('orders').select('id,render_status,pdf_files,render_error,pdf_version,edit_history,customer_email,snapshot').in('id',ids);
   const dbMap=Object.fromEntries((dbOrders||[]).map(o=>[o.id,o]));
   tb.innerHTML=bookOrders.map(o=>{
     const db=dbMap[o.id]||{};
@@ -4742,7 +5347,13 @@ async function renderPdfRows(){
     return keys.map(file=>{
       const pdfUrl=pdfFiles[file]||PDF_BLOBS[o.id+'|'+file]||null;
       const dlBtn=pdfUrl?`<a class="btn btn-dark xs" href="${pdfUrl}" target="_blank" download="binder-${o.id}-${file}-v${db.pdf_version||1}.pdf">⬇ v${db.pdf_version||1}</a>`:'';
-      const renderBtn=`<button class="btn btn-ghost xs" onclick="reRenderOrder('${o.id}','${file}',this)" ${o.snapshot?'':'disabled title="No snapshot"'}>${pdfUrl?'Re-render':'Render'}</button>`;
+      const hasSnapshot=!!(o.snapshot||db.snapshot); // prefer local, but the DB copy (saved at checkout, same as every order) is just as valid — this is what lets an order be rendered from any admin session, not just the one that placed it
+      const renderBtn=`<button class="btn btn-ghost xs" onclick="reRenderOrder('${o.id}','${file}',this)" ${hasSnapshot?'':'disabled title="No snapshot"'}>${pdfUrl?'Re-render':'Render'}</button>`;
+      // Purely additive — only appears once a render service URL is configured in Admin →
+      // Content, and never replaces or disables the button above. Runs the identical rendering
+      // logic on a real server instead of this browser tab, via render-worker.js.
+      const serverRenderBtn=(SITE_CFG.renderServiceUrl&&hasSnapshot)
+        ?`<button class="btn btn-ghost xs" onclick="serverRenderOrder('${o.id}','${file}',this)" title="Render on the server instead of this browser tab">Render (server)</button>`:'';
       const editBtn=`<button class="btn btn-ghost xs" onclick="openAdminEditor('${o.id}')" title="Open in editor to make changes, then re-render"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 2.5l2 2-7 7H2.5v-2l7-7z" stroke="#52B57D" stroke-width="1.5" stroke-linejoin="round"/></svg> Edit Design</button>`;
       return `<tr>
         <td>${o.id}</td>
@@ -4751,7 +5362,7 @@ async function renderPdfRows(){
         <td>${esc(file)}</td>
         <td style="white-space:nowrap">${statusLabel}</td>
         <td style="white-space:nowrap;font-size:12px;color:var(--slate)">v${db.pdf_version||1}${(db.edit_history||[]).length>0?' ·  '+db.edit_history.length+' edit'+(db.edit_history.length>1?'s':''):''}</td>
-        <td style="display:flex;gap:6px;flex-wrap:wrap;padding:8px 6px">${editBtn}${renderBtn}${dlBtn}</td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap;padding:8px 6px">${editBtn}${renderBtn}${serverRenderBtn}${dlBtn}</td>
       </tr>`;
     }).join('');
   }).join('');
@@ -4761,13 +5372,15 @@ async function reRenderOrder(orderId,fileKey,btn){
   btn.disabled=true;btn.textContent='Triggering…';
   const local=S.orders.find(o=>o.id===orderId);
   if(local){
-    await sb.from('orders').upsert({
+    const payload={
       id:local.id,customer_email:local.customer,customer_name:S.user?.name||null,
       customer_id:S.user?.id||null,title:local.title,product:local.product,
       qty:local.qty,amount:local.amount,status:local.status,
       pay_method:local.payMethod||null,payment_id:local.paymentId||null,
-      snapshot:local.snapshot,pdf_files:{},render_status:'pending'
-    },{onConflict:'id'}).then(({error})=>{if(error)console.warn('upsert:',error.message)});
+      pdf_files:{},render_status:'pending'
+    };
+    if(local.snapshot)payload.snapshot=local.snapshot; // only ever set this if we actually have one — never overwrite a good snapshot already sitting in Supabase with a missing local copy
+    await sb.from('orders').upsert(payload,{onConflict:'id'}).then(({error})=>{if(error)console.warn('upsert:',error.message)});
   }
   await sb.from('orders').update({render_status:'pending',render_error:null}).eq('id',orderId);
   try{
@@ -4780,6 +5393,45 @@ async function reRenderOrder(orderId,fileKey,btn){
     await sb.from('orders').update({render_status:'failed',render_error:e.message||String(e)}).eq('id',orderId);
   }
   btn.disabled=false;btn.textContent='Re-render';
+  renderPdfRows();
+}
+// Triggers a render on the separate backend render service (see render-service/README.md)
+// instead of doing it in this browser tab. Only ever shown/callable once a service URL is
+// configured in Admin → Content — see the serverRenderBtn conditional in renderPdfRows() above.
+// The service responds immediately once the job has started (not once it's finished, since a
+// large book can take a while to render) and does the actual work in the background, updating
+// the order's render_status in Supabase as it goes — so this polls that status for a bit to
+// give the admin a live "still rendering…" / "done" indication without needing a second visit.
+async function serverRenderOrder(orderId,fileKey,btn){
+  const url=(SITE_CFG.renderServiceUrl||'').trim(), secret=(SITE_CFG.renderServiceSecret||'').trim();
+  if(!url)return toast('No render service configured — set one in Admin → Content.');
+  btn.disabled=true; const origLabel=btn.textContent; btn.textContent='Starting…';
+  try{
+    const res=await fetch(url+'/render',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+secret},
+      body:JSON.stringify({orderId,fileKey})
+    });
+    if(!res.ok){
+      const body=await res.json().catch(()=>({}));
+      throw new Error(body.error||('HTTP '+res.status));
+    }
+    toast('Render started on the server — this can take a moment for a large book.');
+    btn.textContent='Rendering…';
+    // Poll for completion for up to ~2 minutes, checking every 4 seconds — long enough for a
+    // typical book, without polling forever if something's gone wrong (the order's render_error
+    // field will show why, next time the admin opens this page, either way).
+    for(let i=0;i<30;i++){
+      await new Promise(r=>setTimeout(r,4000));
+      const {data}=await sb.from('orders').select('render_status,render_error').eq('id',orderId).single();
+      if(!data)break;
+      if(data.render_status==='ready'){toast('✅ Server render complete');break;}
+      if(data.render_status==='failed'){toast('❌ Server render failed: '+(data.render_error||'unknown error'));break;}
+    }
+  }catch(e){
+    toast('⚠ Could not reach the render service: '+(e.message||e));
+  }
+  btn.disabled=false; btn.textContent=origLabel;
   renderPdfRows();
 }
 
@@ -4846,6 +5498,7 @@ async function uploadCmsImage(key,file){
     if(error)throw error;
     CONTENT[key]=url;
     setPreview(url,fileIsVideo);
+    URL.revokeObjectURL(localPreview);
     saveContent();
     applyContent();
     if(ACTIVE_START_KEY)renderStartPage(ACTIVE_START_KEY);
@@ -5046,13 +5699,15 @@ function rteImage(target){const inp=document.createElement('input');inp.type='fi
     // Insert a temporary placeholder immediately so the editor doesn't feel stuck, then swap
     // it for the real Storage URL once the upload finishes.
     const tempId='rte-img-'+uid();
-    document.execCommand('insertHTML',false,`<img id="${tempId}" src="${URL.createObjectURL(f)}" style="opacity:.5">`);
+    const localPreview=URL.createObjectURL(f);
+    document.execCommand('insertHTML',false,`<img id="${tempId}" src="${localPreview}" style="opacity:.5">`);
     try{
       const path=`site/rte-${uid()}`;
       const {error,url}=await uploadWebImage(path,f);
       if(error)throw error;
       const placed=document.getElementById(tempId);
       if(placed){placed.src=url;placed.style.opacity='';placed.removeAttribute('id');}
+      URL.revokeObjectURL(localPreview);
     }catch(e){
       console.warn('RTE image upload failed:',e.message||e);
       toast('⚠ Image upload failed — is the "cms-images" storage bucket created (public) in Supabase? '+(e.message||''));
@@ -5092,6 +5747,7 @@ async function uploadHeroImage(file){
     if(error)throw error;
     CONTENT.heroImageUrl=url;
     loadHeroImage(); if(hp)hp.src=url;
+    URL.revokeObjectURL(localPreview);
     saveContent();
   }catch(e){
     console.warn('Hero image upload failed:',e.message||e);
@@ -5105,8 +5761,28 @@ function loadHeroImage(){
   if(!CONTENT.heroImageUrl)return;
   const vid=$('heroVideo');
   if(isVideoUrl(CONTENT.heroImageUrl)){
-    if(vid){vid.src=CONTENT.heroImageUrl;vid.style.display='block';vid.play().catch(()=>{});}
-    img.style.display='none';
+    if(vid){
+      vid.src=CONTENT.heroImageUrl;vid.style.display='block';vid.play().catch(()=>{});
+      img.style.display='none';
+      // Rather than loop the video, play it once and land on a dedicated static end frame —
+      // this sidesteps browser looping quirks entirely, since there's nothing left to loop.
+      // Two independent triggers, not just one: 'ended' alone has already proven unreliable
+      // here (it's the same event that silently didn't fire earlier when `loop` was still set),
+      // so 'timeupdate' — which fires continuously and reliably throughout normal playback —
+      // is the primary detector, catching the end of the video a fraction of a second early;
+      // 'ended' stays as a backup for whenever it does fire correctly. showEndImage() is
+      // idempotent, so having both fire is harmless. Guarded so a second loadHeroImage() call
+      // (e.g. after a CMS sync) never attaches duplicate listeners.
+      if(!vid._endImageBound){
+        vid._endImageBound=true;
+        const showEndImage=()=>{
+          if(img.style.display==='block')return; // already showing it — avoid redundant work
+          vid.style.display='none'; img.src='/images/hero-end.jpg'; img.style.display='block';
+        };
+        vid.addEventListener('timeupdate',()=>{ if(vid.duration&&vid.currentTime>=vid.duration-0.25)showEndImage(); });
+        vid.addEventListener('ended',showEndImage);
+      }
+    }
   }else{
     if(vid)vid.style.display='none';
     img.src=CONTENT.heroImageUrl;img.style.display='block';
@@ -5127,6 +5803,7 @@ async function uploadScanHeroImage(file){
     CONTENT.scanHeroImageUrl=url;
     loadScanHeroImage();
     if(prev)prev.src=url;
+    URL.revokeObjectURL(localPreview);
     saveContent();
   }catch(e){
     console.warn('Scan hero image upload failed:',e.message||e);
@@ -5167,6 +5844,7 @@ async function uploadStoreHeroImage(file){
     CONTENT.storeHeroImageUrl=url;
     loadStoreHeroImage();
     if(prev){prev.src=isVideoUrl(url)?'':url;prev.style.display=isVideoUrl(url)?'none':'block';}
+    URL.revokeObjectURL(localPreview);
     saveContent();
   }catch(e){
     console.warn('Store hero image upload failed:',e.message||e);
@@ -5254,11 +5932,13 @@ async function onProductImageUpload(file){
   if(!file)return;
   const prev=$('pfImgPreview');
   // Instant local preview while the real upload happens in the background.
-  prev.src=URL.createObjectURL(file); prev.style.display='block';
+  const localPreview=URL.createObjectURL(file);
+  prev.src=localPreview; prev.style.display='block';
   _productImgUploading=true; toast('Uploading image…');
   try{
     const url=await uploadProductImageToStorage(file);
     _pendingProductImg=url; prev.src=url;
+    URL.revokeObjectURL(localPreview);
     toast('Image uploaded ✓');
   }catch(e){
     console.warn('Product image upload failed:',e.message||e);
@@ -5688,11 +6368,13 @@ async function onPostHeroUpload(file){
   if(!file)return;
   const p=$('bpHeroPreview');
   // Instant local preview while the real upload happens in the background.
-  p.src=URL.createObjectURL(file); p.style.display='block';
+  const localPreview=URL.createObjectURL(file);
+  p.src=localPreview; p.style.display='block';
   _postHeroUploading=true; toast('Uploading image…');
   try{
     const url=await uploadPostHeroToStorage(file);
     _pendingPostHero=url; p.src=url;
+    URL.revokeObjectURL(localPreview);
     toast('Image uploaded ✓');
   }catch(e){
     console.warn('Post hero upload failed:',e.message||e);
@@ -6491,6 +7173,12 @@ cmsLoadAll().then((fetched)=>{
   const sbGallery=fetched.gallery;
   if(sbGallery&&Array.isArray(sbGallery)){GALLERY=sbGallery;GALLERY.forEach(im=>{if(!Array.isArray(im.images))im.images=[];});renderGallery();}
 
+  const sbCustomTemplates=fetched.custom_templates;
+  if(sbCustomTemplates&&Array.isArray(sbCustomTemplates)&&sbCustomTemplates.length){
+    CUSTOM_TEMPLATES=sbCustomTemplates; renderTemplatesPageV2();
+    if($('ap-templates')&&$('ap-templates').style.display!=='none')renderCustomTemplatesAdmin();
+  }
+
   const sbSiteCfg=fetched.site_cfg;
   if(sbSiteCfg){Object.assign(SITE_CFG,sbSiteCfg);if(SITE_CFG.accentColor)applySiteColor('accent',SITE_CFG.accentColor);applySiteCfgToPublicSite();}
 
@@ -6503,4 +7191,19 @@ cmsLoadAll().then((fetched)=>{
     if(!Array.isArray(SEOMOAT.topics)||!SEOMOAT.topics.length)SEOMOAT.topics=JSON.parse(JSON.stringify(SEOMOAT_TOPICS_DEFAULT));
     if($('ap-seomoat')&&$('ap-seomoat').style.display!=='none')renderSeoMoat();
   }
+});
+
+// Click outside the page (the grey stage background) to hide every editing guide/marking —
+// bleed line, safe-margin line, low-DPI badges — so it's easy to see exactly what the finished
+// page will look like; click back onto the page (or a photo/shape/text on it) to bring them
+// back. Applies to every editor — the 4 book editors and all 3 Art Print variants — and, since
+// Admin → Templates → Edit layout opens these same editors, to template editing too, with no
+// separate wiring needed there. Wired once, here, rather than per-render, since .stage-scroll is
+// a static element in the page's own HTML (only its contents get rebuilt on every ed.renderAll()).
+document.querySelectorAll('.stage-scroll').forEach(stageScroll=>{
+  const edStage=stageScroll.closest('.ed-stage'); if(!edStage)return;
+  stageScroll.addEventListener('click',e=>{
+    const insideCanvas=e.target.closest('.spread,.book-page,.artboard');
+    edStage.classList.toggle('markings-hidden',!insideCanvas);
+  });
 });

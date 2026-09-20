@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1D1D1F">
+<meta name="google-site-verification" content="tXxpF4ySYw9YzBu_J8uyE0AzafewGq98CVD9Nai3vik" />
 <title>Binder — Custom Photobook & Book Printing, Delhi, India</title>
 <meta name="description" content="Binder is a Delhi-based publisher and printer — design custom photobooks, self-publish trade books with free ISBN help, and order archival art prints.">
 <meta name="keywords" content="photobook printing India, custom photo book maker, self publish book India, free ISBN registration India, layflat photo album, trade book printing Delhi, art print printing India, photobook printing Delhi">
@@ -71,6 +72,7 @@
       <a href="/" onclick="go('home');return false;">Home</a>
       <a href="/photobooks" onclick="goStart('photobook');return false;">Photobooks</a>
       <a href="/gallery" onclick="go('gallery');return false;">Gallery</a>
+      <a href="/templates" onclick="go('templates');return false;">Ready-to-go Templates</a>
       <a href="/trade-books" onclick="goStart('tradebook');return false;">Trade Books</a>
       <a href="/art-prints" onclick="goStart('artprints');return false;">Art Prints</a>
       <a href="/pricing" onclick="go('pricing');return false;">Pricing</a>
@@ -106,7 +108,7 @@
   </div>
   <div class="hero-image-wrap">
     <p style="text-align:center;font-size:15px;font-weight:700;letter-spacing:.02em;color:var(--accent);margin:0 0 14px">390,000+ books printed and published</p>
-    <video id="heroVideo" muted loop playsinline preload="auto" style="display:none"></video>
+    <video id="heroVideo" muted playsinline preload="auto" style="display:none"></video>
     <img id="heroImage" src="/images/img-hero.jpg" alt="Binder photobooks, trade books, and art prints" loading="eager" fetchpriority="high">
   </div>
 
@@ -146,6 +148,41 @@
   <div id="clientsGrid"></div>
 </div></section>
 
+<!-- ============ SITEMAP (human-readable page — the machine-readable /sitemap.xml is a separate static file for crawlers) ============ -->
+<section class="view" id="view-sitemap"><div class="page-wrap">
+  <span class="tag">Sitemap</span>
+  <h1>Every page on Binder</h1>
+  <div class="sitemap-groups">
+    <div class="sitemap-group">
+      <h3>Publish a Book</h3>
+      <a href="/photobooks" onclick="goStart('photobook');return false;">Photobooks</a>
+      <a href="/trade-books" onclick="goStart('tradebook');return false;">Trade Books</a>
+      <a href="/art-prints" onclick="goStart('artprints');return false;">Art Prints</a>
+      <a href="/pricing" onclick="go('pricing');return false;">Pricing</a>
+      <a href="/isbn" onclick="go('isbn');return false;">Publish | Free ISBN</a>
+    </div>
+    <div class="sitemap-group">
+      <h3>Services</h3>
+      <a href="/scanning" onclick="go('scanning');return false;">Scanning Services</a>
+      <a href="/photography" onclick="go('photography');return false;">Photography Services</a>
+    </div>
+    <div class="sitemap-group">
+      <h3>Shop &amp; Read</h3>
+      <a href="/store" onclick="go('store');return false;">Store</a>
+      <a href="/journal" onclick="go('journal');return false;">Kagaz Journal</a>
+      <a href="/gallery" onclick="go('gallery');return false;">Gallery</a>
+      <a href="/templates" onclick="go('templates');return false;">Ready-to-go Templates</a>
+    </div>
+    <div class="sitemap-group">
+      <h3>Company</h3>
+      <a href="/clients" onclick="go('clients');return false;">Clients</a>
+      <a href="/contact" onclick="go('contact');return false;">Contact</a>
+      <a href="/" onclick="go('home');return false;">Home</a>
+    </div>
+  </div>
+  <p class="lead" style="margin-top:36px">For search engines, that's <a href="/sitemap.xml" style="color:var(--accent);text-decoration:underline">sitemap.xml</a>.</p>
+</div></section>
+
 <!-- ============ PHOTOGRAPHY SERVICES ============ -->
 <section class="view" id="view-photography"><div class="page-wrap">
   <span class="tag">Photography</span>
@@ -170,6 +207,14 @@
   <div id="galGrid" style="margin-top:36px"></div>
 </div></section>
 
+<!-- ============ TEMPLATES ============ -->
+<section class="view" id="view-templates"><div class="page-wrap">
+  <span class="tag">Ready-to-go Templates</span>
+  <h1>Start from a ready-made size</h1>
+  <p class="lead">Blank starting points, sized exactly for each of our formats — cover, back cover, and pages ready to go. Drop in your photos and design from there.</p>
+  <div class="tpl-grid" id="tplGridV2" style="margin-top:36px"></div>
+</div></section>
+
 <!-- ============ STORE ============ -->
 <section class="view" id="view-store"><div class="page-wrap" style="padding-top:0">
 
@@ -183,7 +228,7 @@
 
 <div class="overlay-bg" id="cartOverlay" onclick="closeCart()"></div>
 <aside class="cart-drawer" id="cartDrawer">
-  <div class="cart-head"><h3 style="font-size:19px">Your cart</h3><button class="icon-btn" onclick="closeCart()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+  <div class="cart-head"><h3 style="font-size:19px">Your cart</h3><button class="icon-btn" onclick="closeCart()" aria-label="Close cart"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
   <div class="cart-items" id="cartItems"></div>
   <div id="cartFoot" style="padding:18px 22px;border-top:1px solid var(--line)"></div>
 </aside>
@@ -592,6 +637,7 @@
       <button data-ap="fonts" onclick="adminTab('fonts')">Font Manager</button>
       <button data-ap="content" onclick="adminTab('content')">Content Manager</button>
       <button data-ap="gallery-edit" onclick="adminTab('gallery-edit')">Gallery</button>
+      <button data-ap="templates" onclick="adminTab('templates')">Templates</button>
       <button data-ap="products" onclick="adminTab('products')">Store Products</button>
       <button data-ap="journal" onclick="adminTab('journal')">Kagaz Journal Manager</button>
       <button data-ap="customers" onclick="adminTab('customers')">Customers</button>
@@ -635,7 +681,6 @@
               <div style="font-weight:700;font-size:16px" id="adminEditorTitle"></div>
               <div style="font-size:12px;color:var(--slate-l)" id="adminEditorMeta"></div>
             </div>
-            <button class="btn btn-ghost sm" onclick="adminEditorPreview()">Preview</button>
             <button class="btn btn-accent sm" id="adminSaveRerenderBtn" onclick="adminSaveAndRerender()">Save &amp; Re-render →</button>
           </div>
           <div id="adminEditorNote" style="background:#EAF3FF;border:1px solid #C5DCF8;border-radius:10px;padding:12px 16px;font-size:13px;color:#1A4A7A;margin-bottom:16px">
@@ -741,6 +786,15 @@
           <textarea class="field" id="cfgAddress" rows="2" placeholder="New Delhi, India" oninput="saveSiteCfg()"></textarea>
         </div>
 
+        <h4 style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-l);margin:26px 0 12px">Render Service (server-side PDF rendering)</h4>
+        <p style="font-size:12.5px;color:var(--slate-l);margin-bottom:12px">Optional — connects Admin → PDF Manager to a separate backend service that renders order PDFs without needing a browser tab open. See render-service/README.md for how to deploy one. Leave blank to keep using the existing in-browser Render button only.</p>
+        <div style="margin-bottom:16px">
+          <label style="font-size:12.5px;color:var(--slate);display:block;margin-bottom:4px">Render Service URL</label>
+          <input class="field" id="cfgRenderServiceUrl" placeholder="https://binder-render-service.onrender.com" oninput="saveSiteCfg()">
+          <label style="font-size:12.5px;color:var(--slate);display:block;margin:10px 0 4px">Render Service Secret</label>
+          <input class="field" id="cfgRenderServiceSecret" type="password" placeholder="Same RENDER_SECRET value set on the service" oninput="saveSiteCfg()">
+        </div>
+
         <h4 style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-l);margin:26px 0 12px">Publish With Us page</h4>
         <div class="rte-tools" data-rte-for="publish"></div>
         <div class="rte" id="rte-publish" contenteditable="true"></div>
@@ -766,6 +820,18 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><h2 style="margin:0">Gallery</h2><button class="btn btn-accent sm" onclick="addGalleryImage()">+ Add placeholder</button></div>
         <p style="font-size:12.5px;color:var(--slate-l);margin-bottom:20px">Photos of finished photobooks shown on the public Gallery page. Click a tile to upload or replace a photo, click the star to make it the large featured banner at the top of the page (the first photo is used by default if none is starred).</p>
         <div id="galAdminRows" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:20px"></div>
+      </div>
+      <div id="ap-templates" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px">
+          <h2 style="margin:0">Templates</h2>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input id="newTplNameInput" class="field" style="width:auto;min-width:180px;margin-bottom:0" placeholder="Template name (optional)">
+            <select id="newTplEditorSelect" class="field" style="width:auto;min-width:220px;margin-bottom:0"></select>
+            <button class="btn btn-accent sm" onclick="addCustomTemplateFromAdmin()">+ Add template</button>
+          </div>
+        </div>
+        <p style="font-size:12.5px;color:var(--slate-l);margin-bottom:20px">Each template is blank and sized exactly for one product. Give it a name (or leave blank to use the size's default name), pick the size, and click <b>+ Add template</b>. Click <b>Edit layout</b> to design it in the real editor (cover, pages, back cover), upload reusable graphics under <b>Assets</b> — they'll show up as a "Clip Art" tool inside the editor while you're building this template — and edit the card's title/description/thumbnail any time below.</p>
+        <div id="customTemplatesAdminRows" style="display:flex;flex-direction:column;gap:16px"></div>
       </div>
       <div id="ap-products" style="display:none">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><h2 style="margin:0">Store Products</h2><div style="display:flex;gap:8px"><button class="btn btn-ghost sm" onclick="openListArrange('products')">✦ AI Arrange</button><button class="btn btn-accent sm" onclick="openProductForm()">+ Add product</button></div></div>
@@ -1109,6 +1175,7 @@
     <a href="/pricing" onclick="go('pricing');return false;">Pricing</a>
     <a href="/isbn" onclick="go('isbn');return false;">Publish | Free ISBN</a>
     <a href="/clients" onclick="go('clients');return false;">Clients</a>
+    <a href="/sitemap" onclick="go('sitemap');return false;">Sitemap</a>
   </div>
   <div class="footer-social" id="footerSocial" style="display:none"></div>
   <div class="footer-copy" id="footerCopy">© 2026 Binder · A291/1, Okhla Phase I, Delhi – 110020 · info@binder.co.in</div>
@@ -1117,11 +1184,11 @@
 <!-- ============ PHOTOBOOK EDITOR ============ -->
 <div class="ed-root" id="editor-photobook">
   <div class="ed-top">
-    <button class="icon-btn" onclick="navHome()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" onclick="navHome()" aria-label="Back to home"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85"></a>
     <input class="title" id="pb-title" value="Untitled Photobook">
-    <button class="icon-btn" id="pb-undoBtn" onclick="EDS.photobook.undo()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H9.5a3.5 3.5 0 0 1 0 7H6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M3 6L6 3M3 6l3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <button class="icon-btn" id="pb-redoBtn" onclick="EDS.photobook.redo()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 6H6.5a3.5 3.5 0 0 0 0 7H10" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M13 6L10 3m3 3-3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" id="pb-undoBtn" onclick="EDS.photobook.undo()" aria-label="Undo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H9.5a3.5 3.5 0 0 1 0 7H6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M3 6L6 3M3 6l3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" id="pb-redoBtn" onclick="EDS.photobook.redo()" aria-label="Redo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 6H6.5a3.5 3.5 0 0 0 0 7H10" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M13 6L10 3m3 3-3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="icon-btn" id="pb-gridBtn" title="Toggle layout grid" onclick="EDS.photobook.toggleGrid()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/></svg></button>
     <button class="icon-btn" id="pb-pnBtn" title="Toggle auto page numbers" onclick="EDS.photobook.togglePageNums()" style="font-size:10px;font-weight:700;font-family:serif;letter-spacing:-.02em">Pn</button>
     <button class="icon-btn ed-theme-btn" title="Switch to dark mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -1133,14 +1200,15 @@
     <span style="font-size:12px;color:var(--slate-l)" id="pb-saveState"></span>
     <button class="btn btn-ghost sm" onclick="openMyDashboard()">My Dashboard</button>
     <button class="btn btn-ghost sm" onclick="saveCurrentProject()">Save</button>
-    <button class="btn btn-ghost sm" onclick="openPreview('photobook')">Preview</button>
     <button class="btn btn-accent sm" onclick="openCheckout('photobook')">Order print →</button>
   </div>
   <div class="ed-body">
     <div class="ed-rail" id="pb-rail">
+      <button data-tool="adjust" onclick="EDS.photobook.setTool('adjust')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4h12M2 8h12M2 12h12" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round"/><circle cx="5" cy="4" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="10" cy="8" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="6" cy="12" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/></svg></span>Photo Edit</button>
       <button data-tool="photos" class="on" onclick="EDS.photobook.setTool('photos')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5" stroke="#52B57D" stroke-width="1.6"/><circle cx="5.5" cy="7" r="1.5" fill="#52B57D"/><path d="M1.5 11l3.5-3 3 2.5 2-2 4 3.5" stroke="#52B57D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Photos</button>
+      <button data-tool="uploads" style="display:none" onclick="EDS.photobook.setTool('uploads')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 11V2M4.5 5.5L8 2l3.5 3.5" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Clip Art</button>
       <button data-tool="shapes" onclick="EDS.photobook.setTool('shapes')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="1.5" width="6" height="6" rx="1" stroke="#52B57D" stroke-width="1.6"/><circle cx="11.5" cy="4.5" r="2.5" stroke="#52B57D" stroke-width="1.6"/><path d="M2 14.5l4-7 4 7H2z" stroke="#52B57D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="9.5" y="9.5" width="5" height="5" rx="0.5" stroke="#52B57D" stroke-width="1.5"/></svg></span>Shapes</button>
-      <button data-tool="adjust" onclick="EDS.photobook.setTool('adjust')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4h12M2 8h12M2 12h12" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round"/><circle cx="5" cy="4" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="10" cy="8" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="6" cy="12" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/></svg></span>Adjust</button>
+      
       <button data-tool="text" onclick="EDS.photobook.setTool('text')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h10M8 3v10M5 13h6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/></svg></span>Text</button>
       <button data-tool="layers" onclick="EDS.photobook.setTool('layers')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 2L14 5.5 8 9 2 5.5 8 2z" stroke="#52B57D" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 9l6 3.5L14 9" stroke="#52B57D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Layers</button>
       <button data-tool="cover" onclick="EDS.photobook.setTool('cover')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="#52B57D" stroke-width="1.6"/><path d="M7.5 2v12" stroke="#52B57D" stroke-width="1.2" stroke-dasharray="2 1.5"/><path d="M5 5h1.5M5 7.5h1.5M5 10h1.5" stroke="#52B57D" stroke-width="1.3" stroke-linecap="round"/><rect x="9" y="4.5" width="3" height="4" rx="0.5" stroke="#52B57D" stroke-width="1.3"/></svg></span>Cover</button>
@@ -1156,11 +1224,11 @@
 <!-- ============ PHOTOBOOK EDITOR (12x12) ============ -->
 <div class="ed-root" id="editor-photobook12">
   <div class="ed-top">
-    <button class="icon-btn" onclick="navHome()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" onclick="navHome()" aria-label="Back to home"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85"></a>
     <input class="title" id="pb12-title" value="Untitled Photobook (12×12)">
-    <button class="icon-btn" id="pb12-undoBtn" onclick="EDS.photobook12.undo()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H9.5a3.5 3.5 0 0 1 0 7H6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M3 6L6 3M3 6l3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <button class="icon-btn" id="pb12-redoBtn" onclick="EDS.photobook12.redo()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 6H6.5a3.5 3.5 0 0 0 0 7H10" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M13 6L10 3m3 3-3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" id="pb12-undoBtn" onclick="EDS.photobook12.undo()" aria-label="Undo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H9.5a3.5 3.5 0 0 1 0 7H6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M3 6L6 3M3 6l3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" id="pb12-redoBtn" onclick="EDS.photobook12.redo()" aria-label="Redo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 6H6.5a3.5 3.5 0 0 0 0 7H10" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M13 6L10 3m3 3-3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="icon-btn" id="pb12-gridBtn" title="Toggle layout grid" onclick="EDS.photobook12.toggleGrid()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/></svg></button>
     <button class="icon-btn" id="pb12-pnBtn" title="Toggle auto page numbers" onclick="EDS.photobook12.togglePageNums()" style="font-size:10px;font-weight:700;font-family:serif;letter-spacing:-.02em">Pn</button>
     <button class="icon-btn ed-theme-btn" title="Switch to dark mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -1172,14 +1240,15 @@
     <span style="font-size:12px;color:var(--slate-l)" id="pb12-saveState"></span>
     <button class="btn btn-ghost sm" onclick="openMyDashboard()">My Dashboard</button>
     <button class="btn btn-ghost sm" onclick="saveCurrentProject()">Save</button>
-    <button class="btn btn-ghost sm" onclick="openPreview('photobook12')">Preview</button>
     <button class="btn btn-accent sm" onclick="openCheckout('photobook12')">Order print →</button>
   </div>
   <div class="ed-body">
     <div class="ed-rail" id="pb12-rail">
+      <button data-tool="adjust" onclick="EDS.photobook12.setTool('adjust')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4h12M2 8h12M2 12h12" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round"/><circle cx="5" cy="4" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="10" cy="8" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="6" cy="12" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/></svg></span>Photo Edit</button>
       <button data-tool="photos" class="on" onclick="EDS.photobook12.setTool('photos')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5" stroke="#52B57D" stroke-width="1.6"/><circle cx="5.5" cy="7" r="1.5" fill="#52B57D"/><path d="M1.5 11l3.5-3 3 2.5 2-2 4 3.5" stroke="#52B57D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Photos</button>
+      <button data-tool="uploads" style="display:none" onclick="EDS.photobook12.setTool('uploads')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 11V2M4.5 5.5L8 2l3.5 3.5" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Clip Art</button>
       <button data-tool="shapes" onclick="EDS.photobook12.setTool('shapes')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="1.5" width="6" height="6" rx="1" stroke="#52B57D" stroke-width="1.6"/><circle cx="11.5" cy="4.5" r="2.5" stroke="#52B57D" stroke-width="1.6"/><path d="M2 14.5l4-7 4 7H2z" stroke="#52B57D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="9.5" y="9.5" width="5" height="5" rx="0.5" stroke="#52B57D" stroke-width="1.5"/></svg></span>Shapes</button>
-      <button data-tool="adjust" onclick="EDS.photobook12.setTool('adjust')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4h12M2 8h12M2 12h12" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round"/><circle cx="5" cy="4" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="10" cy="8" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="6" cy="12" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/></svg></span>Adjust</button>
+      
       <button data-tool="text" onclick="EDS.photobook12.setTool('text')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h10M8 3v10M5 13h6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/></svg></span>Text</button>
       <button data-tool="layers" onclick="EDS.photobook12.setTool('layers')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 2L14 5.5 8 9 2 5.5 8 2z" stroke="#52B57D" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 9l6 3.5L14 9" stroke="#52B57D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Layers</button>
       <button data-tool="cover" onclick="EDS.photobook12.setTool('cover')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="#52B57D" stroke-width="1.6"/><path d="M7.5 2v12" stroke="#52B57D" stroke-width="1.2" stroke-dasharray="2 1.5"/><path d="M5 5h1.5M5 7.5h1.5M5 10h1.5" stroke="#52B57D" stroke-width="1.3" stroke-linecap="round"/><rect x="9" y="4.5" width="3" height="4" rx="0.5" stroke="#52B57D" stroke-width="1.3"/></svg></span>Cover</button>
@@ -1195,11 +1264,11 @@
 <!-- ============ PHOTOBOOK EDITOR (12x18, portrait/landscape) ============ -->
 <div class="ed-root" id="editor-photobook18">
   <div class="ed-top">
-    <button class="icon-btn" onclick="navHome()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" onclick="navHome()" aria-label="Back to home"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85"></a>
     <input class="title" id="pb18-title" value="Untitled Photobook (12×18)">
-    <button class="icon-btn" id="pb18-undoBtn" onclick="EDS.photobook18.undo()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H9.5a3.5 3.5 0 0 1 0 7H6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M3 6L6 3M3 6l3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <button class="icon-btn" id="pb18-redoBtn" onclick="EDS.photobook18.redo()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 6H6.5a3.5 3.5 0 0 0 0 7H10" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M13 6L10 3m3 3-3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" id="pb18-undoBtn" onclick="EDS.photobook18.undo()" aria-label="Undo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H9.5a3.5 3.5 0 0 1 0 7H6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M3 6L6 3M3 6l3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" id="pb18-redoBtn" onclick="EDS.photobook18.redo()" aria-label="Redo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 6H6.5a3.5 3.5 0 0 0 0 7H10" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M13 6L10 3m3 3-3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="icon-btn" id="pb18-gridBtn" title="Toggle layout grid" onclick="EDS.photobook18.toggleGrid()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/></svg></button>
     <button class="icon-btn" id="pb18-pnBtn" title="Toggle auto page numbers" onclick="EDS.photobook18.togglePageNums()" style="font-size:10px;font-weight:700;font-family:serif;letter-spacing:-.02em">Pn</button>
     <button class="icon-btn" id="pb18-orientBtn" title="Currently portrait — switch to landscape" onclick="EDS.photobook18.toggleOrientation()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4.5" y="1.5" width="7" height="13" rx="1.3" stroke="#52B57D" stroke-width="1.6"/><path d="M2 9.5l-1 1 1 1M14 9.5l1 1-1 1M1 10.5h2M13 10.5h2" stroke="#52B57D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -1212,14 +1281,15 @@
     <span style="font-size:12px;color:var(--slate-l)" id="pb18-saveState"></span>
     <button class="btn btn-ghost sm" onclick="openMyDashboard()">My Dashboard</button>
     <button class="btn btn-ghost sm" onclick="saveCurrentProject()">Save</button>
-    <button class="btn btn-ghost sm" onclick="openPreview('photobook18')">Preview</button>
     <button class="btn btn-accent sm" onclick="openCheckout('photobook18')">Order print →</button>
   </div>
   <div class="ed-body">
     <div class="ed-rail" id="pb18-rail">
+      <button data-tool="adjust" onclick="EDS.photobook18.setTool('adjust')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4h12M2 8h12M2 12h12" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round"/><circle cx="5" cy="4" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="10" cy="8" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="6" cy="12" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/></svg></span>Photo Edit</button>
       <button data-tool="photos" class="on" onclick="EDS.photobook18.setTool('photos')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5" stroke="#52B57D" stroke-width="1.6"/><circle cx="5.5" cy="7" r="1.5" fill="#52B57D"/><path d="M1.5 11l3.5-3 3 2.5 2-2 4 3.5" stroke="#52B57D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Photos</button>
+      <button data-tool="uploads" style="display:none" onclick="EDS.photobook18.setTool('uploads')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 11V2M4.5 5.5L8 2l3.5 3.5" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Clip Art</button>
       <button data-tool="shapes" onclick="EDS.photobook18.setTool('shapes')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="1.5" width="6" height="6" rx="1" stroke="#52B57D" stroke-width="1.6"/><circle cx="11.5" cy="4.5" r="2.5" stroke="#52B57D" stroke-width="1.6"/><path d="M2 14.5l4-7 4 7H2z" stroke="#52B57D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="9.5" y="9.5" width="5" height="5" rx="0.5" stroke="#52B57D" stroke-width="1.5"/></svg></span>Shapes</button>
-      <button data-tool="adjust" onclick="EDS.photobook18.setTool('adjust')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4h12M2 8h12M2 12h12" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round"/><circle cx="5" cy="4" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="10" cy="8" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="6" cy="12" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/></svg></span>Adjust</button>
+      
       <button data-tool="text" onclick="EDS.photobook18.setTool('text')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h10M8 3v10M5 13h6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/></svg></span>Text</button>
       <button data-tool="layers" onclick="EDS.photobook18.setTool('layers')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 2L14 5.5 8 9 2 5.5 8 2z" stroke="#52B57D" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 9l6 3.5L14 9" stroke="#52B57D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Layers</button>
       <button data-tool="cover" onclick="EDS.photobook18.setTool('cover')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="#52B57D" stroke-width="1.6"/><path d="M7.5 2v12" stroke="#52B57D" stroke-width="1.2" stroke-dasharray="2 1.5"/><path d="M5 5h1.5M5 7.5h1.5M5 10h1.5" stroke="#52B57D" stroke-width="1.3" stroke-linecap="round"/><rect x="9" y="4.5" width="3" height="4" rx="0.5" stroke="#52B57D" stroke-width="1.3"/></svg></span>Cover</button>
@@ -1235,11 +1305,11 @@
 <!-- ============ TRADE BOOK EDITOR ============ -->
 <div class="ed-root" id="editor-tradebook">
   <div class="ed-top">
-    <button class="icon-btn" onclick="navHome()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" onclick="navHome()" aria-label="Back to home"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85"></a>
     <input class="title" id="tb-title" value="Untitled Trade Book">
-    <button class="icon-btn" id="tb-undoBtn" onclick="EDS.tradebook.undo()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H9.5a3.5 3.5 0 0 1 0 7H6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M3 6L6 3M3 6l3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <button class="icon-btn" id="tb-redoBtn" onclick="EDS.tradebook.redo()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 6H6.5a3.5 3.5 0 0 0 0 7H10" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M13 6L10 3m3 3-3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" id="tb-undoBtn" onclick="EDS.tradebook.undo()" aria-label="Undo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H9.5a3.5 3.5 0 0 1 0 7H6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M3 6L6 3M3 6l3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" id="tb-redoBtn" onclick="EDS.tradebook.redo()" aria-label="Redo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 6H6.5a3.5 3.5 0 0 0 0 7H10" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M13 6L10 3m3 3-3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="icon-btn" id="tb-gridBtn" title="Toggle layout grid" onclick="EDS.tradebook.toggleGrid()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/></svg></button>
     <button class="icon-btn" id="tb-pnBtn" title="Toggle auto page numbers" onclick="EDS.tradebook.togglePageNums()" style="font-size:10px;font-weight:700;font-family:serif;letter-spacing:-.02em">Pn</button>
     <button class="icon-btn ed-theme-btn" title="Switch to dark mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -1247,14 +1317,15 @@
     <span style="font-size:12px;color:var(--slate-l)" id="tb-saveState"></span>
     <button class="btn btn-ghost sm" onclick="openMyDashboard()">My Dashboard</button>
     <button class="btn btn-ghost sm" onclick="saveCurrentProject()">Save</button>
-    <button class="btn btn-ghost sm" onclick="openPreview('tradebook')">Preview</button>
     <button class="btn btn-accent sm" onclick="openCheckout('tradebook')">Order print →</button>
   </div>
   <div class="ed-body">
     <div class="ed-rail" id="tb-rail">
+      <button data-tool="adjust" onclick="EDS.tradebook.setTool('adjust')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4h12M2 8h12M2 12h12" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round"/><circle cx="5" cy="4" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="10" cy="8" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="6" cy="12" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/></svg></span>Photo Edit</button>
       <button data-tool="photos" class="on" onclick="EDS.tradebook.setTool('photos')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5" stroke="#52B57D" stroke-width="1.6"/><circle cx="5.5" cy="7" r="1.5" fill="#52B57D"/><path d="M1.5 11l3.5-3 3 2.5 2-2 4 3.5" stroke="#52B57D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Photos</button>
+      <button data-tool="uploads" style="display:none" onclick="EDS.tradebook.setTool('uploads')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 11V2M4.5 5.5L8 2l3.5 3.5" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Clip Art</button>
       <button data-tool="manuscript" onclick="EDS.tradebook.setTool('manuscript')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="1.5" width="10" height="13" rx="1.5" stroke="#52B57D" stroke-width="1.6"/><path d="M6 5h4M6 7.5h4M6 10h2.5" stroke="#52B57D" stroke-width="1.4" stroke-linecap="round"/></svg></span>Manuscript</button>
-      <button data-tool="adjust" onclick="EDS.tradebook.setTool('adjust')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4h12M2 8h12M2 12h12" stroke="#52B57D" stroke-width="1.6" stroke-linecap="round"/><circle cx="5" cy="4" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="10" cy="8" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/><circle cx="6" cy="12" r="1.5" fill="#fff" stroke="#52B57D" stroke-width="1.5"/></svg></span>Adjust</button>
+      
       <button data-tool="text" onclick="EDS.tradebook.setTool('text')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h10M8 3v10M5 13h6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/></svg></span>Text</button>
       <button data-tool="layers" onclick="EDS.tradebook.setTool('layers')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 2L14 5.5 8 9 2 5.5 8 2z" stroke="#52B57D" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 9l6 3.5L14 9" stroke="#52B57D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Layers</button>
       <button data-tool="cover" onclick="EDS.tradebook.setTool('cover')"><span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="#52B57D" stroke-width="1.6"/><path d="M7.5 2v12" stroke="#52B57D" stroke-width="1.2" stroke-dasharray="2 1.5"/><path d="M5 5h1.5M5 7.5h1.5M5 10h1.5" stroke="#52B57D" stroke-width="1.3" stroke-linecap="round"/><rect x="9" y="4.5" width="3" height="4" rx="0.5" stroke="#52B57D" stroke-width="1.3"/></svg></span>Cover</button>
@@ -1270,7 +1341,7 @@
 <!-- ============ ART PRINTS EDITOR ============ -->
 <div class="ed-root" id="editor-artprints">
   <div class="ed-top">
-    <button class="icon-btn" onclick="navHome()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" onclick="navHome()" aria-label="Back to home"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85"></a>
     <input class="title" id="ap-title" value="Untitled Art Print Set">
     <button class="icon-btn ed-theme-btn" title="Switch to dark mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -1281,7 +1352,6 @@
     <span class="spacer"></span>
     <button class="btn btn-ghost sm" onclick="openMyDashboard()">My Dashboard</button>
     <button class="btn btn-ghost sm" onclick="saveCurrentProject()">Save</button>
-    <button class="btn btn-ghost sm" onclick="openPreview('artprints')">Preview</button>
     <button class="btn btn-accent sm" onclick="openCheckout('artprints')">Order print →</button>
   </div>
   <div class="ed-body">
@@ -1298,7 +1368,7 @@
 <!-- ============ SINGLE ART PRINT (12x18) ============ -->
 <div class="ed-root" id="editor-artprint12x18">
   <div class="ed-top">
-    <button class="icon-btn" onclick="navHome()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" onclick="navHome()" aria-label="Back to home"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85"></a>
     <input class="title" id="ap12x18-title" value="Untitled 12×18 Art Print">
     <button class="icon-btn ed-theme-btn" title="Switch to dark mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -1309,7 +1379,6 @@
     <span class="spacer"></span>
     <button class="btn btn-ghost sm" onclick="openMyDashboard()">My Dashboard</button>
     <button class="btn btn-ghost sm" onclick="saveCurrentProject()">Save</button>
-    <button class="btn btn-ghost sm" onclick="openPreview('artprint12x18')">Preview</button>
     <button class="btn btn-accent sm" onclick="openCheckout('artprint12x18')">Order print →</button>
   </div>
   <div class="ed-body">
@@ -1326,7 +1395,7 @@
 <!-- ============ SINGLE ART PRINT (16x20) ============ -->
 <div class="ed-root" id="editor-artprint16x20">
   <div class="ed-top">
-    <button class="icon-btn" onclick="navHome()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn" onclick="navHome()" aria-label="Back to home"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85"></a>
     <input class="title" id="ap16x20-title" value="Untitled 16×20 Art Print">
     <button class="icon-btn ed-theme-btn" title="Switch to dark mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -1337,7 +1406,6 @@
     <span class="spacer"></span>
     <button class="btn btn-ghost sm" onclick="openMyDashboard()">My Dashboard</button>
     <button class="btn btn-ghost sm" onclick="saveCurrentProject()">Save</button>
-    <button class="btn btn-ghost sm" onclick="openPreview('artprint16x20')">Preview</button>
     <button class="btn btn-accent sm" onclick="openCheckout('artprint16x20')">Order print →</button>
   </div>
   <div class="ed-body">
@@ -1404,15 +1472,6 @@
   <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:10px" onclick="hide('listArrangeModal')">Cancel</button>
 </div></div>
 
-<div class="modal-bg" id="previewModal" onclick="if(event.target===this)hide('previewModal')"><div class="modal" style="max-width:760px;background:var(--ink);color:#fff">
-  <div style="display:flex;justify-content:space-between;margin-bottom:18px"><h3 style="color:#fff">Preview</h3><button class="btn btn-accent xs" onclick="hide('previewModal')">Close ✕</button></div>
-  <div id="pvStage" style="display:flex;justify-content:center"></div>
-  <div style="display:flex;justify-content:center;gap:12px;margin-top:18px">
-    <button class="btn btn-accent sm pv-navbtn" onclick="pvNav(-1)">← Prev</button>
-    <span id="pvLabel" style="color:#9AA0A6;font-size:13px;align-self:center"></span>
-    <button class="btn btn-accent sm pv-navbtn" onclick="pvNav(1)">Next →</button>
-  </div>
-</div></div>
 <script src="/script.js?v=20260908a" defer></script>
 </body>
 </html>

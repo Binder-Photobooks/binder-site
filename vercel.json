@@ -6,12 +6,11 @@
     { "source": "/(.*)", "has": [{ "type": "host", "value": "binder.co.in" }], "destination": "https://www.binder.co.in/$1", "permanent": true }
   ],
   "rewrites": [
-    { "source": "/sitemap.xml", "destination": "https://sooqtzedurtjiisjdmbz.supabase.co/functions/v1/sitemap" },
     { "source": "/((?!images/|.*\\.[a-zA-Z0-9]+$).*)", "destination": "/index.html" }
   ],
   "headers": [
     {
-      "source": "/(index.html|script.js|styles.css)",
+      "source": "/(index.html|script.js|styles.css|sitemap.xml|robots.txt)",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
       ]
