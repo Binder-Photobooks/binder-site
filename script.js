@@ -1409,6 +1409,17 @@ function createEditor(key,cfg){
         d.ondragover=ev=>{ev.preventDefault();d.classList.add('dragover')};
         d.ondragleave=()=>d.classList.remove('dragover');
         d.ondrop=ev=>{ev.preventDefault();d.classList.remove('dragover');const id=ev.dataTransfer.getData('photo');if(!id)return;
+          // An existing image sitting near the gutter would otherwise catch this drop itself (to
+          // swap its own photo) before the page-level spanning check ever runs — check for a
+          // spanning placement FIRST, using coordinates relative to the whole PAGE (not this
+          // smaller image box), so dropping near the spine still spans correctly even when it
+          // lands on top of something already there.
+          const newPh=ed.photos.find(p=>p.id===id);
+          if(newPh){
+            const pageRect=el.getBoundingClientRect();
+            const pageCx=(ev.clientX-pageRect.left)/pageRect.width*100;
+            if(ed.trySpanningPlace(newPh,pageRef,siblingIdx,side,pageCx)){ed.renderAll();return;}
+          }
           ed.mutate(()=>{im.photo=id});ed.sel={page:pageRef,kind:'image',id:im.id};ed.renderAll();};
         el.appendChild(d);
       });
@@ -1451,6 +1462,15 @@ function createEditor(key,cfg){
           d.ondragover=ev=>{ev.preventDefault();d.classList.add('dragover')};
           d.ondragleave=()=>d.classList.remove('dragover');
           d.ondrop=ev=>{ev.preventDefault();d.classList.remove('dragover');const id=ev.dataTransfer.getData('photo');if(!id)return;
+            // Same reasoning as the per-image handler above — a placeholder frame sitting near
+            // the gutter would otherwise swallow this drop for itself before the page-level
+            // spanning check ever gets a chance to run.
+            const newPh=ed.photos.find(p=>p.id===id);
+            if(newPh){
+              const pageRect=el.getBoundingClientRect();
+              const pageCx=(ev.clientX-pageRect.left)/pageRect.width*100;
+              if(ed.trySpanningPlace(newPh,pageRef,siblingIdx,side,pageCx)){ed.renderAll();return;}
+            }
             ed.mutate(()=>{sh.photo=id});ed.sel={page:pageRef,kind:'shape',id:sh.id};ed.renderAll();};
         }
         el.appendChild(d);
