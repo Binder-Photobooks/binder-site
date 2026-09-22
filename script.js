@@ -1084,7 +1084,7 @@ function createEditor(key,cfg){
     // one shared computation, not two independent fits that would have to coincidentally agree.
     trySpanningPlace(ph,pageRef,siblingIdx,side,cx){
       if(!side||siblingIdx==null)return false;
-      const nearGutter = side==='l' ? cx>=80 : cx<=20; // rightmost/leftmost 20% of this page, i.e. near the shared spine
+      const nearGutter = side==='l' ? cx>=65 : cx<=35; // inner 35% of either page — a large, deliberately generous target, paired with the live visual highlight during drag so it's never a guess
       if(!nearGutter)return false;
       const box=fitPhotoBox(ph, 2*pageR(), 0, 0, 200, 100); // 200%-wide box = both open pages combined
       const leftIdx = side==='l' ? pageRef : siblingIdx;
@@ -1409,6 +1409,7 @@ function createEditor(key,cfg){
         d.ondragover=ev=>{ev.preventDefault();d.classList.add('dragover')};
         d.ondragleave=()=>d.classList.remove('dragover');
         d.ondrop=ev=>{ev.preventDefault();d.classList.remove('dragover');const id=ev.dataTransfer.getData('photo');if(!id)return;
+          if(side){const hi=el.parentElement.querySelector('.gutter-hi');if(hi)hi.classList.remove('active');}
           // An existing image sitting near the gutter would otherwise catch this drop itself (to
           // swap its own photo) before the page-level spanning check ever runs — check for a
           // spanning placement FIRST, using coordinates relative to the whole PAGE (not this
@@ -1462,6 +1463,7 @@ function createEditor(key,cfg){
           d.ondragover=ev=>{ev.preventDefault();d.classList.add('dragover')};
           d.ondragleave=()=>d.classList.remove('dragover');
           d.ondrop=ev=>{ev.preventDefault();d.classList.remove('dragover');const id=ev.dataTransfer.getData('photo');if(!id)return;
+            if(side){const hi=el.parentElement.querySelector('.gutter-hi');if(hi)hi.classList.remove('active');}
             // Same reasoning as the per-image handler above — a placeholder frame sitting near
             // the gutter would otherwise swallow this drop for itself before the page-level
             // spanning check ever gets a chance to run.
@@ -1526,8 +1528,15 @@ function createEditor(key,cfg){
             ed.mutate(()=>{ed.pageRefObj(pageRef).images.push(mkImg(ph.id,Math.max(0,Math.min(100-fb.w,fb.x)),Math.max(0,Math.min(100-fb.h,fb.y)),fb.w,fb.h))});
             ed.armed=null;ed.sel={page:pageRef,kind:'image',id:ed.pageRefObj(pageRef).images.slice(-1)[0].id};ed.renderAll();return;}}
           ed.sel=null;ed.renderAll();};
-        el.ondragover=e=>e.preventDefault();
+        el.ondragover=e=>{e.preventDefault();
+          if(!side)return; // only relevant in an open two-page spread
+          const rect=el.getBoundingClientRect();const cx=(e.clientX-rect.left)/rect.width*100;
+          const near=side==='l'?cx>=65:cx<=35;
+          const hi=el.parentElement.querySelector('.gutter-hi');if(hi)hi.classList.toggle('active',near);
+        };
+        el.ondragleave=e=>{if(!side)return;const hi=el.parentElement.querySelector('.gutter-hi');if(hi)hi.classList.remove('active');};
         el.ondrop=e=>{if(e.target!==el)return;e.preventDefault();
+          if(side){const hi=el.parentElement.querySelector('.gutter-hi');if(hi)hi.classList.remove('active');}
           const shapeData=e.dataTransfer.getData('shape');
           if(shapeData){const {shapeKey,isPlaceholder}=JSON.parse(shapeData);
             const rect=el.getBoundingClientRect();const cx=(e.clientX-rect.left)/rect.width*100,cy=(e.clientY-rect.top)/rect.height*100;
@@ -1601,6 +1610,7 @@ function createEditor(key,cfg){
         }else{
           spread.appendChild(ed.buildPage(ed.doc.pages[item.l],item.l,item.r,'l',true,true));
           spread.appendChild(ed.buildPage(ed.doc.pages[item.r],item.r,item.l,'r',true,true));
+          const gutterHi=document.createElement('div');gutterHi.className='gutter-hi';spread.appendChild(gutterHi);
         }
       }
       st.appendChild(spread);
