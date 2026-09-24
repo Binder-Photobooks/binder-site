@@ -1,5 +1,32 @@
 /* ================= BINDER — shared utilities ================= */
-const $=id=>document.getElementById(id);
+/* Private UI (account dashboard, checkout, editors, admin) lives in <template id="tpl-private">
+   in the HTML so it is not part of the public, indexable page. It is mounted into the document
+   the first time anything looks up one of its elements by id, so every existing call site keeps
+   working unchanged. */
+let PRIVATE_MOUNTED=false, APP_BOOTED=false;
+function mountPrivate(){
+  if(PRIVATE_MOUNTED)return false;
+  const t=document.getElementById('tpl-private'); if(!t){PRIVATE_MOUNTED=true;return false;}
+  PRIVATE_MOUNTED=true;
+  t.replaceWith(t.content);
+  if(APP_BOOTED)afterPrivateMount();
+  return true;
+}
+const $=id=>document.getElementById(id)||(mountPrivate()?document.getElementById(id):null);
+if(/^\/(admin|dashboard|editor)(\/|$)/.test(location.pathname))mountPrivate();
+// Canonical <link>: present in every prerendered page's HTML; the shared app shell (used for
+// /store/<slug>, /journal/<slug>, /admin …) ships without one so it never contradicts the URL.
+function canonLink(){
+  let l=document.querySelector('link[rel="canonical"]');
+  if(!l){l=document.createElement('link');l.rel='canonical';document.head.appendChild(l);}
+  return l;
+}
+function setMetaProp(prop,val){
+  let m=document.querySelector('meta[property="'+prop+'"]');
+  if(!m){m=document.createElement('meta');m.setAttribute('property',prop);document.head.appendChild(m);}
+  m.setAttribute('content',val);
+}
+function clearProductMeta(){ document.querySelectorAll('meta[property^="product:"]').forEach(m=>m.remove()); }
 const uid=()=>Math.random().toString(36).slice(2,9);
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),2800)}
 function show(id){$(id).classList.add('show')} function hide(id){$(id).classList.remove('show')}
@@ -145,13 +172,15 @@ function updateSeoMeta(v){
   const ogd=document.querySelector('meta[property="og:description"]'); if(ogd)ogd.setAttribute('content',m.desc);
   const ogi=document.querySelector('meta[property="og:image"]'); if(ogi)ogi.setAttribute('content',DEFAULT_OG_IMAGE);
   const ogtype=document.querySelector('meta[property="og:type"]'); if(ogtype)ogtype.setAttribute('content','website');
-  const ogp=document.querySelector('meta[property="product:price:amount"]'); if(ogp)ogp.setAttribute('content','');
+  clearProductMeta();
   clearPageSchema();
   const tt=document.querySelector('meta[name="twitter:title"]'); if(tt)tt.setAttribute('content',m.title);
   const td=document.querySelector('meta[name="twitter:description"]'); if(td)td.setAttribute('content',m.desc);
   const ti=document.querySelector('meta[name="twitter:image"]'); if(ti)ti.setAttribute('content',DEFAULT_OG_IMAGE);
-  const canon=document.querySelector('link[rel="canonical"]'); if(canon)canon.setAttribute('href','https://www.binder.co.in'+pathForView(v));
+  const canon=canonLink(); if(canon)canon.setAttribute('href','https://www.binder.co.in'+pathForView(v));
 }
+// Breadcrumb names per page — keep in step with the labels in scripts/prerender.mjs.
+const VIEW_LABELS={pricing:'Pricing',scanning:'Scanning Services',photography:'Photography Services',store:'Store',journal:'Kagaz Journal',isbn:'Free ISBN',publish:'Publish with us',gallery:'Gallery',templates:'Templates',clients:'Clients',contact:'Contact',sitemap:'Sitemap'};
 function go(v,push){
   if(v==='dashboard'&&!S.user){authGo('login');show('authModal');toast('Sign in to view your dashboard');return}
   const robots=document.querySelector('meta[name="robots"]');
@@ -164,6 +193,7 @@ function go(v,push){
   $('view-'+v).classList.add('active'); window.scrollTo(0,0);
   updateSeoMeta(v);
   if(v==='home')setPageSchema(buildFaqSchema()); // FAQ section only actually renders on the home view
+  else if(VIEW_LABELS[v])setPageSchema(buildBreadcrumbSchema([{name:'Home',url:'https://www.binder.co.in/'},{name:VIEW_LABELS[v],url:'https://www.binder.co.in'+pathForView(v)}]));
   if(push!==false)setPath(pathForView(v));
   if(v==='journal')renderBlog(); if(v==='store')renderStore(); if(v==='clients')renderClients(); if(v==='gallery')renderGallery();
   if(v==='templates')renderTemplatesPageV2();
@@ -182,13 +212,13 @@ const START_PATH_FOR_KEY={photobook:'photobooks',tradebook:'trade-books',artprin
 const START_KEY_FOR_PATH={photobooks:'photobook','trade-books':'tradebook','art-prints':'artprints'};
 const START_PAGES={
   photobook:{
-    label:'Photobook',heroImg:'/images/photobook-hero.mp4',heroImgKey:'photobookTileImageUrl',contentKey:'startPhotobookIntro',needKey:'startPhotobookNeed',stepsKey:'startPhotobookSteps',
+    label:'Photobook',h1:'Custom Photobook Printing',heroImg:'/images/photobook-hero.mp4',heroImgKey:'photobookTileImageUrl',contentKey:'startPhotobookIntro',needKey:'startPhotobookNeed',stepsKey:'startPhotobookSteps',
   },
   tradebook:{
-    label:'Trade Book',heroImg:'/images/img-3.jpg',heroImgKey:'tradebookTileImageUrl',contentKey:'startTradebookIntro',needKey:'startTradebookNeed',stepsKey:'startTradebookSteps',
+    label:'Trade Book',h1:'Trade Book Printing & Self-Publishing',heroImg:'/images/img-3.jpg',heroImgKey:'tradebookTileImageUrl',contentKey:'startTradebookIntro',needKey:'startTradebookNeed',stepsKey:'startTradebookSteps',
   },
   artprints:{
-    label:'Art Prints',heroImg:'/images/img-5.jpg',heroImgKey:'artprintsTileImageUrl',contentKey:'startArtprintsIntro',needKey:'startArtprintsNeed',stepsKey:'startArtprintsSteps',
+    label:'Art Prints',h1:'Archival Art Print Printing',heroImg:'/images/img-5.jpg',heroImgKey:'artprintsTileImageUrl',contentKey:'startArtprintsIntro',needKey:'startArtprintsNeed',stepsKey:'startArtprintsSteps',
   }
 };
 let ACTIVE_START_KEY=null;
@@ -220,11 +250,11 @@ function goStart(key,push){
     const ogImg=(info.heroImgKey&&CONTENT[info.heroImgKey]&&!isVideoUrl(CONTENT[info.heroImgKey]))?CONTENT[info.heroImgKey]:DEFAULT_OG_IMAGE;
     const ogi=document.querySelector('meta[property="og:image"]'); if(ogi)ogi.setAttribute('content',ogImg);
     const ogtype=document.querySelector('meta[property="og:type"]'); if(ogtype)ogtype.setAttribute('content','website');
-    const ogp=document.querySelector('meta[property="product:price:amount"]'); if(ogp)ogp.setAttribute('content','');
+    clearProductMeta();
     const tt=document.querySelector('meta[name="twitter:title"]'); if(tt)tt.setAttribute('content',seo.title);
     const td=document.querySelector('meta[name="twitter:description"]'); if(td)td.setAttribute('content',seo.desc);
     const ti=document.querySelector('meta[name="twitter:image"]'); if(ti)ti.setAttribute('content',ogImg);
-    const canon=document.querySelector('link[rel="canonical"]'); if(canon)canon.setAttribute('href','https://www.binder.co.in/'+START_PATH_FOR_KEY[key]);
+    const canon=canonLink(); if(canon)canon.setAttribute('href','https://www.binder.co.in/'+START_PATH_FOR_KEY[key]);
     const svc=buildServiceSchema(key);
     const crumbs=buildBreadcrumbSchema([{name:'Home',url:'https://www.binder.co.in/'},{name:info.label,url:'https://www.binder.co.in/'+START_PATH_FOR_KEY[key]}]);
     setPageSchema(svc?[svc,crumbs]:crumbs);
@@ -257,7 +287,7 @@ function renderStartPage(key){
       </div>`;
   wrap.innerHTML=`
     <span class="tag">Start creating</span>
-    <h1>${esc(info.label)}</h1>
+    <h1>${esc(info.h1||info.label)}</h1>
     <p class="lead">${esc(intro)}</p>
     ${heroBlock}
     <h4 style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-l);font-weight:700;margin-bottom:14px">What you'll need before you start</h4>
@@ -323,7 +353,7 @@ function renderStartPage(key){
   `;
   document.title=info.label+' — Binder';
   const desc=document.querySelector('meta[name="description"]'); if(desc)desc.setAttribute('content',intro.slice(0,155));
-  const canon=document.querySelector('link[rel="canonical"]'); if(canon)canon.setAttribute('href','https://www.binder.co.in/'+START_PATH_FOR_KEY[key]);
+  const canon=canonLink(); if(canon)canon.setAttribute('href','https://www.binder.co.in/'+START_PATH_FOR_KEY[key]);
 }
 /* ================= URL ROUTER ================= */
 /* Every section, editor, and blog post gets its own real path (e.g. /store, /journal,
@@ -346,9 +376,11 @@ function routeFromPath(){
   if(!segs.length){ go('home',false); return; }
 
   const v=segs[0];
-  if($('view-'+v)){ go(v,false); return; }
-  // Unknown path — fall back to home without leaving the browser stuck on a dead URL.
+  if(document.getElementById('view-'+v)||v==='admin'||v==='dashboard'){ go(v,false); return; }
+  // Unknown path — fall back to home without leaving the browser stuck on a dead URL, but mark
+  // it noindex so search engines don't index the dead URL as a copy of the homepage.
   go('home',false);
+  const rb=document.querySelector('meta[name="robots"]'); if(rb)rb.setAttribute('content','noindex, follow');
 }
 window.addEventListener('popstate', routeFromPath);
 function loadJSON(key,fallback){try{const v=JSON.parse(localStorage.getItem(key));return v==null?fallback:v}catch(e){return fallback}}
@@ -694,7 +726,7 @@ function startCustomTemplate(templateId){
 
 /* ---------- Admin: template CRUD, thumbnails, assets ---------- */
 function populateNewTplEditorSelect(){
-  const sel=$('newTplEditorSelect'); if(!sel)return;
+  const sel=document.getElementById('newTplEditorSelect'); if(!sel)return;
   sel.innerHTML=TEMPLATE_EDITOR_OPTIONS.map(o=>`<option value="${o.key}">${esc(o.label)}</option>`).join('');
 }
 function addCustomTemplateFromAdmin(){
@@ -776,7 +808,7 @@ function deleteCustomTemplateAsset(templateId,assetId){
 }
 function renderCustomTemplatesAdmin(){
   populateNewTplEditorSelect();
-  const wrap=$('customTemplatesAdminRows'); if(!wrap)return; wrap.innerHTML='';
+  const wrap=document.getElementById('customTemplatesAdminRows'); if(!wrap)return; wrap.innerHTML='';
   CUSTOM_TEMPLATES.forEach(t=>{
     const meta=templateEditorMeta(t.editorKey);
     const url=t.thumbUrl;
@@ -2761,12 +2793,16 @@ async function runManuscriptLayout(){
 }
 
 /* ---------- 7. Wire the manuscript file input + drop zone ---------- */
-$('msFileInput').addEventListener('change',e=>{msReadTextFile(e.target.files[0]);e.target.value='';});
-(()=>{const dz=$('msDropUp');if(!dz)return;
+// Runs once the private UI (which contains the manuscript modal) is mounted — see mountPrivate().
+function wireManuscriptInputs(){
+const fi=document.getElementById('msFileInput'); if(!fi||fi.dataset.wired)return; fi.dataset.wired='1';
+fi.addEventListener('change',e=>{msReadTextFile(e.target.files[0]);e.target.value='';});
+(()=>{const dz=document.getElementById('msDropUp');if(!dz)return;
   dz.onclick=()=>$('msFileInput').click();
   dz.ondragover=e=>{e.preventDefault();dz.classList.add('over')};
   dz.ondragleave=()=>dz.classList.remove('over');
   dz.ondrop=e=>{e.preventDefault();dz.classList.remove('over');msReadTextFile(e.dataTransfer.files[0])};})();
+}
 
 /* ================= Client-side PDF rendering =================
    Produces real, downloadable proof PDFs entirely in the browser via html2canvas + jsPDF:
@@ -3523,7 +3559,7 @@ function renderApSingle(key){
   wrap.appendChild(board);
 }
 function renderApPhotoGrid(){
-  const g=$('ap-photoGrid'); if(!g)return; g.innerHTML='';
+  const g=document.getElementById('ap-photoGrid'); if(!g)return; g.innerHTML='';
   AP.photos.forEach(ph=>{const d=document.createElement('div');d.className='photo-th'+(window._apArmed===ph.id?' armed':'');
     d.style.backgroundImage=`url(${ph.url})`;d.draggable=true;
     d.ondragstart=e=>e.dataTransfer.setData('photo',ph.id);
@@ -3617,7 +3653,7 @@ async function cmsRetryDirtyKeys(){
 }
 const CMS_KEY_LABELS={content:'Site text/images',catalog:'Store products',posts:'Kagaz Journal posts',clients:'Clients list',site_cfg:'Site settings',faq:'FAQ',custom_templates:'Templates'};
 function refreshCmsSyncBanner(){
-  const banner=$('cmsSyncBanner'); if(!banner)return;
+  const banner=document.getElementById('cmsSyncBanner'); if(!banner)return;
   const stuck=CMS_KNOWN_KEYS.filter(k=>cmsIsDirty(k));
   if(!stuck.length){ banner.style.display='none'; return; }
   const names=stuck.map(k=>CMS_KEY_LABELS[k]||k).join(', ');
@@ -3805,8 +3841,8 @@ function applySiteColor(type,val){
     document.documentElement.style.setProperty('--accent-d',dk([r,g,b]));
     saveJSON('cms_site_cfg',SITE_CFG);
     cmsSet('site_cfg',SITE_CFG).then(ok=>{toast(ok?'Saved ✓ — visible to all visitors':'⚠ Saved on this device only — cloud sync failed, other visitors won\'t see this yet');});
-    if($('cfgAccentHex'))$('cfgAccentHex').value=hex;
-    if($('cfgAccentColor'))$('cfgAccentColor').value=hex;
+    if(document.getElementById('cfgAccentHex'))$('cfgAccentHex').value=hex;
+    if(document.getElementById('cfgAccentColor'))$('cfgAccentColor').value=hex;
   }
 }
 function applySiteFont(family){
@@ -3862,20 +3898,20 @@ function applySiteCfgToPublicSite(){
   }
 }
 function loadSiteCfgIntoAdmin(){
-  if($('cfgAccentColor'))$('cfgAccentColor').value=SITE_CFG.accentColor||'#52B57D';
-  if($('cfgAccentHex'))$('cfgAccentHex').value=SITE_CFG.accentColor||'#52B57D';
-  if($('cfgSiteFont'))$('cfgSiteFont').value=SITE_CFG.siteFont||'';
-  if($('cfgHeadingWeight'))$('cfgHeadingWeight').value=SITE_CFG.headingWeight||'300';
-  if($('cfgContactEmail'))$('cfgContactEmail').value=SITE_CFG.contactEmail||'';
-  if($('cfgContactPhone'))$('cfgContactPhone').value=SITE_CFG.contactPhone||'';
-  if($('cfgInstagram'))$('cfgInstagram').value=SITE_CFG.instagram||'';
-  if($('cfgTwitter'))$('cfgTwitter').value=SITE_CFG.twitter||'';
-  if($('cfgFacebook'))$('cfgFacebook').value=SITE_CFG.facebook||'';
-  if($('cfgWhatsapp'))$('cfgWhatsapp').value=SITE_CFG.whatsapp||'';
-  if($('cfgFooterTagline'))$('cfgFooterTagline').value=SITE_CFG.footerTagline||'';
-  if($('cfgAddress'))$('cfgAddress').value=SITE_CFG.address||'';
-  if($('cfgRenderServiceUrl'))$('cfgRenderServiceUrl').value=SITE_CFG.renderServiceUrl||'';
-  if($('cfgRenderServiceSecret'))$('cfgRenderServiceSecret').value=SITE_CFG.renderServiceSecret||'';
+  if(document.getElementById('cfgAccentColor'))$('cfgAccentColor').value=SITE_CFG.accentColor||'#52B57D';
+  if(document.getElementById('cfgAccentHex'))$('cfgAccentHex').value=SITE_CFG.accentColor||'#52B57D';
+  if(document.getElementById('cfgSiteFont'))$('cfgSiteFont').value=SITE_CFG.siteFont||'';
+  if(document.getElementById('cfgHeadingWeight'))$('cfgHeadingWeight').value=SITE_CFG.headingWeight||'300';
+  if(document.getElementById('cfgContactEmail'))$('cfgContactEmail').value=SITE_CFG.contactEmail||'';
+  if(document.getElementById('cfgContactPhone'))$('cfgContactPhone').value=SITE_CFG.contactPhone||'';
+  if(document.getElementById('cfgInstagram'))$('cfgInstagram').value=SITE_CFG.instagram||'';
+  if(document.getElementById('cfgTwitter'))$('cfgTwitter').value=SITE_CFG.twitter||'';
+  if(document.getElementById('cfgFacebook'))$('cfgFacebook').value=SITE_CFG.facebook||'';
+  if(document.getElementById('cfgWhatsapp'))$('cfgWhatsapp').value=SITE_CFG.whatsapp||'';
+  if(document.getElementById('cfgFooterTagline'))$('cfgFooterTagline').value=SITE_CFG.footerTagline||'';
+  if(document.getElementById('cfgAddress'))$('cfgAddress').value=SITE_CFG.address||'';
+  if(document.getElementById('cfgRenderServiceUrl'))$('cfgRenderServiceUrl').value=SITE_CFG.renderServiceUrl||'';
+  if(document.getElementById('cfgRenderServiceSecret'))$('cfgRenderServiceSecret').value=SITE_CFG.renderServiceSecret||'';
 }
 // Apply saved config on load
 (function initSiteCfg(){
@@ -4187,15 +4223,15 @@ function loadAccountInfo(){
   sb.auth.getUser().then(({data})=>{
     if(!data.user)return;
     const m=data.user.user_metadata||{};
-    if($('acctName'))$('acctName').value=m.name||S.user.name||'';
-    if($('acctPhone'))$('acctPhone').value=m.phone||'';
-    if($('acctAddr1'))$('acctAddr1').value=m.address1||'';
-    if($('acctAddr2'))$('acctAddr2').value=m.address2||'';
-    if($('acctCity'))$('acctCity').value=m.city||'';
-    if($('acctPin'))$('acctPin').value=m.pin||'';
-    if($('acctState'))$('acctState').value=m.state||'';
-    if($('acctGstin'))$('acctGstin').value=m.gstin||'';
-    if($('acctBizName'))$('acctBizName').value=m.bizName||'';
+    if(document.getElementById('acctName'))$('acctName').value=m.name||S.user.name||'';
+    if(document.getElementById('acctPhone'))$('acctPhone').value=m.phone||'';
+    if(document.getElementById('acctAddr1'))$('acctAddr1').value=m.address1||'';
+    if(document.getElementById('acctAddr2'))$('acctAddr2').value=m.address2||'';
+    if(document.getElementById('acctCity'))$('acctCity').value=m.city||'';
+    if(document.getElementById('acctPin'))$('acctPin').value=m.pin||'';
+    if(document.getElementById('acctState'))$('acctState').value=m.state||'';
+    if(document.getElementById('acctGstin'))$('acctGstin').value=m.gstin||'';
+    if(document.getElementById('acctBizName'))$('acctBizName').value=m.bizName||'';
   });
 }
 async function doChangePassword(){
@@ -4451,11 +4487,11 @@ function openProductDetail(id,push){
   const ogd=document.querySelector('meta[property="og:description"]'); if(ogd)ogd.setAttribute('content',pageDesc);
   const ogi=document.querySelector('meta[property="og:image"]'); if(ogi)ogi.setAttribute('content',pageImg);
   const ogtype=document.querySelector('meta[property="og:type"]'); if(ogtype)ogtype.setAttribute('content','product');
-  const ogp=document.querySelector('meta[property="product:price:amount"]'); if(ogp)ogp.setAttribute('content',(p.price/100).toString());
+  setMetaProp('product:price:amount',(p.price/100).toString()); setMetaProp('product:price:currency','INR'); setMetaProp('product:availability','in stock');
   const tt=document.querySelector('meta[name="twitter:title"]'); if(tt)tt.setAttribute('content',pageTitle);
   const td=document.querySelector('meta[name="twitter:description"]'); if(td)td.setAttribute('content',pageDesc);
   const ti=document.querySelector('meta[name="twitter:image"]'); if(ti)ti.setAttribute('content',pageImg);
-  const canon=document.querySelector('link[rel="canonical"]'); if(canon)canon.setAttribute('href','https://www.binder.co.in/store/'+slugPath);
+  const canon=canonLink(); if(canon)canon.setAttribute('href','https://www.binder.co.in/store/'+slugPath);
   setPageSchema([buildProductSchema(p,slugPath),buildBreadcrumbSchema([{name:'Home',url:'https://www.binder.co.in/'},{name:'Store',url:'https://www.binder.co.in/store'},{name:p.name,url:'https://www.binder.co.in/store/'+slugPath}])]);
 }
 function closeProductDetail(){
@@ -4497,7 +4533,7 @@ function openStoreCheckout(){pruneInvalidCartItems();if(!S.cart.length)return to
 // CATALOG so the price and description here can never drift out of sync with the Store itself.
 const UPSELL_ADDON_IDS=['sleeve','giftbox'];
 function renderCheckoutAddons(){
-  const wrap=$('coAddonsList'); if(!wrap)return;
+  const wrap=document.getElementById('coAddonsList'); if(!wrap)return;
   const items=UPSELL_ADDON_IDS.map(id=>CATALOG.find(p=>p.id===id)).filter(Boolean);
   if(!items.length){$('coAddonsRow').style.display='none';return;}
   $('coAddonsRow').style.display='block';
@@ -4606,7 +4642,7 @@ function finalizeCheckoutRows(itemRowsHtml,subtotal){
 }
 function resetCoupon(){
   if(CHECKOUT_CTX){CHECKOUT_CTX.couponCode=null;CHECKOUT_CTX.couponPercent=0;CHECKOUT_CTX.discountAmount=0;}
-  if($('coCouponInput'))$('coCouponInput').value='';
+  if(document.getElementById('coCouponInput'))$('coCouponInput').value='';
   const msg=$('coCouponMsg'); if(msg)msg.style.display='none';
 }
 async function applyCoupon(ev){
@@ -4676,7 +4712,7 @@ function openCheckout(editorKey){
   $('coQtyNudge').style.display=showQty?'block':'none';
   $('coFinishRow').style.display='block';
   $('coBindingRow').style.display=(editorKey==='photobook12'||editorKey==='photobook18')?'block':'none';
-  if($('coQty'))$('coQty').value=1;
+  if(document.getElementById('coQty'))$('coQty').value=1;
   renderCheckoutAddons();
   $('coGiftRow').style.display='block'; resetGiftForm();
   resetCoupon();
@@ -4698,7 +4734,7 @@ const PAY_METHODS=[
 ];
 let PAY_METHOD='upi';
 function renderPayMethods(){
-  const wrap=$('payMethods');if(!wrap)return;
+  const wrap=document.getElementById('payMethods');if(!wrap)return;
   wrap.innerHTML=PAY_METHODS.map(m=>`<div class="paym ${PAY_METHOD===m.id?'on':''}" onclick="setPayMethod('${m.id}')">
     <span>${m.icon}</span><b>${m.name}</b><small>${m.sub}</small></div>`).join('');
 }
@@ -5129,7 +5165,7 @@ async function createCoupon(){
   renderCouponRows();
 }
 async function renderCouponRows(){
-  const tb=$('couponRows'); if(!tb)return;
+  const tb=document.getElementById('couponRows'); if(!tb)return;
   tb.innerHTML='<tr><td colspan="7" style="padding:10px 8px;font-size:12.5px;color:var(--slate-l)">Loading…</td></tr>';
   const {data,error}=await sb.from('coupons').select('*').order('created_at',{ascending:false});
   if(error){tb.innerHTML=`<tr><td colspan="7" style="padding:10px 8px;font-size:12.5px;color:var(--slate-l)">⚠ Could not load coupons: ${esc(error.message)}</td></tr>`;return;}
@@ -5539,7 +5575,7 @@ async function uploadCmsImage(key,file){
   }
 }
 function renderContentImageFields(){
-  const wrap=$('contentImageFields'); if(!wrap)return; wrap.innerHTML='';
+  const wrap=document.getElementById('contentImageFields'); if(!wrap)return; wrap.innerHTML='';
   Object.keys(CONTENT_IMAGE_LABELS).forEach(k=>{
     const row=document.createElement('div');
     row.style.cssText='display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px';
@@ -6390,8 +6426,8 @@ async function migrateLegacyContentImages(){
   if(changed){
     console.warn('Migrated legacy base64 images out of site content — re-saving.');
     saveContent(); applyContent();
-    if($('rte-publish'))$('rte-publish').innerHTML=CONTENT.publishBody;
-    if($('rte-isbn'))$('rte-isbn').innerHTML=CONTENT.isbnBody;
+    if(document.getElementById('rte-publish'))$('rte-publish').innerHTML=CONTENT.publishBody;
+    if(document.getElementById('rte-isbn'))$('rte-isbn').innerHTML=CONTENT.isbnBody;
   }
 }
 async function onPostHeroUpload(file){
@@ -6462,7 +6498,7 @@ function deletePost(id){if(!confirm('Delete this post permanently?'))return;
   POSTS=POSTS.filter(p=>p.id!==id);saveJSON('cms_posts',POSTS);cmsSet('posts',POSTS);
   if(_editingPostId===id)resetPostEditor();
   renderJournalAdmin();toast('Post deleted');}
-function renderJournalAdmin(){const wrap=$('jpPostRows');if(!wrap)return;wrap.innerHTML='';
+function renderJournalAdmin(){const wrap=document.getElementById('jpPostRows');if(!wrap)return;wrap.innerHTML='';
   if(!POSTS.length){wrap.innerHTML='<p style="font-size:13px;color:#86868B">No posts yet.</p>';return}
   POSTS.forEach(p=>{const row=document.createElement('div');row.className='jp-row';
     const thumb=p.hero?`<img src="${p.hero}" style="width:52px;height:38px;object-fit:cover;border-radius:6px;flex:0 0 auto">`
@@ -6643,7 +6679,7 @@ function renderGallery(){
   }
 }
 function renderGalAdmin(){
-  const wrap=$('galAdminRows'); if(!wrap)return; wrap.innerHTML='';
+  const wrap=document.getElementById('galAdminRows'); if(!wrap)return; wrap.innerHTML='';
   GALLERY.forEach(img=>{
     const photoCount=(img.images||[]).length;
     const tile=document.createElement('div');
@@ -6757,7 +6793,7 @@ async function uploadPhotoServiceImage(si,ii,file){
   }
 }
 function renderPhotoServicesAdmin(){
-  const wrap=$('photoServicesAdminRows'); if(!wrap)return; wrap.innerHTML='';
+  const wrap=document.getElementById('photoServicesAdminRows'); if(!wrap)return; wrap.innerHTML='';
   PHOTO_SERVICES.forEach((section,si)=>{
     const card=document.createElement('div');
     card.style.cssText='border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px';
@@ -6946,7 +6982,7 @@ function removeClientName(sectionIndex,nameIndex){
   saveClients(); renderClientsAdmin();
 }
 function renderClientsAdmin(){
-  const wrap=$('clientsAdminRows'); if(!wrap)return; wrap.innerHTML='';
+  const wrap=document.getElementById('clientsAdminRows'); if(!wrap)return; wrap.innerHTML='';
   CLIENTS.forEach((section,si)=>{
     const card=document.createElement('div');
     card.style.cssText='border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px';
@@ -7044,7 +7080,7 @@ function openPost(p,push){
   const tt=document.querySelector('meta[name="twitter:title"]'); if(tt)tt.setAttribute('content',pageTitle);
   const td=document.querySelector('meta[name="twitter:description"]'); if(td)td.setAttribute('content',excerpt);
   const ti=document.querySelector('meta[name="twitter:image"]'); if(ti)ti.setAttribute('content',heroImg);
-  const canon=document.querySelector('link[rel="canonical"]'); if(canon)canon.setAttribute('href','https://www.binder.co.in/journal/'+slugPath);
+  const canon=canonLink(); if(canon)canon.setAttribute('href','https://www.binder.co.in/journal/'+slugPath);
   setPageSchema([buildPostSchema(p,slugPath),buildBreadcrumbSchema([{name:'Home',url:'https://www.binder.co.in/'},{name:'Kagaz Journal',url:'https://www.binder.co.in/journal'},{name:p.title,url:'https://www.binder.co.in/journal/'+slugPath}])]);
 }
 
@@ -7206,7 +7242,7 @@ cmsLoadAll().then((fetched)=>{
   const sbCustomTemplates=fetched.custom_templates;
   if(sbCustomTemplates&&Array.isArray(sbCustomTemplates)&&sbCustomTemplates.length){
     CUSTOM_TEMPLATES=sbCustomTemplates; renderTemplatesPageV2();
-    if($('ap-templates')&&$('ap-templates').style.display!=='none')renderCustomTemplatesAdmin();
+    if(document.getElementById('ap-templates')&&$('ap-templates').style.display!=='none')renderCustomTemplatesAdmin();
   }
 
   const sbSiteCfg=fetched.site_cfg;
@@ -7219,7 +7255,7 @@ cmsLoadAll().then((fetched)=>{
   if(sbSeomoat){
     SEOMOAT={...seomoatDefaults(),...sbSeomoat};
     if(!Array.isArray(SEOMOAT.topics)||!SEOMOAT.topics.length)SEOMOAT.topics=JSON.parse(JSON.stringify(SEOMOAT_TOPICS_DEFAULT));
-    if($('ap-seomoat')&&$('ap-seomoat').style.display!=='none')renderSeoMoat();
+    if(document.getElementById('ap-seomoat')&&$('ap-seomoat').style.display!=='none')renderSeoMoat();
   }
 });
 
@@ -7230,10 +7266,20 @@ cmsLoadAll().then((fetched)=>{
 // Admin → Templates → Edit layout opens these same editors, to template editing too, with no
 // separate wiring needed there. Wired once, here, rather than per-render, since .stage-scroll is
 // a static element in the page's own HTML (only its contents get rebuilt on every ed.renderAll()).
-document.querySelectorAll('.stage-scroll').forEach(stageScroll=>{
+function wireStageScroll(){document.querySelectorAll('.stage-scroll').forEach(stageScroll=>{
+  if(stageScroll.dataset.wired)return; stageScroll.dataset.wired='1';
   const edStage=stageScroll.closest('.ed-stage'); if(!edStage)return;
   stageScroll.addEventListener('click',e=>{
     const insideCanvas=e.target.closest('.spread,.book-page,.artboard');
     edStage.classList.toggle('markings-hidden',!insideCanvas);
   });
-});
+});}
+// Wiring for elements inside the private UI. Runs at boot if it is already mounted (/admin,
+// /dashboard, /editor/…), otherwise the moment mountPrivate() inserts it.
+function afterPrivateMount(){
+  wireStageScroll(); wireManuscriptInputs(); buildRteToolbars();
+  try{applyContent();}catch(e){console.warn(e)}
+  try{applySiteCfgToPublicSite();}catch(e){console.warn(e)}
+}
+APP_BOOTED=true;
+if(PRIVATE_MOUNTED)afterPrivateMount();

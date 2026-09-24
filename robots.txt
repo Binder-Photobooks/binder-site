@@ -5,3 +5,4 @@ Disallow: /dashboard
 Disallow: /editor/
 
 Sitemap: https://www.binder.co.in/sitemap.xml
+Sitemap: https://www.binder.co.in/sitemap-content.xml

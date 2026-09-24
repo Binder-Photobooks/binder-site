@@ -7,7 +7,8 @@ Plain static site, split into separate files for easier maintenance:
 - `script.js` — all app logic (editors, cart, admin, checkout, etc.)
 - `images/` — the photos used on the homepage (hero + product cards)
 
-No build step. External libraries (Supabase JS, jsPDF, html2canvas, heic2any,
+No build step, but after editing `index.html` run `node scripts/prerender.mjs` to regenerate
+the per-page HTML files (see **[SEO-CHANGES.md](./SEO-CHANGES.md)**). External libraries (Supabase JS, jsPDF, html2canvas, heic2any,
 mammoth, Razorpay) load from CDN at runtime, same as before.
 
 ## Deploy & maintain
