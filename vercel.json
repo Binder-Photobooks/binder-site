@@ -3,27 +3,56 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
-    { "source": "/(.*)", "has": [{ "type": "host", "value": "binder.co.in" }], "destination": "https://www.binder.co.in/$1", "permanent": true },
-    { "source": "/index", "destination": "/", "permanent": true }
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "binder.co.in"
+        }
+      ],
+      "destination": "https://www.binder.co.in/$1",
+      "permanent": true
+    },
+    {
+      "source": "/index",
+      "destination": "/",
+      "permanent": true
+    }
   ],
   "rewrites": [
-    { "source": "/sitemap-content.xml", "destination": "https://sooqtzedurtjiisjdmbz.supabase.co/functions/v1/sitemap" },
-    { "source": "/((?!images/|.*\\.[a-zA-Z0-9]+$).*)", "destination": "/app.html" }
+    {
+      "source": "/((?!images/|.*\\.[a-zA-Z0-9]+$).*)",
+      "destination": "/app.html"
+    }
   ],
   "headers": [
     {
       "source": "/(index.html|script.js|styles.css|sitemap.xml|robots.txt)",
       "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
       ]
     },
     {
       "source": "/(admin|dashboard|app)(.*)",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     },
     {
       "source": "/editor/(.*)",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     }
   ]
 }

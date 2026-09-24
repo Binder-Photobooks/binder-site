@@ -6,10 +6,10 @@
 // receiving the homepage's HTML and relying on JavaScript to fix it afterwards.
 //
 // Also writes:
-//   app.html     — the shell Vercel serves for dynamic URLs (/store/<slug>, /journal/<slug>,
+//   app.html     — the shell the server returns for dynamic URLs (/store/<slug>, /journal/<slug>,
 //                  /admin, /editor/…). It has no canonical tag, so it never tells Google that
 //                  a product or post "is really the homepage"; script.js adds the right one.
-//   sitemap.xml  — the fixed pages, regenerated from the list below.
+//   sitemap.xml  — the fixed pages below plus every store product and journal post (from Supabase).
 //
 // Page titles/descriptions are read from SEO_META and START_SEO in script.js, and start-page
 // copy from CONTENT_DEFAULTS — so there is still exactly one place to edit each of them.
@@ -157,17 +157,41 @@ for (const page of PAGES) {
   written.push(file);
 }
 
-// App shell for dynamic routes: no canonical, no og:url; script.js sets both per page.
+// App shell for dynamic routes (/store/<slug>, /journal/<slug>, /admin, /editor/…) — served by
+// .htaccess rule 5. No canonical, no og:url; script.js sets both per page.
 let app = template.replace(/\s*<link rel="canonical"[^>]*>/, '').replace(/\s*<meta property="og:url"[^>]*>/, '');
 fs.writeFileSync(path.join(ROOT, 'app.html'), app);
 written.push('app.html');
 
-// Sitemap of the fixed pages. Store products and journal posts are listed separately, live,
-// by the Supabase `sitemap` function, served at /sitemap-content.xml (see vercel.json).
+// Sitemap: the fixed pages above, plus every Store product and Kagaz Journal post, read live
+// from Supabase (the same public `cms` rows the site itself reads). If Supabase can't be reached,
+// the fixed pages are still written and a warning is printed — re-run when you're online.
 const today = new Date().toISOString().slice(0, 10);
+const day = v => { const d = new Date(v || ''); return isNaN(d) ? today : d.toISOString().slice(0, 10); };
+const urls = PAGES.map(p => [SITE + p.path, today, p.freq, p.pri]);
+try {
+  const sUrl = js.match(/const SUPABASE_URL='([^']+)'/)?.[1];
+  const sKey = js.match(/const SUPABASE_KEY='([^']+)'/)?.[1];
+  if (!sUrl || !sKey) throw new Error('SUPABASE_URL / SUPABASE_KEY not found in script.js');
+  const res = await fetch(`${sUrl}/rest/v1/cms?select=key,value,updated_at&key=in.(catalog,posts)`, { headers: { apikey: sKey } });
+  if (!res.ok) throw new Error('Supabase responded ' + res.status);
+  const rows = await res.json();
+  const row = k => rows.find(r => r.key === k) || {};
+  const catalog = row('catalog'), posts = row('posts');
+  for (const p of Array.isArray(catalog.value) ? catalog.value : []) {
+    const slug = p?.slug || p?.id; if (slug) urls.push([`${SITE}/store/${encodeURIComponent(slug)}`, day(catalog.updated_at), 'weekly', '0.7']);
+  }
+  for (const p of Array.isArray(posts.value) ? posts.value : []) {
+    const slug = p?.slug || p?.id; if (slug) urls.push([`${SITE}/journal/${encodeURIComponent(slug)}`, day(p.updatedISO || p.updated || p.dateISO || p.date), 'monthly', '0.6']);
+  }
+  console.log(`prerender: sitemap includes ${urls.length - PAGES.length} store products / journal posts`);
+} catch (e) {
+  console.warn('prerender: WARNING — could not load products/posts from Supabase (' + e.message + '). sitemap.xml lists the fixed pages only.');
+}
+const xmlEsc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${PAGES.map(p => `  <url><loc>${SITE}${p.path}</loc><lastmod>${today}</lastmod><changefreq>${p.freq}</changefreq><priority>${p.pri}</priority></url>`).join('\n')}
+${urls.map(([loc, mod, f, pr]) => `  <url><loc>${xmlEsc(loc)}</loc><lastmod>${mod}</lastmod><changefreq>${f}</changefreq><priority>${pr}</priority></url>`).join('\n')}
 </urlset>
 `;
 fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), xml);

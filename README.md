@@ -13,6 +13,8 @@ mammoth, Razorpay) load from CDN at runtime, same as before.
 
 ## Deploy & maintain
 
+**Live hosting is a Linux shared host, not Vercel — see [UPLOAD-TO-HOST.md](./UPLOAD-TO-HOST.md).**
+
 See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for the full path: first deploy,
 DNS at bagful.net, and how to make changes safely afterward.
 
