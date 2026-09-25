@@ -197,8 +197,9 @@ function go(v,push){
   if(push!==false)setPath(pathForView(v));
   if(v==='journal')renderBlog(); if(v==='store')renderStore(); if(v==='clients')renderClients(); if(v==='gallery')renderGallery();
   if(v==='templates')renderTemplatesPageV2();
+  if(v==='home'&&typeof fitHeroHeading==='function')requestAnimationFrame(fitHeroHeading);
   if(v==='dashboard')renderCustomerDashboard();
-  if(v==='scanning'){const vid=$('scanHeroVideo');if(vid){vid.style.display='block';$('scanHeroStill').style.display='none';vid.currentTime=0;vid.play().catch(()=>{});}}
+  if(v==='scanning'){const vid=$('scanHeroVideo');if(vid){attachScanVideo(vid);if(vid.style.display!=='none'||!vid.dataset.imageMode){vid.style.display='block';$('scanHeroStill').style.display='none';vid.currentTime=0;vid.play().catch(()=>{});}}}
 }
 /* ================= "BEFORE YOU START" FORMAT PAGES =================
    One page per format (Photobook / Trade Book / Art Prints) that a visitor lands
@@ -303,17 +304,17 @@ function renderStartPage(key){
     ${key==='photobook'?`
     <h4 style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-l);font-weight:700;margin-bottom:14px">Choose a size</h4>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:32px;max-width:960px">
-      <div style="border:1px solid var(--line);border-radius:14px;padding:26px;display:flex;flex-direction:column">
+      <div style="padding:4px 0 0;display:flex;flex-direction:column">
         <h3 style="font-size:19px;margin-bottom:6px">8.5″ × 8.5″</h3>
         <p style="font-size:14px;color:var(--slate);line-height:1.5;margin-bottom:20px">Our original layflat photobook. From ₹2,200/copy, 20 pages included.</p>
         <button class="btn btn-accent sm" style="margin-top:auto" onclick="openEditor('photobook')">Start 8.5″×8.5″ →</button>
       </div>
-      <div style="border:1px solid var(--line);border-radius:14px;padding:26px;display:flex;flex-direction:column">
+      <div style="padding:4px 0 0;display:flex;flex-direction:column">
         <h3 style="font-size:19px;margin-bottom:6px">12″ × 12″</h3>
         <p style="font-size:14px;color:var(--slate);line-height:1.5;margin-bottom:20px">A larger format for bigger, bolder spreads. From ₹4,200/copy, 20 pages included. Hardbound or softbound, same price.</p>
         <button class="btn btn-accent sm" style="margin-top:auto" onclick="openEditor('photobook12')">Start 12″×12″ →</button>
       </div>
-      <div style="border:1px solid var(--line);border-radius:14px;padding:26px;display:flex;flex-direction:column">
+      <div style="padding:4px 0 0;display:flex;flex-direction:column">
         <h3 style="font-size:19px;margin-bottom:6px">12″ × 18″</h3>
         <p style="font-size:14px;color:var(--slate);line-height:1.5;margin-bottom:20px">Our largest format, for a real coffee-table statement piece. Switch between portrait and landscape right in the editor. From ₹6,300/copy, 20 pages included. Hardbound or softbound, same price.</p>
         <button class="btn btn-accent sm" style="margin-top:auto" onclick="openEditor('photobook18')">Start 12″×18″ →</button>
@@ -2440,14 +2441,16 @@ async function pollRenderStatus(orderId, onUpdate){
   };
   poll();
 }
-/* ---------- Editor light/dark theme ---------- */
+/* ---------- Editor light/dark theme ----------
+   Dark by default for every editor (photobooks, trade book, art prints). A customer who switches
+   to light mode keeps that choice (stored in localStorage as binder_ed_theme). */
 function applyEditorTheme(){
-  const dark=loadJSON('binder_ed_theme','light')==='dark';
+  const dark=loadJSON('binder_ed_theme','dark')==='dark';
   document.querySelectorAll('.ed-root').forEach(r=>r.classList.toggle('ed-dark',dark));
   document.querySelectorAll('.ed-theme-btn').forEach(b=>{b.innerHTML=dark?`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="3" stroke="#52B57D" stroke-width="1.7"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.1 3.1l1.4 1.4M11.5 11.5l1.4 1.4M11.5 3.1l-1.4 1.4M4.5 11.5l-1.4 1.4" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round"/></svg>`:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;b.title=dark?'Switch to light mode':'Switch to dark mode';});
 }
 function toggleEditorTheme(){
-  const next=loadJSON('binder_ed_theme','light')==='dark'?'light':'dark';
+  const next=loadJSON('binder_ed_theme','dark')==='dark'?'light':'dark';
   saveJSON('binder_ed_theme',next);
   applyEditorTheme();
 }
@@ -3754,7 +3757,7 @@ const CONTENT_DEFAULTS={
   startArtprintsIntro:'Everything worth knowing before you pick your four images — print size, paper, and how orientation and cropping work.',
   storeBooksTagline:'',
   storePhotoTagline:'Loose prints and framing-ready editions, pulled on 300gsm archival stock.',
-  heroHeading:"It's your moment, live it.",
+  heroHeading:"It's your moment, save it.",
   heroBody:'A publishing platform for everyone. Publish photobooks, novel-grade trade books, and gallery art prints, all professional grade.',
   publishHeading:'The basics of Binder photobooks',
   publishBody:'<p>Every Binder book is printed on 250gsm matte art paper, bound layflat, and colour-checked before it ships. We work in small batches out of Delhi, so every order gets a proof review before it goes to press.</p>',
@@ -5880,14 +5883,21 @@ async function uploadScanHeroImage(file){
     _scanHeroImgUploading=false;
   }
 }
+// The scanning hero video is large, so it is only downloaded when the Scanning page is actually
+// shown — the markup carries it in data-src with preload="none" (it sits in a hidden section on
+// every other page).
+function attachScanVideo(vid){
+  if(vid&&vid.dataset.src&&vid.getAttribute('src')!==vid.dataset.src){vid.preload='auto';vid.src=vid.dataset.src;}
+}
+function onScanningView(){ const s=document.getElementById('view-scanning'); return !!(s&&s.classList.contains('active')); }
 function loadScanHeroImage(){
   if(CONTENT.scanHeroImageUrl&&$('scanHeroImage')){
     const vid=$('scanHeroVideo');
     if(isVideoUrl(CONTENT.scanHeroImageUrl)){
-      if(vid){vid.src=CONTENT.scanHeroImageUrl;vid.style.display='block';vid.currentTime=0;vid.play().catch(()=>{});}
+      if(vid){vid.dataset.src=CONTENT.scanHeroImageUrl;delete vid.dataset.imageMode;vid.style.display='block';if(onScanningView()){attachScanVideo(vid);vid.currentTime=0;vid.play().catch(()=>{});}}
       $('scanHeroImage').style.display='none';
     }else{
-      if(vid)vid.style.display='none';
+      if(vid){vid.style.display='none';vid.dataset.imageMode='1';delete vid.dataset.src;vid.removeAttribute('src');}
       $('scanHeroImage').src=CONTENT.scanHeroImageUrl;$('scanHeroImage').style.display='block';
     }
     $('scanHeroPlaceholder').style.display='none';
@@ -7281,5 +7291,20 @@ function afterPrivateMount(){
   try{applyContent();}catch(e){console.warn(e)}
   try{applySiteCfgToPublicSite();}catch(e){console.warn(e)}
 }
+// Keep the homepage headline on a single line on every screen: CSS sizes it for the default
+// headline; if a longer one is set in Admin → Content Manager, shrink it until it fits.
+function fitHeroHeading(){
+  const h=document.querySelector('.hero h1'); if(!h||!h.offsetParent)return;
+  h.style.fontSize='';
+  let fs=parseFloat(getComputedStyle(h).fontSize), guard=0;
+  while(h.scrollWidth>h.clientWidth+1&&fs>14&&guard++<60){fs-=1;h.style.fontSize=fs+'px';}
+}
+(()=>{const h=document.querySelector('.hero h1'); if(!h)return;
+  let raf=0; const queue=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(fitHeroHeading);};
+  window.addEventListener('resize',queue);
+  new MutationObserver(queue).observe(h,{childList:true,characterData:true,subtree:true});
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(queue);
+  queue();
+})();
 APP_BOOTED=true;
 if(PRIVATE_MOUNTED)afterPrivateMount();

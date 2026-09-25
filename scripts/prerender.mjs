@@ -94,7 +94,12 @@ function setHead(html, { title, desc, url, image, ld }) {
   if (ld) html = html.replace(ldTag, `<script type="application/ld+json" id="ldPage">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>`);
   return html;
 }
+// Homepage hero image: high priority on "/" only. On every other page it sits in a hidden section,
+// so make it lazy there and the browser never downloads it.
+const HERO_EAGER = 'id="heroImage" src="/images/img-hero.jpg" alt="Binder photobooks, trade books, and art prints" loading="eager" fetchpriority="high"';
+const heroLazy = html => html.replace(HERO_EAGER, 'id="heroImage" src="/images/img-hero.jpg" alt="Binder photobooks, trade books, and art prints" loading="lazy" decoding="async"');
 function setActiveView(html, viewId) {
+  html = heroLazy(html);
   html = html.replace('<section class="view active" id="view-home">', '<section class="view" id="view-home">');
   const tag = `<section class="view" id="view-${viewId}">`;
   if (!html.includes(tag)) throw new Error('prerender: view not found: ' + viewId);
@@ -128,6 +133,7 @@ function startPageHtml(key) {
 // ---------- build ----------
 const template = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 if (!template.includes('<section class="view active" id="view-home">')) throw new Error('prerender: index.html must have view-home active');
+if (!template.includes(HERO_EAGER)) console.warn('prerender: WARNING — homepage hero <img> markup changed; update HERO_EAGER in this script.');
 const written = [];
 
 for (const page of PAGES) {
@@ -159,7 +165,7 @@ for (const page of PAGES) {
 
 // App shell for dynamic routes (/store/<slug>, /journal/<slug>, /admin, /editor/…) — served by
 // .htaccess rule 5. No canonical, no og:url; script.js sets both per page.
-let app = template.replace(/\s*<link rel="canonical"[^>]*>/, '').replace(/\s*<meta property="og:url"[^>]*>/, '');
+let app = heroLazy(template).replace(/\s*<link rel="canonical"[^>]*>/, '').replace(/\s*<meta property="og:url"[^>]*>/, '');
 fs.writeFileSync(path.join(ROOT, 'app.html'), app);
 written.push('app.html');
 

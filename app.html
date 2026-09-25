@@ -24,8 +24,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://sooqtzedurtjiisjdmbz.supabase.co">
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap" rel="stylesheet"></noscript>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js" defer></script>
 <script type="application/ld+json" id="ldBusiness">
 {
   "@context": "https://schema.org",
@@ -52,7 +54,7 @@
 }
 </script>
 <script type="application/ld+json" id="ldPage"></script>
-<link rel="stylesheet" href="/styles.css?v=20260823a">
+<link rel="stylesheet" href="/styles.css?v=20260925b">
 </head>
 <body>
 <!-- ============ NAV ============ -->
@@ -90,9 +92,9 @@
 <!-- ============ HOME ============ -->
 <section class="view active" id="view-home">
   <div class="hero">
-    <img id="heroLogo" src="/images/hero-mark.png" alt="Binder" style="height:58px;margin:6px auto 20px;display:block;opacity:.92">
+    <img id="heroLogo" src="/images/hero-mark.png" alt="Binder" style="height:58px;margin:6px auto 20px;display:block;opacity:.92" loading="lazy" decoding="async">
     <span class="tag" style="color:rgba(0,0,0,.6)">Photobooks · Trade Books · Art Prints</span>
-    <h1 data-c="heroHeading">It's your moment, live it.</h1>
+    <h1 data-c="heroHeading">It's your moment, save it.</h1>
     <p data-c="heroBody">Publish professional grade photobooks, novel-kind books, and art prints.</p>
     <div class="hero-cta">
       <button class="btn btn-accent" onclick="goStart('photobook')">Publish a Photobook →</button>
@@ -103,13 +105,13 @@
   <div class="hero-image-wrap">
     <p style="text-align:center;font-size:15px;font-weight:700;letter-spacing:.02em;color:var(--accent);margin:0 0 14px">390,000+ books printed and published</p>
     <video id="heroVideo" muted playsinline preload="auto" style="display:none"></video>
-    <img id="heroImage" src="/images/img-hero.jpg" alt="Binder photobooks, trade books, and art prints" loading="eager" fetchpriority="high">
+    <img id="heroImage" src="/images/img-hero.jpg" alt="Binder photobooks, trade books, and art prints" loading="lazy" decoding="async">
   </div>
 
   <div class="tri-grid">
-    <div class="tri-card"><video data-c-img-video="tradebookTileImageUrl" class="tri-card-img" muted loop playsinline preload="auto" style="display:none"></video><img data-c-img="tradebookTileImageUrl" src="/images/img-3.jpg" alt="Trade Book" class="tri-card-img"><h3 data-c="tradebookTileTitle">Trade Book</h3><p data-c="tradebookTileDesc">5.5″ × 8″ novel-format books. Monochrome imagery, vector text, classic serif typography.</p><button class="btn btn-ghost sm" onclick="goStart('tradebook')">Learn more →</button></div>
-    <div class="tri-card"><video data-c-img-video="photobookTileImageUrl" class="tri-card-img" muted loop playsinline preload="auto" style="display:none"></video><img data-c-img="photobookTileImageUrl" src="/images/img-4.jpg" alt="Photobook" class="tri-card-img"><h3 data-c="photobookTileTitle">Photobook</h3><p data-c="photobookTileDesc">8.5″ × 8.5″ layflat books. Free-form layout, AI auto-arrange, rich text with any Google Font.</p><button class="btn btn-ghost sm" onclick="goStart('photobook')">Learn more →</button></div>
-    <div class="tri-card"><video data-c-img-video="artprintsTileImageUrl" class="tri-card-img" muted loop playsinline preload="auto" style="display:none"></video><img data-c-img="artprintsTileImageUrl" src="/images/img-5.jpg" alt="Art Prints" class="tri-card-img"><h3 data-c="artprintsTileTitle">Art Prints</h3><p data-c="artprintsTileDesc">6″ × 4″ gallery prints. Four museum-style prints on archival grade paper.</p><button class="btn btn-ghost sm" onclick="goStart('artprints')">Learn more →</button></div>
+    <div class="tri-card"><video data-c-img-video="tradebookTileImageUrl" class="tri-card-img" muted loop playsinline preload="auto" style="display:none"></video><img data-c-img="tradebookTileImageUrl" src="/images/img-3.jpg" alt="Trade Book" class="tri-card-img" loading="lazy" decoding="async"><h3 data-c="tradebookTileTitle">Trade Book</h3><p data-c="tradebookTileDesc">5.5″ × 8″ novel-format books. Monochrome imagery, vector text, classic serif typography.</p><button class="btn btn-ghost sm" onclick="goStart('tradebook')">Learn more →</button></div>
+    <div class="tri-card"><video data-c-img-video="photobookTileImageUrl" class="tri-card-img" muted loop playsinline preload="auto" style="display:none"></video><img data-c-img="photobookTileImageUrl" src="/images/img-4.jpg" alt="Photobook" class="tri-card-img" loading="lazy" decoding="async"><h3 data-c="photobookTileTitle">Photobook</h3><p data-c="photobookTileDesc">8.5″ × 8.5″ layflat books. Free-form layout, AI auto-arrange, rich text with any Google Font.</p><button class="btn btn-ghost sm" onclick="goStart('photobook')">Learn more →</button></div>
+    <div class="tri-card"><video data-c-img-video="artprintsTileImageUrl" class="tri-card-img" muted loop playsinline preload="auto" style="display:none"></video><img data-c-img="artprintsTileImageUrl" src="/images/img-5.jpg" alt="Art Prints" class="tri-card-img" loading="lazy" decoding="async"><h3 data-c="artprintsTileTitle">Art Prints</h3><p data-c="artprintsTileDesc">6″ × 4″ gallery prints. Four museum-style prints on archival grade paper.</p><button class="btn btn-ghost sm" onclick="goStart('artprints')">Learn more →</button></div>
   </div>
 
   <!-- ── FAQ ──────────────────────────────────────── -->
@@ -184,7 +186,7 @@
   <p class="lead" data-c="photographyIntro">Specialist photography across four disciplines — browse a category to see the work.</p>
   <div class="ps-lead-wrap" id="psLeadWrap" style="display:none">
     <video id="psLeadVideo" class="ps-lead-img" muted loop playsinline preload="auto" style="display:none"></video>
-    <img id="psLeadImage" class="ps-lead-img" alt="Featured photography work">
+    <img id="psLeadImage" class="ps-lead-img" alt="Featured photography work" loading="lazy" decoding="async">
     <div class="ps-lead-caption">
       <span>Featured</span>
       <h2 data-c="photographyLeadCaption">Recent work across architecture, editorial, and corporate photography</h2>
@@ -262,7 +264,7 @@
   <h1 data-c="isbnTitle">Free ISBN | 5 easy steps</h1>
   <div style="overflow:hidden;margin:24px 0 34px;max-width:70ch">
     <video data-c-img-video="isbnImageUrl" muted loop playsinline preload="auto" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:none"></video>
-    <img data-c-img="isbnImageUrl" src="/images/img-6.jpg" alt="Trade book back cover with ISBN barcode" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block">
+    <img data-c-img="isbnImageUrl" src="/images/img-6.jpg" alt="Trade book back cover with ISBN barcode" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block" loading="lazy" decoding="async">
   </div>
   <div data-c="isbnBody" data-c-html="1" style="font-size:17px;line-height:1.75;color:var(--text);max-width:70ch"></div>
   <a href="https://isbn.gov.in/" target="_blank" rel="noopener" class="btn btn-accent" style="margin-top:28px">Go to isbn.gov.in →</a>
@@ -416,14 +418,14 @@
     <video
       id="scanHeroVideo"
       class="scan-hero-img"
-      src="/images/scanning-hero.mp4"
+      data-src="/images/scanning-hero.mp4"
       autoplay
       muted
       playsinline
-      preload="auto"
+      preload="none"
       style="width:100%;height:100%;object-fit:cover;display:block"
     ></video>
-    <img id="scanHeroStill" alt="" style="display:none;width:100%;height:100%;object-fit:cover">
+    <img id="scanHeroStill" alt="" style="display:none;width:100%;height:100%;object-fit:cover" loading="lazy" decoding="async">
     <img id="scanHeroImage" alt="Binder Scanning Services" class="scan-hero-img" loading="eager" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" style="display:none">
     <div class="scan-hero-placeholder" id="scanHeroPlaceholder" style="display:none">
       <span></span>
@@ -506,7 +508,7 @@
   </div>
   <div style="display:flex;flex-direction:column;align-items:center;max-width:min(90vw,1100px)">
     <video id="photoLightboxVideo" controls playsinline style="max-width:100%;max-height:82vh;width:auto;height:auto;display:none;box-shadow:0 30px 80px rgba(0,0,0,.4)"></video>
-    <img id="photoLightboxImg" alt="" style="max-width:100%;max-height:82vh;width:auto;height:auto;display:block;box-shadow:0 30px 80px rgba(0,0,0,.4)">
+    <img id="photoLightboxImg" alt="" style="max-width:100%;max-height:82vh;width:auto;height:auto;display:block;box-shadow:0 30px 80px rgba(0,0,0,.4)" loading="lazy" decoding="async">
     <p id="photoLightboxCaption" style="color:#fff;font-size:14px;margin-top:16px;text-align:center;display:none"></p>
     <p id="lightboxCounter" style="color:rgba(255,255,255,.6);font-size:12px;margin-top:6px;text-align:center"></p>
   </div>
@@ -758,17 +760,17 @@
 
         <h4 style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-l);margin:0 0 12px">Homepage — Hero Image</h4>
         <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px">
-          <img alt="" id="heroPreviewAdmin" style="height:80px;border-radius:10px;object-fit:cover;display:none;border:1px solid var(--line)">
+          <img alt="" id="heroPreviewAdmin" style="height:80px;border-radius:10px;object-fit:cover;display:none;border:1px solid var(--line)" loading="lazy" decoding="async">
           <div>
             <input type="file" accept="image/*,video/*" id="heroUploadInput" style="display:none" onchange="uploadHeroImage(this.files[0])">
             <button class="btn btn-ghost sm" onclick="$('heroUploadInput').click()">Upload homepage hero image</button>
-            <p style="font-size:12px;color:var(--slate-l);margin-top:6px">This is the large image on the homepage, next to "It's your moment, live it." Recommended: 1600×1600px.</p>
+            <p style="font-size:12px;color:var(--slate-l);margin-top:6px">This is the large image on the homepage, next to "It's your moment, save it." Recommended: 1600×1600px.</p>
           </div>
         </div>
 
         <h4 style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-l);margin:26px 0 12px">Scanning Services — Hero Image</h4>
         <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px">
-          <img alt="" id="scanHeroPreviewAdmin" style="height:80px;border-radius:10px;object-fit:cover;display:none;border:1px solid var(--line)">
+          <img alt="" id="scanHeroPreviewAdmin" style="height:80px;border-radius:10px;object-fit:cover;display:none;border:1px solid var(--line)" loading="lazy" decoding="async">
           <div>
             <input type="file" accept="image/*,video/*" id="scanHeroUploadInput" style="display:none" onchange="uploadScanHeroImage(this.files[0])">
             <button class="btn btn-ghost sm" onclick="$('scanHeroUploadInput').click()">Upload scanning hero image</button>
@@ -887,7 +889,7 @@
         <input type="file" accept="image/*,video/*" id="bpHeroUpload" style="display:none" onchange="onPostHeroUpload(this.files[0])">
         <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px">
           <button class="btn btn-ghost xs" onclick="$('bpHeroUpload').click()">Upload hero image</button>
-          <img alt="" id="bpHeroPreview" style="height:44px;border-radius:8px;display:none">
+          <img alt="" id="bpHeroPreview" style="height:44px;border-radius:8px;display:none" loading="lazy" decoding="async">
         </div>
         <div class="rte-tools" data-rte-for="post"></div>
         <div class="rte" id="rte-post" contenteditable="true"><p>Start writing…</p></div>
@@ -973,7 +975,7 @@
         </div>
 
         <h3 style="margin:0 0 4px">Authority Snapshot (DA · PA · CF · TF)</h3>
-        <p style="color:var(--slate-l);font-size:12.5px;line-height:1.5;margin-bottom:12px">Domain/Page Authority are Moz metrics; Citation/Trust Flow are Majestic's — this is exactly what Mangools licenses and displays under one dashboard, not a separate methodology of its own. Free checkers: <a href="https://moz.com/domain-analysis" target="_blank" rel="noopener">moz.com/domain-analysis</a> · <a href="https://mangools.com/free-seo-tools/website-authority-checker" target="_blank" rel="noopener">Mangools free authority checker</a>.</p>
+        <p style="color:var(--slate-l);font-size:12.5px;line-height:1.5;margin-bottom:12px">Domain/Page Authority are Moz metrics; Citation/Trust Flow are Majestic's — this is exactly what Mangools licenses and displays under one dashboard, not a separate methodology of its own. Free checkers: <a href="https://moz.com/domain-analysis" target="_blank" rel="nofollow noopener noreferrer">moz.com/domain-analysis</a> · <a href="https://mangools.com/siteprofiler" target="_blank" rel="nofollow noopener noreferrer">Mangools SiteProfiler</a>.</p>
         <div id="moatAuthorityChart" style="margin-bottom:10px"></div>
         <div id="moatAuthorityLog" style="margin-bottom:10px"></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:26px">
@@ -1034,7 +1036,7 @@
     <option value="Photographs & Fine Art">Photographs & Fine Art</option>
   </select>
   <input class="field" id="pfBadge" placeholder="Badge (optional)">
-  <img alt="" id="pfImgPreview" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:none;margin-bottom:8px">
+  <img alt="" id="pfImgPreview" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:none;margin-bottom:8px" loading="lazy" decoding="async">
   <input class="field" id="pfImgUrl" placeholder="Image URL (optional — or upload below)">
   <input type="file" accept="image/*,video/*" id="pfImgUpload" style="display:none" onchange="onProductImageUpload(this.files[0])">
   <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px">
@@ -1179,16 +1181,16 @@
 </div></div>
 
 <!-- ============ PHOTOBOOK EDITOR ============ -->
-<div class="ed-root" id="editor-photobook">
+<div class="ed-root ed-dark" id="editor-photobook">
   <div class="ed-top">
     <button class="icon-btn" onclick="navHome()" aria-label="Back to home"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85"></a>
+    <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85" loading="lazy" decoding="async"></a>
     <input class="title" id="pb-title" value="Untitled Photobook">
     <button class="icon-btn" id="pb-undoBtn" onclick="EDS.photobook.undo()" aria-label="Undo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H9.5a3.5 3.5 0 0 1 0 7H6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M3 6L6 3M3 6l3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="icon-btn" id="pb-redoBtn" onclick="EDS.photobook.redo()" aria-label="Redo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 6H6.5a3.5 3.5 0 0 0 0 7H10" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M13 6L10 3m3 3-3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="icon-btn" id="pb-gridBtn" title="Toggle layout grid" onclick="EDS.photobook.toggleGrid()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/></svg></button>
     <button class="icon-btn" id="pb-pnBtn" title="Toggle auto page numbers" onclick="EDS.photobook.togglePageNums()" style="font-size:10px;font-weight:700;font-family:serif;letter-spacing:-.02em">Pn</button>
-    <button class="icon-btn ed-theme-btn" title="Switch to dark mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn ed-theme-btn" title="Switch to light mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div id="pb-priceTag" style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;margin-left:4px;margin-right:2px">
       <span id="pb-priceMain" style="font-size:13px;font-weight:600;color:var(--text)">₹2,200/copy</span>
       <span id="pb-priceSub" style="font-size:10.5px;color:var(--slate-l)">20 pages · base price</span>
@@ -1219,16 +1221,16 @@
 </div>
 
 <!-- ============ PHOTOBOOK EDITOR (12x12) ============ -->
-<div class="ed-root" id="editor-photobook12">
+<div class="ed-root ed-dark" id="editor-photobook12">
   <div class="ed-top">
     <button class="icon-btn" onclick="navHome()" aria-label="Back to home"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85"></a>
+    <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85" loading="lazy" decoding="async"></a>
     <input class="title" id="pb12-title" value="Untitled Photobook (12×12)">
     <button class="icon-btn" id="pb12-undoBtn" onclick="EDS.photobook12.undo()" aria-label="Undo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H9.5a3.5 3.5 0 0 1 0 7H6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M3 6L6 3M3 6l3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="icon-btn" id="pb12-redoBtn" onclick="EDS.photobook12.redo()" aria-label="Redo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 6H6.5a3.5 3.5 0 0 0 0 7H10" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M13 6L10 3m3 3-3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="icon-btn" id="pb12-gridBtn" title="Toggle layout grid" onclick="EDS.photobook12.toggleGrid()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/></svg></button>
     <button class="icon-btn" id="pb12-pnBtn" title="Toggle auto page numbers" onclick="EDS.photobook12.togglePageNums()" style="font-size:10px;font-weight:700;font-family:serif;letter-spacing:-.02em">Pn</button>
-    <button class="icon-btn ed-theme-btn" title="Switch to dark mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn ed-theme-btn" title="Switch to light mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div id="pb12-priceTag" style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;margin-left:4px;margin-right:2px">
       <span id="pb12-priceMain" style="font-size:13px;font-weight:600;color:var(--text)">₹4,200/copy</span>
       <span id="pb12-priceSub" style="font-size:10.5px;color:var(--slate-l)">20 pages · base price</span>
@@ -1259,17 +1261,17 @@
 </div>
 
 <!-- ============ PHOTOBOOK EDITOR (12x18, portrait/landscape) ============ -->
-<div class="ed-root" id="editor-photobook18">
+<div class="ed-root ed-dark" id="editor-photobook18">
   <div class="ed-top">
     <button class="icon-btn" onclick="navHome()" aria-label="Back to home"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85"></a>
+    <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85" loading="lazy" decoding="async"></a>
     <input class="title" id="pb18-title" value="Untitled Photobook (12×18)">
     <button class="icon-btn" id="pb18-undoBtn" onclick="EDS.photobook18.undo()" aria-label="Undo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H9.5a3.5 3.5 0 0 1 0 7H6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M3 6L6 3M3 6l3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="icon-btn" id="pb18-redoBtn" onclick="EDS.photobook18.redo()" aria-label="Redo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 6H6.5a3.5 3.5 0 0 0 0 7H10" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M13 6L10 3m3 3-3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="icon-btn" id="pb18-gridBtn" title="Toggle layout grid" onclick="EDS.photobook18.toggleGrid()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/></svg></button>
     <button class="icon-btn" id="pb18-pnBtn" title="Toggle auto page numbers" onclick="EDS.photobook18.togglePageNums()" style="font-size:10px;font-weight:700;font-family:serif;letter-spacing:-.02em">Pn</button>
     <button class="icon-btn" id="pb18-orientBtn" title="Currently portrait — switch to landscape" onclick="EDS.photobook18.toggleOrientation()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4.5" y="1.5" width="7" height="13" rx="1.3" stroke="#52B57D" stroke-width="1.6"/><path d="M2 9.5l-1 1 1 1M14 9.5l1 1-1 1M1 10.5h2M13 10.5h2" stroke="#52B57D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <button class="icon-btn ed-theme-btn" title="Switch to dark mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn ed-theme-btn" title="Switch to light mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div id="pb18-priceTag" style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;margin-left:4px;margin-right:2px">
       <span id="pb18-priceMain" style="font-size:13px;font-weight:600;color:var(--text)">₹6,300/copy</span>
       <span id="pb18-priceSub" style="font-size:10.5px;color:var(--slate-l)">20 pages · base price</span>
@@ -1300,16 +1302,16 @@
 </div>
 
 <!-- ============ TRADE BOOK EDITOR ============ -->
-<div class="ed-root" id="editor-tradebook">
+<div class="ed-root ed-dark" id="editor-tradebook">
   <div class="ed-top">
     <button class="icon-btn" onclick="navHome()" aria-label="Back to home"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85"></a>
+    <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85" loading="lazy" decoding="async"></a>
     <input class="title" id="tb-title" value="Untitled Trade Book">
     <button class="icon-btn" id="tb-undoBtn" onclick="EDS.tradebook.undo()" aria-label="Undo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H9.5a3.5 3.5 0 0 1 0 7H6" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M3 6L6 3M3 6l3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="icon-btn" id="tb-redoBtn" onclick="EDS.tradebook.redo()" aria-label="Redo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 6H6.5a3.5 3.5 0 0 0 0 7H10" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round"/><path d="M13 6L10 3m3 3-3 3" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button class="icon-btn" id="tb-gridBtn" title="Toggle layout grid" onclick="EDS.tradebook.toggleGrid()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="#52B57D" stroke-width="1.6"/></svg></button>
     <button class="icon-btn" id="tb-pnBtn" title="Toggle auto page numbers" onclick="EDS.tradebook.togglePageNums()" style="font-size:10px;font-weight:700;font-family:serif;letter-spacing:-.02em">Pn</button>
-    <button class="icon-btn ed-theme-btn" title="Switch to dark mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn ed-theme-btn" title="Switch to light mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <span class="spacer"></span>
     <span style="font-size:12px;color:var(--slate-l)" id="tb-saveState"></span>
     <button class="btn btn-ghost sm" onclick="openMyDashboard()">My Dashboard</button>
@@ -1336,12 +1338,12 @@
 </div>
 
 <!-- ============ ART PRINTS EDITOR ============ -->
-<div class="ed-root" id="editor-artprints">
+<div class="ed-root ed-dark" id="editor-artprints">
   <div class="ed-top">
     <button class="icon-btn" onclick="navHome()" aria-label="Back to home"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85"></a>
+    <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85" loading="lazy" decoding="async"></a>
     <input class="title" id="ap-title" value="Untitled Art Print Set">
-    <button class="icon-btn ed-theme-btn" title="Switch to dark mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn ed-theme-btn" title="Switch to light mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div id="ap-priceTag" style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;margin-left:4px;margin-right:2px">
       <span id="ap-priceMain" style="font-size:13px;font-weight:600;color:var(--text)">₹800</span>
       <span id="ap-priceSub" style="font-size:10.5px;color:var(--slate-l)">set of 4 · 6″×4″</span>
@@ -1363,12 +1365,12 @@
 </div>
 
 <!-- ============ SINGLE ART PRINT (12x18) ============ -->
-<div class="ed-root" id="editor-artprint12x18">
+<div class="ed-root ed-dark" id="editor-artprint12x18">
   <div class="ed-top">
     <button class="icon-btn" onclick="navHome()" aria-label="Back to home"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85"></a>
+    <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85" loading="lazy" decoding="async"></a>
     <input class="title" id="ap12x18-title" value="Untitled 12×18 Art Print">
-    <button class="icon-btn ed-theme-btn" title="Switch to dark mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn ed-theme-btn" title="Switch to light mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div id="ap12x18-priceTag" style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;margin-left:4px;margin-right:2px">
       <span id="ap12x18-priceMain" style="font-size:13px;font-weight:600;color:var(--text)">₹2,800</span>
       <span id="ap12x18-priceSub" style="font-size:10.5px;color:var(--slate-l)">12″×18″ print</span>
@@ -1390,12 +1392,12 @@
 </div>
 
 <!-- ============ SINGLE ART PRINT (16x20) ============ -->
-<div class="ed-root" id="editor-artprint16x20">
+<div class="ed-root ed-dark" id="editor-artprint16x20">
   <div class="ed-top">
     <button class="icon-btn" onclick="navHome()" aria-label="Back to home"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3L5 8l5 5" stroke="#52B57D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85"></a>
+    <a href="/" onclick="navHome();return false;" class="ed-brand"><img src="/images/logo.png" alt="Binder" style="height:18px;display:block;opacity:.85" loading="lazy" decoding="async"></a>
     <input class="title" id="ap16x20-title" value="Untitled 16×20 Art Print">
-    <button class="icon-btn ed-theme-btn" title="Switch to dark mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="icon-btn ed-theme-btn" title="Switch to light mode" onclick="toggleEditorTheme()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 9A6 6 0 0 1 7 2.5a5.5 5.5 0 1 0 6.5 6.5z" stroke="#52B57D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div id="ap16x20-priceTag" style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;margin-left:4px;margin-right:2px">
       <span id="ap16x20-priceMain" style="font-size:13px;font-weight:600;color:var(--text)">₹4,200</span>
       <span id="ap16x20-priceSub" style="font-size:10.5px;color:var(--slate-l)">16″×20″ print</span>
@@ -1471,6 +1473,6 @@
 
 </template>
 
-<script src="/script.js?v=20260924a" defer></script>
+<script src="/script.js?v=20260925d" defer></script>
 </body>
 </html>

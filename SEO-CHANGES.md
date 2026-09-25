@@ -48,3 +48,41 @@ See **UPLOAD-TO-HOST.md** for the upload steps and the checks to run afterwards.
 Google Search Console: submit `sitemap.xml` (remove `sitemap-content.xml` if it was submitted); use URL Inspection on
    `/photobooks`, `/pricing` and `/isbn`, confirm "Google-selected canonical" matches each page,
    and request indexing.
+
+## Page speed (v8)
+
+- The Scanning page's 1.5 MB hero video was downloading on **every** page (it sits in a hidden
+  section with `preload="auto"`). It now loads only when the Scanning page is shown.
+- Every image outside the visible section is `loading="lazy"`, so hidden sections cost nothing; the
+  homepage hero image loads with high priority on `/` only.
+- Images recompressed (hero 436 KB → 187 KB, 1600 px wide; others 10–40% smaller).
+- Supabase library pinned to 2.117.1 and loaded with `defer` (it was render-blocking in `<head>`);
+  the Google Font loads without blocking first paint.
+- `.htaccess` turns on gzip/Brotli: HTML ~133 KB → ~25 KB, script.js ~475 KB → ~145 KB,
+  styles.css ~56 KB → ~13 KB over the wire. (Vercel compresses automatically.)
+
+Result: homepage goes from about 3.2 MB to about 0.6 MB transferred; other pages to about 0.25 MB.
+
+## Homepage headline (v9)
+
+"It's your moment, save it." stays on one line on every screen size: the font scales with the
+screen width (20–65 px, `styles.css`), and `fitHeroHeading()` in `script.js` shrinks it further if
+a longer headline is ever set in Admin → Content Manager. The built-in default headline now matches
+the live one ("save it.").
+
+## Photobooks page (v10)
+
+The three "Choose a size" options on /photobooks (8.5″×8.5″, 12″×12″, 12″×18″) no longer have
+border frames; they now sit flush with the rest of the page. The Art Prints size cards are unchanged.
+
+## Ready-to-go Templates page (v11)
+
+Template cards on /templates no longer have border frames or shadows: the thumbnail keeps its
+rounded corners, and the title, description and button line up with its left edge. (Styled only
+for the public page, `#tplGridV2`; the admin template list is unchanged.)
+
+## Editors dark by default (v12)
+
+All seven editors — Photobook 8.5″, 12″×12″, 12″×18″, Trade Book, Art Prints (set of 4),
+Art Print 12×18 and 16×20 — now open in dark mode. The sun/moon button still switches to light
+mode, and a customer's choice is remembered on their device.
